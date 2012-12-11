@@ -1,0 +1,106 @@
+
+## =============================================================================
+## text in 3D
+## =============================================================================
+# x, y, z, colvar: same length
+    
+text3D <- function(x, y, z, labels, colvar = NULL, ..., 
+                      phi = 40, theta = 40,
+                      col = NULL, NAcol = "white", 
+                      colkey = list(side = 4), 
+                      panel.first = NULL,
+                      clim = NULL, clab = NULL, bty = "f",
+                      add = FALSE, plot = TRUE) {
+
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+ # checks
+  x     <- as.vector(x)
+  y     <- as.vector(y)
+  z     <- as.vector(z)
+  
+  if (length(y) != length(x))
+    stop("'y' should have same length as 'x'")
+  if (length(z) != length(x))
+    stop("'z' should have same length as 'x'")
+  if (length(labels) != length(x))
+    stop("'labels' should have same length as 'x'")
+
+  dot <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist)
+
+ # colors   
+  if (ispresent(colvar)) {
+  
+    if (length(colvar) != length(x))
+      stop("'colvar' should have same length as 'x', 'y' and 'z'")
+
+    colvar <- as.vector(colvar)
+    
+    if (is.null(clim)) 
+      clim <- range(colvar, na.rm = TRUE)
+    
+    if (dot$clog) {
+      colvar <- log(colvar)
+      clim <- log(clim) 
+    }
+
+    if (is.null(col))
+      col <- jet.col(100)
+
+    iscolkey <- is.colkey(colkey, col)
+    if (iscolkey) 
+      colkey <- check.colkey(colkey)
+     
+    Col <- variablecol(colvar, col, NAcol, clim)
+    
+  } else {
+    if (is.null(col))
+      col <- "black"
+    Col <- rep(col, length.out = length(x))  
+    iscolkey <- FALSE
+  }
+  
+  if (is.null(plist)) {
+    do.call("perspbox", c(alist(x = range(x), y = range(y), 
+             z = range(z, na.rm = TRUE),
+             phi = phi, theta = theta, plot = plot, colkey = colkey, col = col), 
+             dot$persp))
+    plist <- getplist()
+  }
+    
+  if (is.function(panel.first)) 
+    panel.first(plist$mat)  
+
+ # sort labels according to view
+  Proj   <- project(x, y, z, plist)
+  setargs <- function(dot, default) {
+    if (is.null(dot)) 
+      rep(default, length.out = length(x))
+    else if (is.vector(dot) & length(dot) > 1)
+      stop("cannot use a vector for arguments of 'text3D'")
+    else 
+      rep(unlist(dot), length.out = length(x))  
+  }
+
+  tlist <- list(x    = x,
+                y    = y,
+                z    = z,                                  
+                labels  = labels,
+                col  = Col,
+                adj = setargs (dot$points$adj, 0),
+                cex = setargs (dot$points$cex, 1),
+                font = setargs(dot$points$font, 1),
+                proj = Proj)                 
+
+  if (iscolkey) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+                 
+  plist <- plot.struct.3D (plist, labels = tlist, plot = plot)        
+
+  setplist(plist)   
+  invisible(plist$mat)
+
+}

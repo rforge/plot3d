@@ -1,0 +1,5 @@
+require(plot3D)
+#spheresurf3D(full = FALSE)
+require(plot3D)
+Contour(z = Hypsometry$z, levels = 0)
+Image(Hypsometry$z, contour = list(levels = 0, col = "black"))

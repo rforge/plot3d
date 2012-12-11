@@ -1,0 +1,204 @@
+\name{3-D contours and images}
+\alias{contour3D}
+\alias{image3D}
+\title{
+ Images and contours in 3-D plots.
+}
+\description{
+  \code{conour3D} adds a \link{contour} in a 3-D plot. 
+  
+  \code{image3D} adds an \link{Image} in a 3-D plot. 
+}
+\usage{
+contour3D (x = NULL, y = NULL, z, colvar = z, 
+       ..., phi = 40, theta = 40,
+       col = NULL,  NAcol = "white", border = NA, facets = TRUE,
+       colkey = list(side = 4), resfac = 1,
+       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
+       inttype = 1, dDepth = 1e-1, add = FALSE, plot = TRUE)
+
+image3D (x = NULL, y = NULL, z, colvar = z, 
+      ..., phi = 40, theta = 40, 
+      col = NULL,  NAcol = "white", border = NA, facets = TRUE,
+      colkey = list(side = 4), resfac = 1, 
+      contour = FALSE, panel.first = NULL,
+      clim = NULL, clab = NULL, bty = "b",
+      inttype = 1, add = FALSE, plot = TRUE)
+}
+
+\arguments{
+  \item{z }{Matrix (2-D) or one value containing the values where the \link{Image} or
+    \link{Contour} is to be plotted. 
+    }
+  \item{x, y }{Vectors with x and y values. 
+    \code{x} should be of length equal to \code{nrow(colvar)} and 
+    \code{y} should be of length equal to \code{ncol(colvar)}. 
+    }
+  \item{colvar }{The variable used for coloring. If present, it should have the 
+    same dimension of \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
+    will toggle off coloration according to \code{colvar}. This gives good results
+    only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
+    }
+  \item{col }{Colors to be used for the \code{colvar} variable.
+    If \code{col} is \code{NULL} and \code{colvar} is specified, 
+    then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
+    If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
+    \code{col} will be "black". 
+    }
+  \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
+    }
+  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
+    Parameters should be one of 
+    \code{side, length, width, dist, shift, col.clab, cex.clab},
+    and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
+    lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    See \link{colkey}.
+    The default is to draw the color key on side = 4, i.e. in the right margin.
+    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
+    } 
+  \item{clab }{Only if \code{colkey = TRUE}, the label to be written on top of the
+    color key. The label will be written at the same level as the main title.
+    to lower it, \code{clab} can be made a vector, with the first values empty 
+    strings. 
+    } 
+  \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
+    for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
+    } 
+  \item{resfac }{Resolution factor, one value or a vector of two numbers, for 
+    the x and y- values respectively. A value > 1 will increase the 
+    resolution. For instance, if \code{resfac} equals \code{3} then for each 
+    adjacent pair of x- and y-values, z will be interpolated to two intermediary points. 
+    This uses simple linear interpolation. If \code{resfac} is one number then
+    the resolution will be increased similarly in x and y-direction.  
+    }
+  \item{theta, phi }{The angles defining the viewing direction. 
+    \code{theta} gives the azimuthal direction and \code{phi} the colatitude. 
+    see \link{persp}.
+    }
+  \item{border }{The color of the lines drawn around the surface facets.
+    The default, \code{NA}, will disable the drawing of borders.
+    }
+  \item{facets }{If \code{TRUE}, then \code{col} denotes the color of the surface facets. 
+    If \code{FALSE}, then the surface facets are colored ``white'' and the \code{border} 
+    (if \code{NA}) will be colored as specified by \code{col}. 
+    If \code{NA} then the facets will be transparent. 
+    It is usually faster to draw with \code{facets = FALSE}.
+    }
+  \item{contour }{If \code{TRUE}, a \link{contour} will be plotted at the bottom. 
+    Also allowed is to pass a \code{list} with arguments for the \link{contour} function,
+    in addition to the \code{side} where it should be plotted (optional). 
+    Allowed are a z-value, or \code{side = "zmin", "zmax", "z"},  for positioning at bottom, 
+    top or on the persp plot respectively. The default is to put the contour at the bottom.
+    }
+  \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
+    set up (and if applicable, images or contours drawn) but before any plotting takes place. 
+    This can be useful for drawing background grids or scatterplot smooths. 
+    The function should have as argument the transformation matrix, e.g. it should
+    be defined as \code{function(pmat)}. See example.
+    } 
+  \item{bty }{The type of the box, the default only drawing background panels.
+    Only effective if the \link{persp} 
+    argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
+    }
+  \item{inttype }{The interpolation type to create the polygons, either 
+    interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
+    values (\code{inttype = 2}) - see \link{persp3D}.
+    } 
+  \item{dDepth }{When a contour is added on an image, the image polygons may
+    hide some contour segments. To avoid that, the viewing depth of the segments
+    can be artificially decreased with the factor \code{dDepth} times the 
+    \link{persp} argument \code{expand} (usually = 1), to make them 
+    appear in front of the polygons. Too large values may create visible artifacts.
+    }   
+  \item{add }{Logical. If \code{TRUE}, then the contours will be added to the current plot.
+    If \code{FALSE} a new plot is started. 
+    } 
+  \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
+     otherwise the viewing transformation matrix is returned (as invisible). 
+  } 
+  \item{\dots}{additional arguments passed to the plotting methods. 
+    The following \link{persp} arguments can be specified: 
+    \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
+    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    In addition, the \link{perspbox} arguments
+    \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
+    also be given a value.
+    
+    For all functions, the arguments \code{lty, lwd} can be specified.
+    
+    The arguments after \dots must be matched exactly.
+    }
+}
+\details{
+  \code{image3D} calls the \link{persp3D} function. If z is one value, then
+  it is expanded as a matrix. 
+  
+}
+\note{
+  To make a \code{contour} to appear on top of an image, the viewing depth
+  of the contour segments is artificially decreased. in some cases this 
+  may produce slight artifacts.
+}
+\value{
+  Returns the viewing transformation matrix.
+  See \link{trans3D}
+}
+\seealso{
+  \link{persp3D} for the function on which \code{image3D} and \code{contour3D} are based.
+
+  \link{contour} for R's 2-D contour function.
+}
+\author{Karline Soetaert <karline.soetaert@nioz.nl>
+}
+\examples{
+# save plotting parameters
+ pm <- par("mfrow")
+
+## =======================================================================
+## Simple images and contours in 3D
+## =======================================================================
+
+ image3D(z = 100, colvar = volcano, zlim = c(0, 150),
+   contour = TRUE, clab = c("height", "m"))
+  
+ contour3D(z = 100, colvar = volcano, zlim = c(0, 150),
+   clab = c("height", "m"))
+
+ contour3D(z = volcano, colvar = volcano, lwd = 2, 
+   nlevels = 20, clab = c("height", "m"))
+
+## =======================================================================
+## Composite images and contours in 3D
+## =======================================================================
+ persp3D(z = volcano, zlim = c(90, 300), col = "white", 
+         shade = 0.1, d = 2)
+ contour3D(z = volcano, colvar = volcano, lwd = 2, 
+         add = TRUE, nlevels = 20, clab = c("height", "m"))
+ contour3D(z = 300, colvar = volcano, lwd = 2, col = "grey",
+         add = TRUE, nlevels = 20, clab = c("height", "m"))
+          
+## =======================================================================
+## the viewing depth of contours (dDepth)
+## =======================================================================
+ par(mfrow = c(2, 2))
+# too low
+ persp3D(z = volcano, col = "white", shade = 0.1)
+ contour3D(z = volcano, colvar = volcano, lwd = 2, 
+         add = TRUE, dDepth = 0, col = "black")
+
+# default
+ persp3D(z = volcano, col = "white", shade = 0.1)
+ contour3D(z = volcano, colvar = volcano, lwd = 2, 
+         add = TRUE, dDepth = 0.1, col = "black")
+
+# too high
+ persp3D(z = volcano, col = "white", shade = 0.1)
+ contour3D(z = volcano, colvar = volcano, lwd = 1, 
+         add = TRUE, dDepth = 0.5, col = "black")
+
+# reset plotting parameters
+ par(mfrow = pm)
+}
+\keyword{ hplot }
+
+                                                   

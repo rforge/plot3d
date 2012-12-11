@@ -1,0 +1,323 @@
+\name{2D image and contour plots}
+\alias{Image}
+\alias{Contour}
+\alias{Image.matrix}
+\alias{Image.array}
+\alias{Image.list}
+\title{
+ Improved image and contour plot for 2-D and 3-D data.
+}
+\description{
+  Image is similar to R's \link{image} function, except that it is possible to 
+  add a colorkey and contours, it has a different default coloring scheme, 
+  it can deal with decreasing x- and y-values, 
+  and it is possible to increase or decrease the resolution by 2-D 
+  linear interpolation. 
+}
+\usage{
+Image (z, ...)
+Contour (z, x = seq(0, 1, length.out = nrow(z)),
+         y = seq(0, 1, length.out = ncol(z)), ...,
+         col = NULL, colkey = list(side = 4), resfac = 1,
+         clab = NULL)
+
+\method{Image}{matrix}(z, x = seq(0, 1, length.out = nrow(z)), 
+               y = seq(0, 1, length.out = ncol(z)), ...,
+               col = jet.col(100), NAcol = "white", 
+               border = NA, facets = TRUE, contour = FALSE, 
+               colkey = list(side = 4), resfac = 1, 
+               clab = NULL, theta = 0) 
+
+\method{Image}{array}(z, margin = c(1, 2), subset, ask = NULL, ...) 
+\method{Image}{list}(z, ...) 
+}
+
+\arguments{
+  \item{z }{Matrix (2-D) or array (3-D) or a list with matrices or arrays,
+    to be colored as an \link{image}. 
+    }
+  \item{x, y }{Vectors or matrix with x and y values. 
+     If a vector \code{x} should be of length equal to \code{nrow(z)} and 
+     \code{y} should be of length equal to \code{ncol(z)}. 
+     If a matrix (only for \code{Image}), they should have
+     the same dimension as \code{z}.
+    }
+  \item{col }{Colors to be used for the \link{image} function or for the contours.
+    See details.
+    }
+  \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
+    }
+  \item{contour }{If \code{TRUE}, then a \link{contour} plot will be 
+    added to the image plot, unless \code{x, y} are a matrix. 
+    Also allowed is to pass a \code{list} with arguments for the 
+    \link{contour} function. 
+    }
+  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend).
+    Parameters should be one of 
+    \code{side, length, width, dist, shift, col.clab, cex.clab},
+    and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
+    lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    See \link{colkey}.
+    The default is to draw the color key on side = 4, i.e. in the right margin.
+    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
+    } 
+  \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE}, 
+    the label to be written on top of the color key. 
+    The label will be written at the same level as the main title.
+    To lower it, \code{clab} can be made a vector, with the first values empty 
+    strings. 
+    To use different color labels for different plots, use a list 
+    (i.e for use with \code{Image.array} and \code{Image.list}).
+    } 
+  \item{resfac }{Resolution factor, one value or a vector of two numbers, for 
+    the x and y- values respectively. A value > 1 will increase the 
+    resolution. For instance, if \code{resfac} equals \code{3} then for each 
+    adjacent pair of x- and y-values, z will be interpolated to two intermediary points. 
+    This uses simple linear interpolation. If \code{resfac} is one number then
+    the resolution will be increased similarly in x and y-direction.  
+    }
+  \item{theta }{The angle defining the azimuthal direction. 
+    Implemented for consistency with the other functions based on \link{persp}.
+    }
+  \item{border }{The color of the lines drawn around the surface facets.
+    The default, \code{NA}, will disable the drawing of borders.
+    }
+  \item{facets }{If \code{TRUE}, then \code{col} denotes the color of the surface facets. 
+    If \code{FALSE}, then the surface facets are colored ``white'' and the \code{border}
+    will be colored as specified by \code{col}. If \code{NA} then the facets will be
+    transparent. 
+    It is usually faster to draw with \code{facets = FALSE}.
+    }
+  \item{margin }{A vector giving the subscripts which the \code{image} 
+    function will be applied over. 
+    The image function will loop over the index that is not in \code{margin}.
+    For instance, \code{c(1, 2)}, indicates to plot rows(x) and columns(y) and to 
+     loop over index \code{3};  
+    \code{c(2, 1)} will do the same but transposed.
+    \code{margin} should be a vector with two numbers inbetween \code{1}, and \code{3}.
+    }
+  \item{ask }{A logical; if \code{TRUE}, the user is asked before each plot, 
+    if \code{NULL} the user is only asked if more than one page of plots is 
+    necessary and the current graphics device is set interactive, 
+    see \link{par}(ask) and \link{dev.interactive}.
+    }
+  \item{subset }{Either a logical expression indicating over which elements to loop,
+    or a vector or integers denoting the indices of the elements over which to loop.
+    Missing values are taken as \code{FALSE}.
+    }
+  \item{\dots}{additional arguments passed to the plotting methods \link{image} and 
+    \link{contour}. 
+    The arguments after \dots must be matched exactly.
+    }
+}
+\details{
+  \code{Image} is an extension to the default \link{image} plot that has
+  the possibility to add a color key and contourlines, and to increase the 
+  resolution in order to make smoother images. It also uses a different color
+  scheme, it can deal with decreasing x- and y- values and x and y can be
+  a matrix. 
+  
+  \code{Image.array} and \code{Image.list} are versions that
+  accept a 3 dimensional array respectively a list with z-matrices 
+  as their first argument to produce multiple plots.
+  
+  If \code{x} and \code{y} are passed as arguments, then they should be either
+  vectors with \code{length(x) = nrow(z)} and \code{length (y) = ncol(z)} or
+  they should be matrices with the same dimensions as \code{z}. 
+
+  For argument \code{col} of the \code{Image} function, 
+  both \code{NA} and \code{NULL} are allowed, 
+  in which case the color will be white, and no color key will be drawn.
+  
+  To set the ranges of the z-variable, both arguments \code{zlim} (as in \link{image})
+  and \code{clim} (as in the other \code{plot3D} functions) are accepted. 
+
+  For \code{contour3D}, \code{x} and \code{y} should be vectors. 
+
+}
+\note{
+  Parts of this help page come from the help pages of the R-core function 
+   \link{image}, on which the implementation of \code{Image} is based.
+   
+  The first argument, \code{z} determines the color variable. 
+  Hence, for consistency with the other functions
+  in this package, it could have been called \code{colvar}. It was called 
+  \code{z} for consistency with the R-function \link{image}.
+
+  The coloring when \code{x} and \code{y} is a vector is as in \link{image}.
+  This means that the x- and y- axis will extend the x- and y- values with half
+  a grid cell. 
+  
+  In contrast, when \code{x} and \code{y} are a matrix, 
+  the axis will not extend the x- or y- values.  See first example.
+}
+
+
+\value{
+  Upon returning from the \code{Image} and \code{Contour} functions, the figure coordinates are defined
+  by the main figure (excluding the color key). Thus, one can safely add other 
+  plotting elements.  
+}
+\author{Karline Soetaert <karline.soetaert@nioz.nl>}
+
+\seealso{
+  \link{jet.col},  \link{ImageOcean}, 
+  \link{Oxsat}, \link{persp3D}, \link{scatter} 
+  for other examples where \code{Image} is used.
+
+  \link{image} and \link{contour} for the original R functions.
+
+  \code{plot.image} from the fields package.
+}
+
+\examples{
+# save plotting parameters
+ pm <- par("mfrow")
+
+## =======================================================================
+## Difference between x or y a vector/matrix
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ x <- y <- 1:3
+ z <- matrix (nrow = 3, ncol = 3, data = 1:9)
+ Image(z, x, y)
+ Image(z, x, y, border = "black")
+ Image(z, x = matrix(nrow = 3, ncol = 3, data = x), 
+       y, border = "black")
+ Image(z, x, y, border = "black", theta = 45)
+
+## =======================================================================
+## Adding points and lines
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ nr <- nrow(volcano)
+ nc <- ncol(volcano)
+
+ Image(volcano, x = 1:nr, y = 1:nc,  
+       main = "volcano", clab = "height, m")
+
+ abline(v = seq(10, 80, by = 10))
+ abline(h = seq(10, 60, by = 10))
+ points(50, 30, pch = 3, cex = 5, lwd = 3, col = "white")
+
+ Contour(volcano, x = 1:nr, y = 1:nc, lwd = 2,
+       main = "volcano", clab = "height, m")
+
+ Image(volcano, x = 1:nr, y = 1:nc, contour = TRUE,
+       main = "volcano", clab = "height, m")
+
+ Image(volcano, x = 1:nr, y = 1:nc, col = jet.col(12),
+       main = "volcano", clab = "height, m")
+
+## =======================================================================
+## A large data set, input is an array
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ Image(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+       main = "surface oxygen saturation data 2005", NAcol = "black", 
+       clab = c("","","\%"))
+
+# images at first 9 depths - use subset to select them
+ Image(z = Oxsat$val, subset = 1:9, 
+       x = Oxsat$lon, y = Oxsat$lat,
+       margin = c(1, 2), NAcol = "black", 
+       xlab = "longitude", ylab = "latitude", 
+       zlim = c(0, 115),
+       main = paste("depth ", Oxsat$depth[1:9], " m"),
+       mfrow = c(3, 3))
+
+# images at latitude - depth section - increase resolution
+ z <- Oxsat$val[,  Oxsat$lat > - 5 & Oxsat$lat < 5, ]
+ Image(z = z, x = Oxsat$lon, y = Oxsat$depth,
+       margin = c(1, 3), NAcol = "black", 
+       resfac = 3, ylim = c(5000, 0))
+  
+# show position of transects 
+ Image(z = Oxsat$val[ , ,1], 
+       x = Oxsat$lon, y = Oxsat$lat,
+       NAcol = "black")
+ abline(h = Oxsat$lat[Oxsat$lat > - 5 & Oxsat$lat < 5])      
+
+## =======================================================================
+## Image of a list of matrices
+## =======================================================================
+
+ listvolcano <- list(volcano = volcano, logvolcano = log(volcano)) 
+ Image(listvolcano, x = 1:nr, y = 1:nc, contour = TRUE,
+       main = c("volcano", "log(volcano)"), 
+       clab = list("height, m", "log(m)"),
+       zlim = list(c(80, 200), c(4.4, 5.5)))
+
+## =======================================================================
+## Image of a list of arrays
+## =======================================================================
+
+\dontrun{
+# crude conversion from oxsat to oxygen 
+ listoxygen <- list(Oxsat$val, Oxsat$val/100 * 360)
+  
+ Image(z = listoxygen, 
+       x = Oxsat$lon, y = Oxsat$lat,
+       margin = c(1, 2), NAcol = "black", 
+       main = c("Oxygen saturation ", " Oxygen concentration"),
+       mtext = paste("depth ", Oxsat$depth, " m")
+       )
+}
+
+## =======================================================================
+## 'x', 'y' and 'z' are matrices
+## =======================================================================
+
+ par(mfrow = c(2, 1))
+
+# tilted x- and y-coordinates of 'volcano'
+ volcx <- matrix(nrow = 87, ncol = 61, data = 1:87)
+ volcx <- volcx + matrix(nrow = 87, ncol = 61, 
+        byrow = TRUE, data = seq(0., 15, length.out = 61))
+
+ volcy <- matrix(ncol = 87, nrow = 61, data = 1:61)
+ volcy <- t(volcy + matrix(ncol = 87, nrow = 61, 
+        byrow = TRUE, data = seq(0., 25, length.out = 87)))
+
+ Image(volcano, x = volcx, y = volcy)
+
+# use of panel function
+ Image(volcano, x = volcx, y = volcy, NAcol = "black", 
+       panel.first = substitute(box(col = "lightgrey", lwd = 30)))
+                                    
+## =======================================================================
+## Image with NAs and logs
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+# normal volcano
+ Image(volcano, clab = c("height", "m"))
+
+# logarithmic z-axis
+ Image(volcano, log = "z", clab = c("height", "m"),
+     main = "log='z'")
+
+# Including NAs
+ VOLC <- volcano - 110
+ VOLC [VOLC <= 0] <- NA
+ Image(VOLC, main = "including NAs and rescaled")
+
+# both
+ Image(VOLC, NAcol = "black", log = "z", zlim = c(1, 100),
+     main = "NAs and log = 'z'")
+
+## =======================================================================
+## Image with contour specification
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ Image(volcano, contour = list(col = "white", labcex = 0.8))
+
+# reset plotting parameters
+ par(mfrow = pm)
+}
+\keyword{ hplot }
+

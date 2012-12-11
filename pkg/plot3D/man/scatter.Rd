@@ -1,0 +1,465 @@
+\name{Scatter plots}
+\alias{scatter3D}
+\alias{text3D}
+\alias{points3D}
+\alias{lines3D}
+\alias{scatter}
+\title{
+ Colored scatter plots and text in 2-D and 3-D
+}
+\description{
+  
+  \code{scatter and scatter3D} plot a (2- or 3 dimensional) dataset with a color variable as points.
+
+  \code{text3D} plot a 3-D dataset with a color variable as text labels.
+
+  \code{points3D} is shorthand for \code{\link{scatter3D}(..., type = "p")}
+
+  \code{lines3D} is shorthand for \code{\link{scatter3D}(..., type = "l")}
+
+}
+\usage{
+scatter (x, y, colvar, ..., col = NULL, NAcol = "white", 
+          colkey = list(side = 4), clim = NULL, clab = NULL, 
+          CI = NULL, add = FALSE)
+
+scatter3D (x, y, z, colvar = z, ..., phi = 40, theta = 40,
+           col = NULL, NAcol = "white",  
+           colkey = list(side = 4), panel.first = NULL, 
+           clim = NULL, clab = NULL, 
+           bty = "f", CI = NULL, surf = NULL, 
+           add = FALSE, plot = TRUE)
+          
+text3D (x, y, z, labels, colvar = NULL, ..., 
+          phi = 40, theta = 40, col = NULL, NAcol = "white",  
+          colkey = list(side = 4),
+          panel.first = NULL, clim = NULL, clab = NULL, 
+          bty = "f", add = FALSE, plot = TRUE)
+
+points3D (x, y, z, colvar = z, col = NULL, ...)
+
+lines3D (x, y, z, colvar = z, col = NULL, ...)
+}
+
+\arguments{
+  \item{x, y, z }{Vectors with x, y and z-values of the points to be plotted. 
+    They should be of equal length, and the same length as \code{colvar} (if present).
+    }
+  \item{colvar }{The variable used for coloring. For \code{scatter3D}, it need
+    not be present, but if specified, it should be a vector of equal length as 
+    (\code{x, y, z}).
+    }
+  \item{theta, phi }{the angles defining the viewing direction. 
+    \code{theta} gives the azimuthal direction and \code{phi} the colatitude. see \link{persp}.
+    }
+  \item{col }{Colors to be used for coloring the \code{colvar} variable. 
+    If \code{col} is \code{NULL} and \code{colvar} is specified, 
+    then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
+    If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
+    \code{col} will be "black".    
+    }
+  \item{NAcol }{Colors to be used for \code{colvar} values that are \code{NA}.
+    }
+  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
+    Parameters should be one of 
+    \code{side, length, width, dist, shift, col.clab, cex.clab},
+    and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
+    lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    See \link{colkey}.
+    The default is to draw the color key on side = 4, i.e. in the right margin.
+    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
+    } 
+  \item{CI }{A \code{list} with parameters and values for the confidence 
+    intervals or \code{NULL}.
+    If a list it should contain at least the item \code{x}, \code{y} or \code{z} 
+    (latter for \code{scatter3D}). Other parameters should be one of (with defaults):
+    \code{alen = 0.01, lty = par("lty"), lwd = par("lwd"), col = NULL},
+    to set the length of the arrow head, the line type and width, and the color.
+    If \code{col} is \code{NULL}, then the colors as specified by \code{colvar} are used.
+    } 
+  \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
+    set up but before any plotting takes place. 
+    This can be useful for drawing background grids or scatterplot smooths. 
+    The function should have as argument the transformation matrix, e.g. it should
+    be defined as \code{function(pmat)}. See last example of \link{persp3D}.
+    } 
+  \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE}, 
+    the label to be written on top of the color key. 
+    The label will be written at the same level as the main title.
+    To lower it, \code{clab} can be made a vector, with the first values empty 
+    strings. 
+    } 
+  \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
+    for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
+    } 
+  \item{bty }{The type of the box, the default draws a full box.
+    Only effective if the \link{persp} 
+    argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
+    Note: the \code{bty = "g", "b2", "bl"} can also be specified 
+    for \code{scatter} (if \code{add = FALSE}).
+    }
+  \item{labels }{The text to be written. A vector of length equal to length of
+    x, y, z.
+    }
+  \item{surf }{If not \code{NULL}, a list specifying a surface to be added on 
+    the scatterplot. 
+    They should include at least \code{x}, \code{y}, \code{z}, equal sized
+    matrices, and optional: \code{colvar, col, NAcol, border, facets, 
+    lwd, resfac, clim, ltheta, lphi, shade, lighting}. Note that the default is 
+    that \code{colvar} is not specified.
+    }
+  \item{add }{Logical. If \code{TRUE}, then the points will be added to the current plot.
+    If \code{FALSE} a new plot is started. 
+    } 
+  \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
+     otherwise the viewing transformation matrix is returned (as invisible). 
+  } 
+  \item{\dots}{additional arguments passed to the plotting methods. 
+    The following \link{persp} arguments can be specified: 
+    \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
+    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    In addition, the \link{perspbox} arguments
+    \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
+    also be given a value.
+
+    For all functions, the arguments \code{lty, lwd} can be specified; \code{type}
+    can be specified for all except \code{text3D}.
+    
+    In case \code{type = "p"} or \code{"b"}, then \code{pch, cex, bg} can also be specified.
+    
+    The arguments after \dots must be matched exactly.
+    }
+}
+
+\value{
+  Function \code{scatter3D} returns the viewing transformation matrix.
+  See \link{trans3D}
+}
+\note{
+  For \code{scatter} and \code{scatter3D} the plottypes that are supported 
+  are: \code{type = "p"},  \code{type = "l"}, \code{type = "h"},
+   \code{type = "o"}. For \code{type = "b"},  \code{type = "o"} is used instead.
+}
+\seealso{
+  \link{persp} for the function on which this implementation is based.
+
+  \link{mesh}, \link{trans3D}, \code{slice3D}, for other examples of \code{scatter} or \code{scatter3D}.
+
+  \link{plotdev} for zooming, rescaling, rotating a plot.
+
+  package \code{scatterplot3D} for an implementation of scatterplots that is 
+  not based on \code{persp}.
+}
+\author{Karline Soetaert <karline.soetaert@nioz.nl>}
+
+
+\examples{
+# save plotting parameters
+ pm <- par("mfrow")
+
+## =======================================================================
+## Scatter; bty can also be set = to one of the perspbox defaults
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ x <- seq(0, 2*pi, length.out = 30)
+
+ scatter(x, sin(x), colvar = cos(x), pch = 16, 
+         ylab = "sin", clab = "cos", cex = 1.5)
+ scatter(x, sin(x), colvar = cos(x), type = "l", lwd = 4, bty = "g")
+ scatter(x, sin(x), colvar = cos(x), type = "b", lwd = 2, bty = "b2")
+ scatter(x, sin(x), colvar = cos(x), type = "h", lwd = 4)
+  
+## =======================================================================
+## mesh examples and scatter
+## =======================================================================
+
+ par(mfrow = c(1, 2))
+ x <- seq(-1, 1, by = 0.1)
+ y <- seq(-2, 2, by = 0.2)
+
+ grid <- mesh(x, y)
+ z    <- with(grid, cos(x) * sin(y))
+ Image(z, x = x, y = y)
+ points(grid)
+ scatter(grid$x, grid$y, colvar = z, pch = 20, cex = 2)
+
+## =======================================================================
+## scatter with confidence intervals
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ x  <- sort(rnorm(10)) 
+ y  <- runif(10)
+ cv <- sqrt(x^2 + y^2)
+
+ CI <- list(lwd = 2)
+ CI$x <- matrix (nrow = length(x), data = c(rep(0.25, 2*length(x))))
+ scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+ scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI, type = "b")
+
+ CI$y <- matrix (nrow = length(x), data = c(rep(0.05, 2*length(x))))
+ CI$col <- "black"
+ scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+
+ CI$y[c(2,4,8,10), ] <- NA  # Some points have no CI
+ CI$x[c(2,4,8,10), ] <- NA  # Some points have no CI
+ CI$alen <- 0.02            # increase arrow head
+ scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+
+## =======================================================================
+## A sphere 
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ M  <- mesh(seq(0, 2*pi, length.out = 100), 
+            seq(0,   pi, length.out = 100))
+ u  <- M$x ; v  <- M$y
+
+ x <- cos(u)*sin(v)
+ y <- sin(u)*sin(v)
+ z <- cos(v)
+
+# full  panels of box are drawn (bty = "f")
+ scatter3D(x, y, z, pch = ".", col = "red", 
+           bty = "f", cex = 2, colkey = FALSE)
+
+## =======================================================================
+## Different types
+## =======================================================================
+
+ par (mfrow = c(2, 2))
+ z <- seq(0, 10, 0.2)
+ x <- cos(z)
+ y <- sin(z)*z
+
+# greyish background for the boxtype (bty = "g") 
+ scatter3D(x, y, z, phi = 0, bty = "g",
+           pch = 20, cex = 2, ticktype = "detailed")
+# add another point
+ scatter3D(x = 0, y = 0, z = 0, add = TRUE, colkey = FALSE, 
+           pch = 18, cex = 3, col = "black")
+
+# add text
+ text3D(x = cos(1:10), y = (sin(1:10)*(1:10) - 1), 
+        z = 1:10, colkey = FALSE, add = TRUE, 
+        labels = LETTERS[1:10], col = c("black", "red"))
+
+# line plot
+ scatter3D(x, y, z, phi = 0, bty = "g", type = "l", 
+           ticktype = "detailed", lwd = 4)
+
+# points and lines
+ scatter3D(x, y, z, phi = 0, bty = "g", type = "b", 
+           ticktype = "detailed", pch = 20, 
+           cex = c(0.5, 1, 1.5))
+
+# horizontal line
+ scatter3D(x, y, z, phi = 0, bty = "g",  type = "h", 
+           ticktype = "detailed")
+
+## =======================================================================
+## With confidence interval
+## =======================================================================
+
+ x <- runif(20)
+ y <- runif(20)
+ z <- runif(20)
+
+ par(mfrow = c(1, 1))
+ CI <- list(z = matrix(nrow = length(x),
+                       data = rep(0.05, 2*length(x))))
+
+# greyish background for the boxtype (bty = "g")
+ scatter3D(x, y, z, phi = 0, bty = "g", CI = CI,
+   col = gg.col(100), pch = 18, cex = 2, ticktype = "detailed",
+   xlim = c(0, 1), ylim = c(0, 1), zlim = c(0, 1))
+
+# add new set of points
+ x <- runif(20)
+ y <- runif(20)
+ z <- runif(20)
+
+ CI2 <- list(x = matrix(nrow = length(x),
+                       data = rep(0.05, 2*length(x))),
+             z = matrix(nrow = length(x),
+                       data = rep(0.05, 2*length(x))))
+
+ scatter3D(x, y, z, CI = CI2, add = TRUE, col = "red", pch = 16)
+
+## =======================================================================
+## With a surface
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ 
+# surface = volcano
+ M <- mesh(1:nrow(volcano), 1:ncol(volcano))
+
+# 100 points above volcano 
+ N  <- 100
+ xs <- runif(N) * 87
+ ys <- runif(N) * 61
+ zs <- runif(N)*50 + 154
+  
+# we must specify colvar here, as the default is as from surf3D
+ scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
+   xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215), 
+   surf = list(x = M$x, y = M$y, z = volcano, shade = 0.5, 
+       col = jet.col(100), colvar = volcano))
+ 
+## =======================================================================
+## A surface and CI
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ M <- mesh(seq(0, 2*pi, length = 30), (1:30)/100)
+ z <- with (M, sin(x) + y)
+ 
+# points 'sampled'
+ N <- 30
+ xs <- runif(N) * 2*pi
+ ys <- runif(N) * 0.3
+
+ zs <- sin(xs) + ys + rnorm(N)*0.3
+ 
+ CI <- list(z = matrix(nrow = length(xs), 
+                       data = rep(0.3, 2*length(xs))),
+            lwd = 3)
+  
+# facets = NA makes a transparent surface; borders are black
+ scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
+   xlim = c(0, 2*pi), ylim = c(0, 0.3), zlim = c(-1.5, 1.5), 
+   CI = CI, theta = 20, phi = 30, cex = 2,
+   surf = list(x = M$x, y = M$y, z = z, border = "black", facets = NA)
+   )
+
+## =======================================================================
+## droplines till the fitted surface
+## =======================================================================
+
+ disttoz <- sin(xs) + ys - zs
+ CIz = matrix(nrow = length(xs), data = c(-disttoz, disttoz))
+ CIz[CIz > 0] <- 0              
+
+# no arrow head (alen=0)
+ CI <- list(z = CIz, lwd = 2, alen = 0, col = "black") 
+
+# transparent surface; border colored according to z (default colvar)
+ scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
+   xlim = c(0, 2*pi), ylim = c(0, 0.3), zlim = c(-1.7, 1.7), 
+   CI = CI, theta = 20, phi = 30, cex = 2, bty = "g",
+   surf = list(x = M$x, y = M$y, z = z, 
+       facets = NA, shade = 0.5)
+   )
+
+## =======================================================================
+## Two ways to make a scatter 3D of quakes data set
+## =======================================================================
+
+ par(mfrow = c(1, 1)) 
+# first way, use vertical spikes (type = "h")
+ with(quakes, scatter3D(x = long, y = lat, z = -depth, colvar = mag, 
+      pch = 16, cex = 1.5, xlab = "longitude", ylab = "latitude", 
+      zlab = "depth, km", clab = c("Richter","Magnitude"),
+      main = "Earthquakes off Fiji", ticktype = "detailed", 
+      type = "h", theta = 10, d = 2, 
+      colkey = list(length = 0.5, width = 0.5, cex.clab = 0.75))
+      )
+
+# second way: add dots on bottom and left panel
+# before the scatters are drawn, 
+# add small dots on basal plane and on the depth plane
+ panelfirst <- function(pmat) {
+    zmin <- min(-quakes$depth)
+    XY <- trans3D(quakes$long, quakes$lat, 
+                  z = rep(zmin, nrow(quakes)), pmat = pmat)
+    scatter(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
+            cex = 2, add = TRUE, colkey = FALSE)
+ 
+    xmin <- min(quakes$long)
+    XY <- trans3D(x = rep(xmin, nrow(quakes)), y = quakes$lat, 
+                  z = -quakes$depth, pmat = pmat)
+    scatter(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
+            cex = 2, add = TRUE, colkey = FALSE)
+ }
+
+ with(quakes, scatter3D(x = long, y = lat, z = -depth, colvar = mag, 
+      pch = 16, cex = 1.5, xlab = "longitude", ylab = "latitude", 
+      zlab = "depth, km", clab = c("Richter","Magnitude"),
+      main = "Earthquakes off Fiji", ticktype = "detailed", 
+      panel.first = panelfirst, theta = 10, d = 2, 
+      colkey = list(length = 0.5, width = 0.5, cex.clab = 0.75))
+      )
+
+## =======================================================================
+## Scatter on an image
+## =======================================================================
+ 
+ par(mfrow = c(1, 1))
+# Image of oxygen saturation
+ oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
+ Image(Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+       contour = TRUE, 
+       xlab = "longitude", ylab = "latitude", 
+       main = "Oxygen saturation", zlim = oxlim, clab = "\%")
+
+# (imaginary) measurements at 5 sites
+ lon   <- c( 11.2,   6.0, 0.9,  -4, -8.8)
+ lat   <- c(-19.7,-14.45,-9.1,-3.8, -1.5)
+ O2sat <- c(   90,    95,  92,  85,  100)
+               
+# add to image; use same zrange; avoid adding  a color key
+ scatter(O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
+         add = TRUE, cex = 2, colkey = FALSE)
+
+## =======================================================================
+## text3D and scatter3D
+## =======================================================================
+
+ with(USArrests, text3D(Murder, Assault, Rape, 
+    colvar = UrbanPop, col = gg.col(100), theta = 60, phi = 20,
+    xlab = "Murder", ylab = "Assault", zlab = "Rape", 
+    main = "USA arrests", 
+    labels = rownames(USArrests), cex = 0.6, 
+    bty = "g", ticktype = "detailed", d = 2,
+    clab = c("Urban","Pop"), adj = 0.5, font = 2))
+
+ with(USArrests, scatter3D(Murder, Assault, Rape - 1, 
+    colvar = UrbanPop, col = gg.col(100), 
+    type = "h", pch = ".", add = TRUE))
+
+## =======================================================================
+## zoom near origin
+## =======================================================================
+
+# display axis ranges
+ getplist()[c("xlim","ylim","zlim")] 
+
+# choose suitable ranges
+ plotdev(xlim = c(0, 10), ylim = c(40, 150), 
+         zlim = c(7, 25))
+
+## =======================================================================
+## text3D to label x- and y axis
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ hist3D (x = 1:5, y = 1:4, z = VADeaths,
+        bty = "g", phi = 20,  theta = -60,
+        xlab = "", ylab = "", zlab = "", main = "VADeaths",
+        col = "#0072B2", border = "black", shade = 0.8,
+        ticktype = "detailed", space = 0.15, d = 2, cex.axis = 1e-9)
+
+ text3D(x = 1:5, y = rep(0.5, 5), z = rep(3, 5),
+       labels = rownames(VADeaths),
+       add = TRUE, adj = 0)
+ text3D(x = rep(1, 4),   y = 1:4, z = rep(0, 4),
+       labels  = colnames(VADeaths),
+       add = TRUE, adj = 1)
+
+# reset plotting parameters
+ par(mfrow = pm)
+}
+\keyword{ hplot }
+
