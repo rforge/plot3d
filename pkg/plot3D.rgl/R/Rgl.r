@@ -1,58 +1,58 @@
 
 ## =============================================================================
-## RGL versions of the functions
+## RGL versions of the functions in package plot3D
 ## =============================================================================
 
-  rglpoly <- function(poly, il, front) { 
+rglpoly <- function(poly, il, front) { 
    
-    if (is.null(il)) {    # choose all
-      i.Tri  <- which(is.na (poly$x[4, ]))
-      i.Quad <- which(!is.na(poly$x[4, ]))
+  if (is.null(il)) {    # choose all
+    i.Tri  <- which(is.na (poly$x[4, ]))
+    i.Quad <- which(!is.na(poly$x[4, ]))
   
-    } else {
-      i.Tri  <- il[which(is.na (poly$x[4, il]))]
-      i.Quad <- il[which(!is.na(poly$x[4, il]))]
-    }
+  } else {
+    i.Tri  <- il[which(is.na (poly$x[4, il]))]
+    i.Quad <- il[which(!is.na(poly$x[4, il]))]
+  }
 
-    if (length(i.Tri > 0) )  {
-      if (front == "fill")  {
-        it <- i.Tri[poly$col[i.Tri] != "transparent" ]
-        triangles3d(x = poly$x[1:3, it], y = poly$y[1:3, it], z = poly$z[1:3, it], 
-          col = matrix (nrow = 3, byrow = TRUE, data = rep(poly$col[it], 3)), 
-          front = front, lwd = poly$lwd[it[1]]) 
-        ii <- which(poly$border[i.Tri] != poly$col[i.Tri])
-        if (length(ii) > 0) {
-          is <- i.Tri[ii]
-          ir <- c(1:3, 1, 4)
-          lines3d(x = poly$x[ir, is], y = poly$y[ir, is], z = poly$z[ir, is], 
-            col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$border[is], 4)), 
+  if (length(i.Tri > 0) )  {
+    if (front == "fill")  {
+      it <- i.Tri[poly$col[i.Tri] != "transparent" ]
+      triangles3d(x = poly$x[1:3, it], y = poly$y[1:3, it], z = poly$z[1:3, it], 
+        col = matrix (nrow = 3, byrow = TRUE, data = rep(poly$col[it], 3)), 
+        front = front, lwd = poly$lwd[it[1]]) 
+      ii <- which(poly$border[i.Tri] != poly$col[i.Tri])
+      if (length(ii) > 0) {
+        is <- i.Tri[ii]
+        ir <- c(1:3, 1, 4)
+        lines3d(x = poly$x[ir, is], y = poly$y[ir, is], z = poly$z[ir, is], 
+          col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$border[is], 4)), 
           lty = poly$lty[is], lwd = poly$lwd[is[1]]) 
-        }
-      } else  
-         triangles3d(x = poly$x[1:3, i.Tri], y = poly$y[1:3, i.Tri], z = poly$z[1:3, i.Tri], 
+      }
+    } else  
+       triangles3d(x = poly$x[1:3, i.Tri], y = poly$y[1:3, i.Tri], z = poly$z[1:3, i.Tri], 
           col = matrix (nrow = 3, byrow = TRUE, data = rep(poly$border[i.Tri], 3)), 
           front = front, back = front, lwd = poly$lwd[i.Tri[1]]) 
-   }
-    if (length(i.Quad > 0) )
-      if (front == "fill")  {
-        iq <- i.Quad[poly$col[i.Quad] != "transparent" ]
-        ir <- c(1:4, 1, 5)
-        quads3d(x = poly$x[1:4, iq], y = poly$y[1:4, iq], z = poly$z[1:4, iq], 
+  }
+  if (length(i.Quad > 0) )
+    if (front == "fill")  {
+      iq <- i.Quad[poly$col[i.Quad] != "transparent" ]
+      ir <- c(1:4, 1, 5)
+      quads3d(x = poly$x[1:4, iq], y = poly$y[1:4, iq], z = poly$z[1:4, iq], 
           col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$col[iq], 4)), 
           front = front, lwd = poly$lwd[iq[1]]) 
-        ii <- which(poly$border[i.Quad] != poly$col[i.Quad])
-        if (length(ii) > 0) {
-          is <- i.Quad[ii]
-          ir <- c(1:4, 1, 5)
-          lines3d(x = poly$x[ir, is], y = poly$y[ir, is], z = poly$z[ir, is], 
+      ii <- which(poly$border[i.Quad] != poly$col[i.Quad])
+      if (length(ii) > 0) {
+        is <- i.Quad[ii]
+        ir <- c(1:4, 1, 5)
+        lines3d(x = poly$x[ir, is], y = poly$y[ir, is], z = poly$z[ir, is], 
           col = matrix (nrow = 5, byrow = TRUE, data = rep(poly$border[is], 5)), 
           lty = poly$lty[is], lwd = poly$lwd[is[1]]) 
-        }
-      } else
-        quads3d(x = poly$x[1:4, i.Quad], y = poly$y[1:4, i.Quad], z = poly$z[1:4, i.Quad], 
+      }
+    } else
+      quads3d(x = poly$x[1:4, i.Quad], y = poly$y[1:4, i.Quad], z = poly$z[1:4, i.Quad], 
           col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$border[i.Quad], 4)), 
           front = front, back = front, lwd = poly$lwd[i.Quad[1]]) 
-   }
+}
    
 ## =============================================================================
 
