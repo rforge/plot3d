@@ -19,12 +19,15 @@ plotrgl (new = TRUE, lighting = FALSE, ...)
   Default is toggled off ; this is similar to shading
     }
   \item{... }{Any argument to the \code{rgl} functions, e.g arguments from
-    \link{open3d} or \link{material3d}.
+    \link{par3d}, \link{open3d} or \link{material3d}.
     }
     
 }
 
 \seealso{
+  \link{material3d}, \link{par3d} for \code{rgl} arguments that can be passed to 
+  the function.
+
   A similar function, \link{plotdev}, from package \code{plot3D} plots the
   3D graphs to the current device (other than a rgl-device). 
 
@@ -349,7 +352,8 @@ plotrgl (new = TRUE, lighting = FALSE, ...)
  spheresurf3D(AA, theta = 90, phi = 30, box = FALSE,
     full = TRUE, xlim = lim, ylim = lim, zlim = lim)
 
- plotrgl()
+# change the way the left mouse reacts
+ plotrgl(mouseMode = c("zAxis", "zoom", "fov"))
 
 ## =======================================================================
 ## several polygons, separated by NAs

@@ -14,49 +14,34 @@ rglpoly <- function(poly, il, front) {
     i.Quad <- il[which(!is.na(poly$x[4, il]))]
   }
 
-  if (length(i.Tri > 0) )  {
+    
+  plotpoly <- function(ipol, func, ir) {
     if (front == "fill")  {
-      it <- i.Tri[poly$col[i.Tri] != "transparent" ]
-      triangles3d(x = poly$x[1:3, it], y = poly$y[1:3, it], z = poly$z[1:3, it], 
-        col = matrix (nrow = 3, byrow = TRUE, data = rep(poly$col[it], 3)), 
+      it <- ipol[poly$col[ipol] != "transparent" ]
+      func(x = poly$x[1:ir, it], y = poly$y[1:ir, it], z = poly$z[1:ir, it], 
+        col = matrix (nrow = ir, byrow = TRUE, data = rep(poly$col[it], ir)), 
         front = front, lwd = poly$lwd[it[1]]) 
-      ii <- which(poly$border[i.Tri] != poly$col[i.Tri])
+      ii <- which(poly$border[ipol] != poly$col[ipol])
       if (length(ii) > 0) {
-        is <- i.Tri[ii]
-        ir <- c(1:3, 1, 4)
-        lines3d(x = poly$x[ir, is], y = poly$y[ir, is], z = poly$z[ir, is], 
-          col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$border[is], 4)), 
-          lty = poly$lty[is], lwd = poly$lwd[is[1]]) 
+        is <- ipol[ii]
+        irr <- c(1:ir, 1, ir+1)
+        lines3d(x = poly$x[irr, is], y = poly$y[irr, is], z = poly$z[irr, is], 
+          col = matrix (nrow = ir+2, byrow = TRUE, data = rep(poly$border[is], ir+2)), 
+          lty = poly$lty[is[1]], lwd = poly$lwd[is[1]]) 
       }
     } else  
-       triangles3d(x = poly$x[1:3, i.Tri], y = poly$y[1:3, i.Tri], z = poly$z[1:3, i.Tri], 
-          col = matrix (nrow = 3, byrow = TRUE, data = rep(poly$border[i.Tri], 3)), 
-          front = front, back = front, lwd = poly$lwd[i.Tri[1]]) 
+       func(x = poly$x[1:ir, ipol], y = poly$y[1:ir, ipol], z = poly$z[1:ir, ipol], 
+          col = matrix (nrow = ir, byrow = TRUE, data = rep(poly$border[ipol], ir)), 
+          front = front, back = front, lwd = poly$lwd[ipol[1]]) 
   }
-  if (length(i.Quad > 0) )
-    if (front == "fill")  {
-      iq <- i.Quad[poly$col[i.Quad] != "transparent" ]
-      ir <- c(1:4, 1, 5)
-      quads3d(x = poly$x[1:4, iq], y = poly$y[1:4, iq], z = poly$z[1:4, iq], 
-          col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$col[iq], 4)), 
-          front = front, lwd = poly$lwd[iq[1]]) 
-      ii <- which(poly$border[i.Quad] != poly$col[i.Quad])
-      if (length(ii) > 0) {
-        is <- i.Quad[ii]
-        ir <- c(1:4, 1, 5)
-        lines3d(x = poly$x[ir, is], y = poly$y[ir, is], z = poly$z[ir, is], 
-          col = matrix (nrow = 5, byrow = TRUE, data = rep(poly$border[is], 5)), 
-          lty = poly$lty[is], lwd = poly$lwd[is[1]]) 
-      }
-    } else
-      quads3d(x = poly$x[1:4, i.Quad], y = poly$y[1:4, i.Quad], z = poly$z[1:4, i.Quad], 
-          col = matrix (nrow = 4, byrow = TRUE, data = rep(poly$border[i.Quad], 4)), 
-          front = front, back = front, lwd = poly$lwd[i.Quad[1]]) 
-}
-   
+  if (length(i.Tri) > 0)
+    plotpoly(i.Tri, triangles3d, 3)
+  if (length(i.Quad) > 0) 
+    plotpoly(i.Quad, quads3d, 4)
+}   
 ## =============================================================================
 
-plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
+plotrgl <- function(lighting = FALSE, new = TRUE, add = FALSE, ...) {
 
   dots <- list(...)
   materialnames <- names(formals(rgl.material))
@@ -64,7 +49,7 @@ plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
   material$lit <- lighting
   if (new) 
     do.call("open3d", dots[!names(dots) %in% materialnames])
-  else
+  else if (! add)
     rgl.clear()
 
 #  if (! is.null(par3d))
@@ -78,15 +63,16 @@ plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
   if (length(plist) == 0)
     stop("nothing to draw")
 
-#  if (new)
   aspect3d(plist$scalefac$x, plist$scalefac$y, plist$scalefac$z)
 
+  meanscale <- plist$scalefac$expand     # this seems to work best...
+  
  # two types of polygons
   poly <- plist$poly
   if (! is.null(poly)) {
 
     if (nrow(poly$x) > 5)
-      stop ("cannot handle true polygons in rgl")
+      stop ("cannot handle polygons with more than 4 nodes in rgl")
 
     ifill <- which(! is.na(poly$col))
     if (length(ifill) > 0)
@@ -129,13 +115,13 @@ plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
     ii <- which(pts$pch == ".") 
     if (length (ii) > 0) 
       spheres3d(x = pts$x.mid[ii], y = pts$y.mid[ii], z = pts$z.mid[ii],
-                 radius = 0.005 *pts$cex[ii],
+                 radius = 0.005 *pts$cex[ii]*meanscale,
                  color = pts$col[ii])
   
     ii <- which(pts$pch != ".") 
     if (length (ii) > 0) 
       spheres3d(x = pts$x.mid[ii], y = pts$y.mid[ii], z = pts$z.mid[ii],
-                 radius = 0.0175 *pts$cex[ii],
+                 radius = 0.0175 *pts$cex[ii]*meanscale,
                  color = pts$col[ii])
   }
   
@@ -145,12 +131,12 @@ plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
     if (length (ii) > 0) 
       spheres3d(x = pts$x.mid[ii], y = pts$y.mid[ii], z = pts$z.mid[ii],
                color = pts$col[ii], 
-               radius = 0.005 *pts$cex[ii]) 
+               radius = 0.005 *pts$cex[ii]*meanscale) 
     ii <- which(pts$pch != ".") 
     if (length (ii) > 0) 
       spheres3d(x = pts$x.mid[ii], y = pts$y.mid[ii], z = pts$z.mid[ii],
                color = pts$col[ii], 
-               radius = 0.0175 *pts$cex[ii]) 
+               radius = 0.0175 *pts$cex[ii]*meanscale) 
     nCImax <- max(pts$nCI)
     
     for (i in 1: nCImax) {             
@@ -168,7 +154,7 @@ plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
     text3d(x = labs$x, y = labs$y, z = labs$z,
                color = labs$col, texts = labs$labels, font = labs$font,
                cex = labs$cex, adj = labs$adj[1]) 
-
+  D <- NULL
   if (plist$persp$drawbox) {
     axes <- FALSE
     
@@ -176,11 +162,17 @@ plotrgl <- function(new = TRUE, lighting = FALSE, ...) {
       if (plist$dot$ticktype == "detailed")
         axes <- TRUE
 
-    decorate3d(xlim = plist$xlim, ylim = plist$ylim, zlim = plist$zlim, 
+    D <- decorate3d(xlim = plist$xlim, ylim = plist$ylim, zlim = plist$zlim, 
 	     xlab = plist$dot$xlab, ylab = plist$dot$ylab, zlab =  plist$dot$zlab, 
 	     main = plist$dot$main, sub = plist$dot$sub, axes = axes)
+  } else 
+    D <- title3d(xlab = plist$dot$xlab, ylab = plist$dot$ylab, zlab = plist$dot$zlab, 
+	     main = plist$dot$main, sub = plist$dot$sub)	
+
+	if (! is.null(D)) {
+    plist$rgl$D <- as.list(D)
+    setplist(plist)
   }
-	
 }
 
   
