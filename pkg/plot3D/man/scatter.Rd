@@ -27,14 +27,14 @@ scatter3D (x, y, z, colvar = z, ..., phi = 40, theta = 40,
            col = NULL, NAcol = "white",  
            colkey = list(side = 4), panel.first = NULL, 
            clim = NULL, clab = NULL, 
-           bty = "f", CI = NULL, surf = NULL, 
+           bty = "b", CI = NULL, surf = NULL, 
            add = FALSE, plot = TRUE)
           
 text3D (x, y, z, labels, colvar = NULL, ..., 
           phi = 40, theta = 40, col = NULL, NAcol = "white",  
           colkey = list(side = 4),
           panel.first = NULL, clim = NULL, clab = NULL, 
-          bty = "f", add = FALSE, plot = TRUE)
+          bty = "b", add = FALSE, plot = TRUE)
 
 points3D (x, y, z, colvar = z, col = NULL, ...)
 
@@ -92,7 +92,7 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
     for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
-  \item{bty }{The type of the box, the default draws a full box.
+  \item{bty }{The type of the box, the default draws only the back panels.
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     Note: the \code{bty = "g", "b2", "bl"} can also be specified 
@@ -158,7 +158,7 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
  pm <- par("mfrow")
 
 ## =======================================================================
-## Scatter; bty can also be set = to one of the perspbox defaults
+## Scatter; bty can also be set = to one of the perspbox alernatives
 ## =======================================================================
 
  par(mfrow = c(2, 2))
@@ -254,7 +254,7 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
            ticktype = "detailed", pch = 20, 
            cex = c(0.5, 1, 1.5))
 
-# horizontal line
+# vertical lines
  scatter3D(x, y, z, phi = 0, bty = "g",  type = "h", 
            ticktype = "detailed")
 
@@ -302,11 +302,11 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
  ys <- runif(N) * 61
  zs <- runif(N)*50 + 154
   
-# we must specify colvar here, as the default is as from surf3D
+# scatter + surface
  scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
    xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215), 
    surf = list(x = M$x, y = M$y, z = volcano, shade = 0.5, 
-       col = jet.col(100), colvar = volcano))
+       col = jet.col(100)))
  
 ## =======================================================================
 ## A surface and CI

@@ -77,6 +77,8 @@ This is because an assumption is made as to how the perspective plots are viewed
  example(scatter3D)
  example(segments3D)
  example(Image)
+ example(image3D)
+ example(contour3D)
  example(colkey) 
  example(jet.col) 
  example(perspbox)

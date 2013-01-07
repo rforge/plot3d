@@ -52,7 +52,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     plist = plist)
   
  # swap if decreasing
-  if (! is.matrix(x) & length(x) > 0 & all(diff(x) < 0)) {    # swap
+  if (length(x) > 0 & all(diff(x) < 0)) {     
     dot$persp$xlim <- rev(range(x))
     x <- rev(x)
     z <- z[nrow(z):1, ]
@@ -60,7 +60,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
       colvar <- colvar[nrow(colvar):1, ]
   }
  
-  if (! is.matrix(y) & length(y) > 1 & all(diff(y) < 0)) {    # swap
+  if (length(y) > 1 & all(diff(y) < 0)) {     
     dot$persp$ylim <- rev(range(y))
     y <- rev(y)
     z <- z[, (ncol(z):1)]
@@ -81,12 +81,12 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
        
-    if (dot$clog) {                    # log transformation of color-values 
+    if (dot$clog) {                    
       colvar <- log(colvar)
       clim   <- log(clim)
     }
   
-    iscolkey <- is.colkey(colkey, col)     # check if colkey is needed
+    iscolkey <- is.colkey(colkey, col) 
     if (iscolkey) 
       colkey <- check.colkey(colkey)
  
@@ -102,7 +102,6 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   }
   
  # mapping from centre to interfaces
-
   extend <- function(x) {
    # This does exceed the x- y boundaries
     N <- length(x)          
@@ -138,7 +137,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     panel.first(plist$mat)
 
  # viewing order
-  ind <- expand.sort(1:length(XYmesh$x), dim(XYmesh$x)) # now pointing to row/col
+  ind <- expand.sort(1:length(XYmesh$x), dim(XYmesh$x)) 
   ix <- ind$x; iy <- ind$y
   
  # The colors
@@ -216,13 +215,19 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   COL   <- rep(Col$facet , 5)#[i,j] 
   BORD  <- rep(Col$border, 5)#[i,j] 
   if (isshade) {
-     RGB  <- t(col2rgb(COL)) * Shade / 255
-     COL  <- rgb(RGB)      
-     RGB  <- t(col2rgb(BORD)) * Shade / 255
-     BORD <- rgb(RGB)      
+     if (facets) {
+       RGB  <- t(col2rgb(COL)) * Shade / 255
+       COL  <- rgb(RGB)      
+     }
+     if (! is.na(border)){
+       RGB  <- t(col2rgb(BORD)) * Shade / 255
+       BORD <- rgb(RGB)     
+     } 
   } else if (islight) {
-     COL  <- facetcols.light (light, Normals, COL,  dot$shade)
-     BORD <- facetcols.light (light, Normals, BORD, dot$shade)
+     if (facets) 
+       COL  <- facetcols.light (light, Normals, COL,  dot$shade)
+     if (! is.na(border))
+       BORD <- facetcols.light (light, Normals, BORD, dot$shade)
   }
 
   PolyX <- rbind(PolyX, NA)   
@@ -255,7 +260,8 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     segm <- NULL
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "hist3D") 
 
   plist <- plot.struct.3D(plist, poly = Poly, segm = segm, plot = plot)  
 

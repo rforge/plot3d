@@ -21,7 +21,8 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
 
   # check colors  
   if (length(col) == 1)
-    if (is.na(col)) col <- NULL
+    if (is.na(col)) 
+      col <- NULL
   
  # The plotting arguments
   dots <- splitpardots(list(...))
@@ -29,9 +30,10 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   dotother <- dots$points
 
   add <- dots[["add"]]
-  if (is.null(add)) add <- FALSE
+  if (is.null(add)) 
+    add <- FALSE
 
-  iscolkey <- is.colkey(colkey, col)        # check if color key is needed
+  iscolkey <- is.colkey(colkey, col)       
   if (iscolkey) {
     colkey <- check.colkey(colkey)
     if (!add)
@@ -44,7 +46,7 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     iscontour <- FALSE
   else if (is.logical(contour[[1]][1]))
     if (contour[[1]][1] == FALSE) 
-    iscontour <- FALSE
+      iscontour <- FALSE
   else if (! is.list(contour)) 
     contour <- list()   
 
@@ -75,10 +77,10 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   }
  
   if (iscontour) {
-      if (is.matrix(x))
-        stop ("cannot add contour if 'x' or 'y' is a matrix")
-      contour$x <- x
-      contour$y <- y
+    if (is.matrix(x))
+      stop ("cannot add contour if 'x' or 'y' is a matrix")
+    contour$x <- x
+    contour$y <- y
   }
  
  # rotate 
@@ -99,24 +101,26 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
 
   useimage <- TRUE     # default it to use the image function
   if (is.matrix(x)) {  # ..but not if x and y are matrix!
-     if (any (dim(x) - dim(y) != 0))
-       stop("matrices 'x' and 'y' not of same dimension") 
-     if (any (dim(x) - dim(z) != 0))                             
-       stop("matrices 'x' or 'y' and 'z' not of same dimension") 
-     useimage <- FALSE
+    if (any (dim(x) - dim(y) != 0))
+      stop("matrices 'x' and 'y' not of same dimension") 
+    if (any (dim(x) - dim(z) != 0))                             
+      stop("matrices 'x' or 'y' and 'z' not of same dimension") 
+    useimage <- FALSE
   } 
   
  # Check for decreasing values of x and y    
-   if (! is.matrix(x) & all(diff(x) < 0)) {    # swap
-        if (is.null(dotimage$xlim)) dotimage$xlim <- rev(range(x))
-        x <- rev(x)
-        z <- z[nrow(z):1, ]
+   if (! is.matrix(x) & all(diff(x) < 0)) {     
+     if (is.null(dotimage$xlim)) 
+       dotimage$xlim <- rev(range(x))
+     x <- rev(x)
+     z <- z[nrow(z):1, ]
    }
   
-   if (! is.matrix(y) & all(diff(y) < 0)) {    # swap
-        if (is.null(dotimage$ylim)) dotimage$ylim <- rev(range(y))
-        y <- rev(y)
-        z <- z[, (ncol(z):1)]
+   if (! is.matrix(y) & all(diff(y) < 0)) {    
+     if (is.null(dotimage$ylim)) 
+       dotimage$ylim <- rev(range(y))
+     y <- rev(y)
+     z <- z[, (ncol(z):1)]
    }
   
  # log transformation of z-values (can be specified with log = "c", or log = "z"
@@ -130,13 +134,17 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
       dotimage[["log"]] <- gsub("c", "", dotimage[["log"]])
       zlog <- TRUE
     }
-
+    if (dotimage[["log"]] == "")
+      dotimage[["log"]] <- NULL
   }
-  if (zlog) z <- log(z)
+  if (zlog) 
+    z <- log(z)
 
  # labels
-  if (is.null(dotimage[["xlab"]])) dotimage[["xlab"]] <- "x"
-  if (is.null(dotimage[["ylab"]])) dotimage[["ylab"]] <- "y"
+  if (is.null(dotimage[["xlab"]])) 
+    dotimage[["xlab"]] <- "x"
+  if (is.null(dotimage[["ylab"]])) 
+    dotimage[["ylab"]] <- "y"
 
  # z ranges
   zlim <- dotimage[["zlim"]]
@@ -149,21 +157,23 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   
   if (is.null(zlim)) {
   
-     if (length(which(!is.na(z))) == 0)
-        zlim <- c(0, 1)
-     else zlim <- range(z, na.rm = TRUE)
+    if (length(which(!is.na(z))) == 0)
+      zlim <- c(0, 1)
+    else 
+      zlim <- range(z, na.rm = TRUE)
   } else 
-    if (zlog) zlim  <- log(zlim )
+    if (zlog) 
+      zlim  <- log(zlim )
                                 
   colkeyZlim <- zlim
   colkeyCol  <- col
   
  # Colors for values = NA 
   if (any (is.na(z)) & ! is.null(NAcol) ) {
-      CC <- checkcolors(z, col, NAcol, zlim)
-      zlim  <- CC$lim
-      col <- CC$col
-      z <- CC$colvar
+    CC <- checkcolors(z, col, NAcol, zlim)
+    zlim  <- CC$lim
+    col <- CC$col
+    z <- CC$colvar
   }
 
   if (! facets | is.na(facets)) {
@@ -217,12 +227,14 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
       do.call("abline", c(alist(v = 0.5*(x[-1]+x[-length(x)]), col = border), dotother))
     }
   }
-  if (is.null(dots$add)) box()
+  if (is.null(dots$add)) 
+    box()
   
   # contours
   if (iscontour) {
     if (zlog) 
-      if (!is.null(contour$levels)) contour$levels <- log(contour$levels)
+      if (!is.null(contour$levels)) 
+        contour$levels <- log(contour$levels)
       
     if (! rotate)
       do.call("contour", c(list(z = z, add = TRUE), contour))
@@ -267,9 +279,9 @@ Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
   x <- 1:DD[index]
   
   if (!missing(subset)){
-     if (is.numeric(subset)) { 
-       isub <- subset
-     } else {
+    if (is.numeric(subset)) { 
+      isub <- subset
+    } else {
       e <- substitute(subset)
       r <- eval(e, as.data.frame(z), parent.frame())
       if (!is.logical(r))
@@ -278,7 +290,7 @@ Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
       isub <- which(isub)
       if (length(isub) == 0)
         stop("cannot continue: nothing selected - check 'subset'")
-     }   
+    }   
   } else isub <- x
 
   np     <- length(isub)
@@ -287,13 +299,14 @@ Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
   ## Set par mfrow and ask
   ask <- setplotpar(ldots, np, ask)
   if (ask) {
-      oask <- devAskNewPage(TRUE)
-      on.exit(devAskNewPage(oask))
+    oask <- devAskNewPage(TRUE)
+    on.exit(devAskNewPage(oask))
   }
 
   if (is.null(ldots$main)) {
     title <- names(z)[index][isub]
-    if (is.null(title)) title <- isub
+    if (is.null(title)) 
+      title <- isub
   } else 
     title <- rep(ldots$main, length.out = length(isub))
 
@@ -316,10 +329,9 @@ Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
     LL$main <- title[i1]
     i1 <- i1+1
     do.call(Image, LL)
-
   }
   if (! is.null(Mtext))
-     mtext(text = Mtext, side = 3, outer = TRUE, line = par("oma")[3]-1 )
+    mtext(text = Mtext, side = 3, outer = TRUE, line = par("oma")[3]-1 )
   
 }
 
@@ -333,146 +345,150 @@ Image.list <- function (z, ...) {
   if ( all(c("x", "y", "z") %in% names(z)))  {
     Image.matrix(z = z$z, x = z$x, y = z$y, ...)
   } else {
-  nz     <- length(z)
-  classz <- class(z[[1]])
+    nz     <- length(z)
+    classz <- class(z[[1]])
 
-  if (! classz %in% c("matrix", "array"))
-    stop ("'z' should be a list with either matrices or arrays")
+    if (! classz %in% c("matrix", "array"))
+      stop ("'z' should be a list with either matrices or arrays")
     
-  DD <- dim(z[[1]])
-  if (length(DD) > 3 | length(DD) < 2)
+    DD <- dim(z[[1]])
+    if (length(DD) > 3 | length(DD) < 2)
       stop ("Can only make image of 2-D or 3-D array, 'z' has dimension ", length(DD))
 
-  for (i in 2 : nz)
-    if (any(dim(z[[i]]) - DD != 0))
-      stop("elements of 'z' should have the same dimension, check element", i)
+    for (i in 2 : nz)
+      if (any(dim(z[[i]]) - DD != 0))
+        stop("elements of 'z' should have the same dimension, check element", i)
   
 # Set the mfrow argument - different from the usual
-  if ("matrix" %in% classz)  {
-     nc <- min(ceiling(sqrt(nz)), 3)
-     nr <- min(ceiling(nz/nc), 3)
-  } else { # differs from default in that it is not limited to 3
-     nc <- ceiling(sqrt(nz))
-     nr <- ceiling(nz/nc)
-  }
-  mfrow <- c(nr, nc)
-  par(mfrow = mfrow)
+    if ("matrix" %in% classz)  {
+      nc <- min(ceiling(sqrt(nz)), 3)
+      nr <- min(ceiling(nz/nc), 3)
+    } else { # differs from default in that it is not limited to 3
+      nc <- ceiling(sqrt(nz))
+      nr <- ceiling(nz/nc)
+    }
+    mfrow <- c(nr, nc)
+    par(mfrow = mfrow)
 
 # Plotting arguments
-  Ldots <- list(...) 
-  Ldots$mfrow <- mfrow
+    Ldots <- list(...) 
+    Ldots$mfrow <- mfrow
    
-  if (!is.null(Ldots$main)) {
-     main <- rep(Ldots$main, length.out = nz)
-     Ldots$main <- NULL
-  } else {
-     main <- names(z)
-     if (is.null(main)) main <- 1:nz
-  }
-  ask <- Ldots$ask
-  if (is.null(ask)) ask <- TRUE
-  Ldots$ask <- NULL
+    if (!is.null(Ldots$main)) {
+      main <- rep(Ldots$main, length.out = nz)
+      Ldots$main <- NULL
+    } else {
+      main <- names(z)
+      if (is.null(main)) main <- 1:nz
+    }
+    ask <- Ldots$ask
+    if (is.null(ask)) ask <- TRUE
+    Ldots$ask <- NULL
 
   # ylim and xlim can be lists and are at least two values
-  yylim  <- expanddotslist(Ldots$ylim, nz)
-  xxlim  <- expanddotslist(Ldots$xlim, nz)
-  zzlim  <- expanddotslist(Ldots$zlim, nz)
-  zzlab  <- expanddotslist(Ldots$clab, nz)
+    yylim  <- expanddotslist(Ldots$ylim, nz)
+    xxlim  <- expanddotslist(Ldots$xlim, nz)
+    zzlim  <- expanddotslist(Ldots$zlim, nz)
+    zzlab  <- expanddotslist(Ldots$clab, nz)
    
-  if (ask) {
-     oask <- devAskNewPage(TRUE)
-     on.exit(devAskNewPage(oask))
-  }
+    if (ask) {
+      oask <- devAskNewPage(TRUE)
+      on.exit(devAskNewPage(oask))
+    }
 
  # Display the images
-  if ("matrix" %in% classz)  {
+    if ("matrix" %in% classz)  {
      # outer margin text
-     Mtext <- Ldots$mtext
-     Ldots$mtext <- NULL
+      Mtext <- Ldots$mtext
+      Ldots$mtext <- NULL
 
-     for (i in 1:nz) {
-      Ldots$main <- main[i]
-      Ldots$xlim <- xxlim[[i]]
-      Ldots$ylim <- yylim[[i]]
-      Ldots$zlim <- zzlim[[i]]
-      Ldots$clab <- zzlab[[i]]
-      
-      LL <- c(list(z = z[[i]]), Ldots)
-      do.call(Image, LL)
-     }
-  
-     if (! is.null(Mtext))
-       mtext(text = Mtext, side = 3, outer = TRUE, line = par("oma")[3]-1 )
-   
-  } else {  # array
-     margin <- Ldots$margin
-     Ldots$margin <- NULL
-     
-     if (is.null(margin)) margin <- 1:2
-     if (length(margin) != 2)
-       stop ("'margin' should contain two numbers, the x, y subscripts with which to make images")
-     if ( max(margin) > 3 | min (margin) < 1)
-       stop ("indexes in 'margin' should be inbetween 1 and 3")
-     index <- (1:3) [- margin]
-
-     subset <- Ldots$subset
-     Ldots$subset <- NULL
-     if (!is.null(subset)){
-      if (is.numeric(subset)) { 
-        isub <- subset
-      } else {        e <- substitute(subset)
-        r <- eval(e, as.data.frame(z), parent.frame())
-        if (!is.logical(r))
-          stop("'subset' must evaluate to logical")
-        isub <- r & !is.na(r)
-        isub <- which(isub)
-        if (length(isub) == 0)
-          stop("cannot continue: nothing selected - check 'subset'")
-      } 
-     } else isub <- 1:DD[index]
-     
-     nisub     <- length(isub)
-
-     # number of empty plots 
-     noplot <- prod(mfrow) - nz
-     if (noplot == 0) noplot <- NULL else noplot <- 1:noplot
-
-     # outer margin text
-     Mtext <- Ldots$mtext
-     Ldots$mtext <- NULL
-     
-     if (! is.null(Mtext)) 
-       Mtext <- rep(Mtext, length.out = nisub)
-     else
-       Mtext <- isub
-     pline <- par("oma")[3]-1  
-     # loop first over margin, then over data sets
-     for (jj in 1:nisub) {
-       j <- isub[jj]      
-       for (i in 1:nz) {
-        if (index == 1) 
-         zz <- z[[i]][j, , ] 
-        else if (index == 2)
-         zz <- z[[i]][ ,j , ] 
-        else
-         zz <- z[[i]][ ,, j ]
-        if (margin[2] < margin[1])
-         zz <- t(zz)
-       
+      for (i in 1:nz) {
         Ldots$main <- main[i]
         Ldots$xlim <- xxlim[[i]]
         Ldots$ylim <- yylim[[i]]
         Ldots$zlim <- zzlim[[i]]
         Ldots$clab <- zzlab[[i]]
-        LL <- c(list(z = zz), Ldots)
+      
+        LL <- c(list(z = z[[i]]), Ldots)
         do.call(Image, LL)
-       }
-       # to make sure all figures are drawn
-       for (i in noplot) 
-         plot(0, type = "n", xlab = "", ylab = "", axes = FALSE, 
+      }
+  
+      if (! is.null(Mtext))
+        mtext(text = Mtext, side = 3, outer = TRUE, line = par("oma")[3]-1 )
+   
+    } else {  # array
+      margin <- Ldots$margin
+      Ldots$margin <- NULL
+     
+      if (is.null(margin)) margin <- 1:2
+      if (length(margin) != 2)
+        stop ("'margin' should contain two numbers, the x, y subscripts with which to make images")
+      if ( max(margin) > 3 | min (margin) < 1)
+        stop ("indexes in 'margin' should be inbetween 1 and 3")
+      index <- (1:3) [- margin]
+
+      subset <- Ldots$subset
+      Ldots$subset <- NULL
+      if (!is.null(subset)){
+        if (is.numeric(subset)) { 
+          isub <- subset
+        } else {        e <- substitute(subset)
+          r <- eval(e, as.data.frame(z), parent.frame())
+          if (!is.logical(r))
+            stop("'subset' must evaluate to logical")
+          isub <- r & !is.na(r)
+          isub <- which(isub)
+          if (length(isub) == 0)
+            stop("cannot continue: nothing selected - check 'subset'")
+        } 
+      } else 
+        isub <- 1:DD[index]
+     
+      nisub     <- length(isub)
+
+   # number of empty plots 
+      noplot <- prod(mfrow) - nz
+      if (noplot == 0) 
+        noplot <- NULL 
+      else 
+        noplot <- 1:noplot
+
+     # outer margin text
+      Mtext <- Ldots$mtext
+      Ldots$mtext <- NULL
+     
+      if (! is.null(Mtext)) 
+        Mtext <- rep(Mtext, length.out = nisub)
+      else
+        Mtext <- isub
+      pline <- par("oma")[3]-1  
+   # loop first over margin, then over data sets
+      for (jj in 1:nisub) {
+        j <- isub[jj]      
+        for (i in 1:nz) {
+          if (index == 1) 
+            zz <- z[[i]][j, , ] 
+          else if (index == 2)
+            zz <- z[[i]][ ,j , ] 
+          else
+            zz <- z[[i]][ ,, j ]
+          if (margin[2] < margin[1])
+            zz <- t(zz)
+       
+          Ldots$main <- main[i]
+          Ldots$xlim <- xxlim[[i]]
+          Ldots$ylim <- yylim[[i]]
+          Ldots$zlim <- zzlim[[i]]
+          Ldots$clab <- zzlab[[i]]
+          LL <- c(list(z = zz), Ldots)
+          do.call(Image, LL)
+        }
+     # to make sure all figures are drawn
+        for (i in noplot) 
+          plot(0, type = "n", xlab = "", ylab = "", axes = FALSE, 
               frame.plot = FALSE)
-       mtext(text = Mtext[jj], side = 3, outer = TRUE, line = pline)
-     }  
+        mtext(text = Mtext[jj], side = 3, outer = TRUE, line = pline)
+      }  
     } 
   }
 }

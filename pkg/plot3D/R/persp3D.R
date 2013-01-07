@@ -12,7 +12,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
                   image = FALSE, contour = FALSE, panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",
                   lighting = FALSE, inttype = 1, 
-                  add = FALSE, plot = TRUE){
+                  curtain = FALSE, add = FALSE, plot = TRUE){
 
   if (add) 
     plist <- getplist()
@@ -47,7 +47,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   }
   
  # swap if decreasing
-  if (all(diff(x) < 0)) {    # swap
+  if (all(diff(x) < 0)) {     
     if (is.null(dot$persp$xlim)) 
       dot$persp$xlim <- rev(range(x))
     x <- rev(x)
@@ -56,7 +56,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
       colvar <- colvar[nrow(colvar):1, ]
   }
  
-  if (all(diff(y) < 0)) {    # swap
+  if (all(diff(y) < 0)) {     
     if (is.null(dot$persp$ylim)) 
       dot$persp$ylim <- rev(range(y))
     y <- rev(y)
@@ -67,7 +67,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
 
   image   <- check.args(image)
   contour <- check.args(contour)
-  if (contour$add) 
+  if (contour$add | curtain) 
     cv <- colvar
       
  # check colvar and colors
@@ -83,7 +83,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     if (iscolkey) 
       colkey <- check.colkey(colkey)
     
-    if (dot$clog) {                # log transformation of color-values 
+    if (dot$clog) {                
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -113,6 +113,57 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
            border, facets, dot$points$lwd, dot$points$lty, 
            dot$shade, Extend)
 
+  if (curtain) {
+    P <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
+               lwd = NULL, lty = NULL, proj = NULL)                    
+ 
+    zmin <- plist$zlim[1]
+    Nx <- length(x)
+    Ny <- length(y)      
+    P <- add.poly(P, 
+          cbind(rep(x[1], Ny), rep(x[1], Ny)), cbind(y, y), 
+          cbind(rep(zmin, Ny), z[1,]), colvar[1,], 
+          col, NAcol, clim, facets, border)
+    P <- add.poly(P, 
+          cbind(rep(x[Nx], Ny), rep(x[Nx], Ny)), cbind(y, y), 
+          cbind(rep(zmin, Ny), z[Nx,]), colvar[Nx-1,], 
+          col, NAcol, clim, facets, border)
+    P <- add.poly(P, 
+          cbind(x, x), cbind(rep(y[1], Nx), rep(y[1], Nx)), 
+          cbind(rep(zmin, Nx), z[,1]), colvar[, 1], 
+          col, NAcol, clim, facets, border)
+    P <- add.poly(P, 
+          cbind(x, x), cbind(rep(y[Ny], Nx), rep(y[Ny], Nx)), 
+          cbind(rep(zmin, Nx), z[,Ny]), colvar[, Ny-1], 
+          col, NAcol, clim, facets, border)
+    if (! dot$shade$type == "none") {
+      P <- color3D(P, plist$scalefac, dot$shade, lighting)
+      if (!facets) P$col[] <- "white"
+    }
+    
+   # depth view of the points 
+     P$proj   <- project(colMeans(P$x, na.rm = TRUE), 
+                         colMeans(P$y, na.rm = TRUE), 
+                         colMeans(P$z, na.rm = TRUE), plist)
+      
+    lwd <- ifelse (is.null (dot$points$lwd), 1, dot$points$lwd)
+    lty <- ifelse (is.null (dot$points$lty), 1, dot$points$lty)
+    P$lwd    <- rep(lwd , length.out = length(P$col))
+    P$lty    <- rep(lty , length.out = length(P$col))
+
+    Poly <- 
+      list(x      = cbind(Poly$x, P$x),
+           y      = cbind(Poly$y, P$y),               
+           z      = cbind(Poly$z, P$z),               
+           col    = c(Poly$col, P$col),
+           border = c(Poly$border, P$border),
+           proj   = c(Poly$proj, P$proj),
+           lwd    = c(Poly$lwd, P$lwd),
+           lty    = c(Poly$lty, P$lty)
+           )
+
+  }
+   
  # images and contours
   if (image$add) 
     Poly <- XYimage (Poly, image, x, y, z, plist, col) 
@@ -123,7 +174,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     segm <- NULL
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "persp3D") 
 
  # plot it
   plist <- plot.struct.3D(plist, poly = Poly, segm = segm, plot = plot)  

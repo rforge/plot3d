@@ -1,3 +1,62 @@
+ # a function to create polygons
+  add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border)  {
+
+    nr <- nrow(x) - 1
+    nc <- ncol(x) - 1
+    
+ # create polygons
+    ix <- rep(1:nr, nc)
+    iy <- as.vector(matrix(nrow = nr, ncol = nc, 
+                     data = 1:nc, byrow =TRUE))
+    xx <- x
+    yy <- y
+    zz <- z
+    
+  # the polygon coordinates
+    PolyX <- rbind(xx[cbind(ix,     iy    )],
+                   xx[cbind(ix + 1, iy    )],
+                   xx[cbind(ix + 1, iy + 1)],
+                   xx[cbind(ix,     iy + 1)], NA)
+    PolyY <- rbind(yy[cbind(ix,     iy    )],
+                   yy[cbind(ix + 1, iy    )],
+                   yy[cbind(ix + 1, iy + 1)],
+                   yy[cbind(ix,     iy + 1)], NA)
+    PolyZ <- rbind(zz[cbind(ix,     iy    )],
+                   zz[cbind(ix + 1, iy    )],
+                   zz[cbind(ix + 1, iy + 1)],
+                   zz[cbind(ix,     iy + 1)], NA)
+
+   # colvar is converted to colors.
+    if (! is.null(cv)) {
+      if (length(cv) == nrow(x))
+        cv <- 0.5*(cv[-1] + cv[-length(cv)])
+
+   # Colors for values = NA 
+      if (any (is.na(cv)) & ! is.null(NAcol) ) {
+        CC <- checkcolors(cv, col, NAcol, clim)
+        clim   <- CC$lim
+        col    <- CC$col
+        cv     <- CC$colvar
+      }
+      crange <- diff(clim)
+      N      <- length(col) -1
+      Col <- col[1 + trunc((cv - clim[1])/crange*N)]
+    } else 
+      Col <- rep(col, length.out = length(cv))
+
+ # border and colors 
+    Col <- createcolors(facets, border, Col)
+  
+ # update and return polygons.
+    poly <- 
+      list(x      = cbind(poly$x, PolyX),
+           y      = cbind(poly$y, PolyY),               
+           z      = cbind(poly$z, PolyZ),               
+           col    = c(poly$col, Col$facet),
+           border = c(poly$border, Col$border))
+    return(poly)
+  } 
+
 ## =============================================================================
 ## Adding polygons from a surface or persp to a plot
 ## =============================================================================
@@ -6,13 +65,13 @@
 addpoly <- function(poly, x, y, z, colvar = z, plist,
                      col = NULL, NAcol = "white", 
                      border = NA, facets = TRUE, lwd = 1, lty = 1,
-                     resfac = 1, clim = NULL,  
+                     resfac = 1, clim = NULL,   
                      ltheta = -135, lphi = 0, shade = NA, 
                      lighting = FALSE)  {
 
   if (missing(poly) | is.null(poly)) 
     poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
-                 lwd = NULL, proj = NULL)                    
+                 lwd = NULL, lty = NULL, proj = NULL)                    
   else if (class(poly) != "poly")
     stop ("'poly' not of correct type for addpoly")
 
@@ -23,9 +82,6 @@ addpoly <- function(poly, x, y, z, colvar = z, plist,
     dot$shade$ys <- plist$scalefac$y
     dot$shade$zs <- plist$scalefac$z
   }  
-  if (missing(poly))
-    poly <- list(x = NULL, y = NULL, z = NULL, col = NULL, border = NULL, 
-                 lwd = NULL, lty = NULL, proj = NULL)                    
 
   if (! is.matrix(z))
     stop("'z' should be a matrix")
@@ -72,15 +128,18 @@ addpoly <- function(poly, x, y, z, colvar = z, plist,
   if (any (DD != dim(z)) )
     stop("dimension of 'y' not equal to dimension of 'z'")
 
- # depth view of the points 
-  Proj   <- project(x, y, z, plist)
-    
- # create polygons - unsorted
+ # create polygons - unsorted                  
   ix <- rep(1:nrow(x), ncol(x))
   iy <- as.vector(matrix(nrow = nrow(x), ncol = ncol(x), 
                      data = 1:ncol(x), byrow =TRUE))
 
   Poly <- createpoly(x, y, z, ix, iy) 
+
+ # depth view of the points 
+  Proj   <- project(colMeans(Poly$X, na.rm = TRUE), 
+                    colMeans(Poly$Y, na.rm = TRUE), 
+                    colMeans(Poly$Z, na.rm = TRUE), plist)
+    
 
  # colvar is converted to colors.
   if (! is.null(colvar)) {

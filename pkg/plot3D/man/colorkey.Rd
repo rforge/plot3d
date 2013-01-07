@@ -151,6 +151,19 @@ colkey (col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
       cex.axis = 0.8, cex.clab = 0.85),
    clab = c("gradient","m/m"), plot = TRUE)
 
+## =======================================================================
+## categorical colors:
+## =======================================================================
+
+ with(iris, scatter3D(x = Sepal.Length, y = Sepal.Width, 
+   z = Petal.Length, colvar = as.integer(Species), 
+   col = c("red", "blue", "black"), pch = 16, cex = 2,
+   clim = c(1, 3), ticktype = "detailed", phi = 20,
+   xlab = "Sepal Length", ylab = "Sepal.Width", 
+   zlab = "Petal.Length",  main = "iris",
+   colkey = list(at = c(1.33, 2, 2.66), side = 1,
+   labels = c("setosa", "versicolor", "virginica"))))
+
 # reset plotting parameters
  par(mfrow = pm)
  par(mar = pmar)

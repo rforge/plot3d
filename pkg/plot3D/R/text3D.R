@@ -9,7 +9,7 @@ text3D <- function(x, y, z, labels, colvar = NULL, ...,
                       col = NULL, NAcol = "white", 
                       colkey = list(side = 4), 
                       panel.first = NULL,
-                      clim = NULL, clab = NULL, bty = "f",
+                      clim = NULL, clab = NULL, bty = "b",
                       add = FALSE, plot = TRUE) {
 
   if (add) 
@@ -76,6 +76,7 @@ text3D <- function(x, y, z, labels, colvar = NULL, ...,
 
  # sort labels according to view
   Proj   <- project(x, y, z, plist)
+
   setargs <- function(dot, default) {
     if (is.null(dot)) 
       rep(default, length.out = length(x))
@@ -88,7 +89,7 @@ text3D <- function(x, y, z, labels, colvar = NULL, ...,
   tlist <- list(x    = x,
                 y    = y,
                 z    = z,                                  
-                labels  = labels,
+                labels = labels,
                 col  = Col,
                 adj = setargs (dot$points$adj, 0),
                 cex = setargs (dot$points$cex, 1),
@@ -96,7 +97,8 @@ text3D <- function(x, y, z, labels, colvar = NULL, ...,
                 proj = Proj)                 
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "label3D") 
                  
   plist <- plot.struct.3D (plist, labels = tlist, plot = plot)        
 

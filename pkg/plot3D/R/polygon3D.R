@@ -1,5 +1,5 @@
 ## =============================================================================
-## 3-D polygon function
+## 3-D polygon and triangle function
 ## =============================================================================
 
 polygon3D  <- function(x, y, z, colvar = NULL, 
@@ -7,7 +7,7 @@ polygon3D  <- function(x, y, z, colvar = NULL,
                     col = NULL, NAcol = "white", 
                     border = NA, facets = TRUE,
                     colkey = list(side = 4), panel.first = NULL,
-                    clim = NULL, clab = NULL, bty = "f", 
+                    clim = NULL, clab = NULL, bty = "b", 
                     add = FALSE, plot = TRUE)  {
 
   if (add) 
@@ -18,6 +18,18 @@ polygon3D  <- function(x, y, z, colvar = NULL,
   dot  <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist)
 
 # checks
+  checkinput <- function (x) {
+    if (is.matrix(x)) {
+     x <- as.vector(x)
+     if (is.na (x[length(x)]) )
+       x <- x[-length(x)]
+    }
+    x
+  }
+  x <- checkinput(x)
+  y <- checkinput(y)
+  z <- checkinput(z)
+  
   if (length(y) != length(x))
     stop("'y' should have same length as 'x'")
   if (length(z) != length(x))
@@ -39,7 +51,7 @@ polygon3D  <- function(x, y, z, colvar = NULL,
     y[ii] <- NA
     z[ii] <- NA
     len <- length(ii) + 1  # number of polygons!
-#    xx <- x; yy <- y; zz <- z
+
     xx <- yy <- zz <- matrix(nrow = max(di) + 1, ncol = len, data = NA)
     ii <- c(0, ii, length(x)+ 1)
     for (i in 1 : len) {
@@ -67,7 +79,7 @@ polygon3D  <- function(x, y, z, colvar = NULL,
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     
-    if (dot$clog) {                       # log transformation of color-values 
+    if (dot$clog) {                       
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -76,7 +88,7 @@ polygon3D  <- function(x, y, z, colvar = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
-    Col <- variablecol(colvar, col, NAcol, clim) # generate color scheme
+    Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
@@ -102,7 +114,6 @@ polygon3D  <- function(x, y, z, colvar = NULL,
   lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
   lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
 
-
   Poly <- list(x = xx, 
                y = yy, 
                z = zz, 
@@ -111,19 +122,19 @@ polygon3D  <- function(x, y, z, colvar = NULL,
                lwd    = rep(lwd , length.out = len),
                lty    = rep(lty , length.out = len))
 
- # sort points according to view
   Poly$proj   <- project(colMeans(xx, na.rm = TRUE), colMeans(yy, na.rm = TRUE), 
     colMeans(zz, na.rm = TRUE), plist)
 
   class(Poly) <- "poly"
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "polygon3D") 
 
- # plot it
   plist <- plot.struct.3D(plist, poly = Poly, plot = plot)  
 
   setplist(plist)   
   invisible(plist$mat)
 }
+
+
 

@@ -115,7 +115,7 @@ persp(Volcano, theta = 40, phi = 40, col = "gold", border = NA, shade = 0.5)
 persp3D(z = Volcano, clab = "m")
 persp3D(z = Volcano, clab = "m", shade = 0.2)
 persp3D(z = Volcano, facets = FALSE)
-persp3D(z = Volcano, facets = FALSE, shade = 0.2)
+persp3D(z = Volcano, facets = FALSE, curtain = TRUE)
 persp3D(z = Volcano, col = "white", shade = 0.5)
 persp3D(z = Volcano, col = ramp.col(c("white", "black")), border = "black")
 persp3D(z = Volcano, facets = FALSE, col = "darkblue")
@@ -143,7 +143,7 @@ persp3D(z = Volcano, col = "lightblue", shade = 0.5, ticktype = "detailed")
 persp3D(z = Volcano, col = "lightblue", shade = 0.5, bty = "f")
 persp3D(z = Volcano, col = "lightblue", shade = 0.5, bty = "b2")
 persp3D(z = Volcano, col = "lightblue", shade = 0.5, bty = "g")
-persp3D(z = Volcano, col = "lightblue", shade = 0.5, bty = "bl")
+persp3D(z = Volcano, col = "lightblue", shade = 0.5, bty = "bl2")
 persp3D(z = Volcano, col = "lightblue", shade = 0.5, bty = "u",
       col.panel = "yellow", col.grid = "grey")
 persp3D(z = Volcano, col = "lightblue", shade = 0.5,
@@ -209,8 +209,8 @@ ix <- seq(1, nrow(Volcano), length.out = 20)
 iy <- seq(1, ncol(Volcano), length.out = 20)
 
 ribbon3D(z = Volcano[, iy])
-ribbon3D(z = Volcano[ix, ], dir = "y")
-ribbon3D(z = Volcano[ix, iy], dir = "xy")
+ribbon3D(z = Volcano[ix, ], along = "y")
+ribbon3D(z = Volcano[ix, iy], along = "xy")
 hist3D(z = Volcano[ix,iy], shade = 0.5)
 @
 

@@ -1,13 +1,12 @@
 ## =============================================================================
-## 3-D segments function
+## 3-D segments function; no shading/light
 ## =============================================================================
 
 segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
-                    colvar = NULL, 
-                    ..., phi = 40, theta = 40,
+                    colvar = NULL, ..., phi = 40, theta = 40,
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4), panel.first = NULL,
-                    clim = NULL, clab = NULL, bty = "f", 
+                    clim = NULL, clab = NULL, bty = "b", 
                     add = FALSE, plot = TRUE)  {
 
   if (add) 
@@ -15,7 +14,8 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
   else
     plist <- NULL
 
-  dot  <- splitdotpersp(list(...), bty, NULL, c(x0, x1), c(y0, y1), c(z0, z1), plist = plist)
+  dot  <- splitdotpersp(list(...), bty, NULL, 
+    c(x0, x1), c(y0, y1), c(z0, z1), plist = plist)
 
  # checks
   len <- length(x0)
@@ -30,7 +30,6 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
   if (length(z1) != len)
     stop("'z1' should have same length as 'x0'")
 
-  # colors
   if (ispresent(colvar)) { 
     if (length(colvar) != len)
       stop("'colvar' should have same length as 'x0', 'y0' and 'z0'")
@@ -44,7 +43,7 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     
-    if (dot$clog) {                       # log transformation of color-values 
+    if (dot$clog) {                    
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -53,7 +52,7 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    Col <- variablecol(colvar, col, NAcol, clim) # generate color scheme
+    Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
@@ -76,7 +75,6 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
   lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
   lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
 
- # sort points according to view
   Proj   <- project(0.5*(x0 + x1), 0.5*(y0 + y1), 
                     0.5*(z0 + z1), plist)
 
@@ -93,12 +91,12 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
   class(segm) <- "segments"
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "segments3D") 
 
- # plot it
   plist <- plot.struct.3D(plist, segm = segm, plot = plot)  
 
-  setplist(plist)   
+  setplist(plist)                      
   invisible(plist$mat)
 }
 

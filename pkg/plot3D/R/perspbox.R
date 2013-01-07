@@ -1,18 +1,20 @@
+# useable ranges for constants
 
-# ==============================================================================
-# Box around a perspective plot, x, y matrix or vector; z = matrix
-# ==============================================================================
 checklim <- function(lim) {
   if (diff(lim) == 0)
     lim <- lim * c(0.8, 1.2)
   if (diff(lim) == 0)
-    lim <- lim + c(-0.1,0.1)
+    lim <- lim + c(-0.1, 0.1)
   return(lim)
 }
 
+# ==============================================================================
+# Box around a perspective plot, x, y matrix or vector; z = matrix
+# ==============================================================================
+
 perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
                      y = seq(0, 1, length.out = ncol(z)),
-                     z,  bty = c("f", "b", "b2", "g", "bl", "u", "n"),    # predefined types
+                     z,  bty = c("b", "b2", "f", "g", "bl", "bl2", "u", "n"),    # predefined types
                      ..., col.axis = "black", 
                      col.panel = NULL, lwd.panel = 1,
                      col.grid = NULL, lwd.grid = 1,
@@ -69,9 +71,10 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
   if (is.null(dot$ylab)) dot$ylab <- "y"
   if (is.null(dot$zlab)) dot$zlab <- "z"
 
-  bty <- match.arg(bty)#, c("b", "b2", "f", "g", "bl", "u"))
+  bty <- match.arg(bty)#, c("b", "b2", "f", "g", "bl", "bl2", "u"))
   if (bty == "n")   
     dot$box <- FALSE
+  plist$persp$bty <- bty
     
   plist$persp$drawbox <- TRUE
   if (! is.null(dot$box))
@@ -92,6 +95,8 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
       lwd.grid <- 2
       col.grid <- "white"
     } else if (bty == "bl") {
+      col.panel <- "black" 
+    } else if (bty == "bl2") {
       col.panel <- "black" 
       col.axis <- "grey"
       lwd.grid <- 2
@@ -138,33 +143,33 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
 ## plot box based on plist
 ## =============================================================================
 
-  plotbox <- function (plist) {
+plotbox <- function (plist) {
 
-    par(plt = plist$plt$main)
-    plist$persp$box <- TRUE
-     plist$mat <- 
+  par(plt = plist$plt$main)
+  plist$persp$box <- TRUE
+   plist$mat <- 
       do.call("persp", c(alist(plist$xlim, plist$ylim,
             z = matrix(nrow = 2, ncol = 2, data = plist$zlim),
             phi = plist$persp$phi, theta = plist$persp$theta, border = NA, col = NA),
             plist$dot))
 
-    if (plist$persp$drawbox) {
-      P <- !visibility(plist$xlim, plist$ylim, plist$zlim, plist$mat)
-   # e.g for theta <90  P <- c(FALSE, TRUE, TRUE, FALSE, TRUE, FALSE)
-      with (plist$persp$panel, {
-        panels <- (!is.null(col.panel) | lwd.panel != 1) 
+  if (plist$persp$drawbox) {
+    P <- !visibility(plist$xlim, plist$ylim, plist$zlim, plist$mat)
+ # e.g for theta <90  P <- c(FALSE, TRUE, TRUE, FALSE, TRUE, FALSE)
+    with (plist$persp$panel, {
+      panels <- (!is.null(col.panel) | lwd.panel != 1) 
 
-        if (panels) 
-          color.panels(P, plist$xlim, plist$ylim, plist$zlim, 
-            plist$mat, col.panel, lwd.panel, col.axis)
+      if (panels) 
+        color.panels(P, plist$xlim, plist$ylim, plist$zlim, 
+           plist$mat, col.panel, lwd.panel, col.axis)
     
-        if (!is.null(col.grid))
-          grid.panels(P, plist$xlim, plist$ylim, plist$zlim, 
-            plist$mat, col.grid, plist$dot$nticks, lwd.grid)
-      })
-    }        
+      if (!is.null(col.grid))
+        grid.panels(P, plist$xlim, plist$ylim, plist$zlim, 
+           plist$mat, col.grid, plist$dot$nticks, lwd.grid)
+    })
+  }        
   plist  
-  }
+}
   
 ## =============================================================================
 ## Set background color to backward panels
@@ -290,6 +295,7 @@ grid.panels <- function(P, xlim, ylim, zlim, pmat, gcol, nticks, lwd) {
                 col = gcol)
 }
 
+# code based on plot3d.c
 # points on edges (x,y,z)
   Vertex <- matrix(ncol = 3, byrow = TRUE, data = c(
        1, 1, 1,  #xlim[1], ylim[1], zlim[1]
@@ -312,6 +318,7 @@ grid.panels <- function(P, xlim, ylim, zlim, pmat, gcol, nticks, lwd) {
 
 visibility <- function(xlim, ylim, zlim, pmat) {
   Near <- vector(length = 6)
+
   for (ii in 1:6) {
 	  p <- Face[ii, ]
 
@@ -406,3 +413,72 @@ transmat <- function (phi, theta, scalefac, r, d) {
   return(VT) 
 }
 
+## =============================================================================
+## Draw visible edges of box
+## =============================================================================
+
+drawfullbox <- function(plist) {
+  P <- visibility(plist$xlim, plist$ylim, plist$zlim, plist$mat)
+
+  addsegments <- function(x0, x1, y0, y1, z0, z1) {
+
+    XY0 <- trans3D(x = x0, y = y0, z = z0, pmat = plist$mat)
+    XY1 <- trans3D(x = x1, y = y1, z = z1, pmat = plist$mat)
+    segments(XY1$x, XY1$y, XY0$x, XY0$y, col = "black")
+  }
+  xlim <- plist$xlim
+  ylim <- plist$ylim
+  zlim <- plist$zlim
+  
+  if (P[1])
+    addsegments(xlim, xlim,
+                rep(ylim[1], 2), rep(ylim[1], 2),
+                rep(zlim[1], 2), rep(zlim[2], 2))
+  if (P[1])
+    addsegments(rep(xlim[1], 2), rep(xlim[2], 2),
+                rep(ylim[1], 2), rep(ylim[1], 2),
+                zlim, zlim)
+
+  if (P[3])
+    addsegments(rep(xlim[1], 2), rep(xlim[1], 2),
+                rep(ylim[1], 2), rep(ylim[2], 2),
+                zlim, zlim)
+  if (P[3])
+    addsegments(rep(xlim[1], 2), rep(xlim[1], 2),
+                ylim, ylim,
+                rep(zlim[1], 2), rep(zlim[2], 2))
+ 
+  if (P[2])
+    addsegments(xlim, xlim, 
+                rep(ylim[2], 2), rep(ylim[2], 2),
+                rep(zlim[1], 2), rep(zlim[2], 2))
+  if (P[2])
+    addsegments(rep(xlim[1], 2), rep(xlim[2], 2),
+                rep(ylim[2], 2), rep(ylim[2], 2),
+                zlim, zlim)
+  if (P[4])
+    addsegments(rep(xlim[2], 2), rep(xlim[2], 2),
+                ylim, ylim,
+                rep(zlim[1], 2), rep(zlim[2], 2))
+  if (P[4])
+    addsegments(rep(xlim[2], 2), rep(xlim[2], 2),
+                rep(ylim[1], 2), rep(ylim[2], 2),
+                zlim, zlim)
+  if (P[5])
+    addsegments(xlim, xlim,
+                rep(ylim[1], 2), rep(ylim[2], 2),
+                rep(zlim[1], 2), rep(zlim[1], 2))
+  if (P[5])
+    addsegments(rep(xlim[1], 2), rep(xlim[2], 2),
+                ylim, ylim,
+                rep(zlim[1], 2), rep(zlim[1], 2))
+  if (P[6])
+    addsegments(rep(xlim[1], 2), rep(xlim[2], 2),
+                ylim, ylim,
+                rep(zlim[2], 2), rep(zlim[2], 2))
+  if (P[6])
+    addsegments(xlim, xlim,
+                rep(ylim[1], 2), rep(ylim[2], 2),
+                rep(zlim[2], 2), rep(zlim[2], 2))
+
+}

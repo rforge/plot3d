@@ -1,39 +1,34 @@
-\name{3-D contours}
-\alias{contour3D}
+\name{images in 3D frame}
+\alias{image3D}
 \title{
- Contours in 3-D plots.
+ Images in 3-D plots.
 }
 \description{
-  \code{conour3D} adds a \link{contour} in a 3-D plot. 
+  \code{image3D} adds an \link{Image} in a 3-D plot. 
 }
 \usage{
-contour3D (x = NULL, y = NULL, z, colvar = z, 
-       ..., phi = 40, theta = 40,
-       col = NULL,  NAcol = "white", border = NA, facets = TRUE,
-       colkey = list(side = 4), resfac = 1,
-       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
-       inttype = 1, dDepth = 1e-1, add = FALSE, plot = TRUE)
+image3D (x = NULL, y = NULL, z = NULL, colvar = NULL, 
+      ..., phi = 40, theta = 40, 
+      col = jet.col(100),  NAcol = "white", 
+      border = NA, facets = TRUE, colkey = list(side = 4), 
+      panel.first = NULL,
+      clim = NULL, clab = NULL, bty = "b",
+      inttype = 1, add = FALSE, plot = TRUE)
 }
 
 \arguments{
-  \item{z }{Matrix (2-D) or one value containing the values where the 
-    \link{Contour} is to be plotted. 
+  \item{x, y, z }{Matrix (2-D), vector, or one value containing the values 
+    where the \link{Image} is to be plotted. 
+    At least one should be one number.
+    If two vectors, the first vector should be of length equal to 
+    \code{nrow(colvar)} and the second should be of length equal to 
+    \code{ncol(colvar)}. 
     }
-  \item{x, y }{Vectors with x and y values, or one value where the \link{Contour} 
-    is to be plotted. 
-    \code{x} should be of length equal to \code{nrow(colvar)} and 
-    \code{y} should be of length equal to \code{ncol(colvar)}. 
-    }
-  \item{colvar }{The variable used for coloring. If present, it should have the 
-    same dimension of \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
+  \item{colvar }{The variable used for coloring. Values of \code{NULL}, \code{NA}, or \code{FALSE}
     will toggle off coloration according to \code{colvar}. This gives good results
     only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
     }
   \item{col }{Colors to be used for the \code{colvar} variable.
-    If \code{col} is \code{NULL} and \code{colvar} is specified, 
-    then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
-    If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
-    \code{col} will be "black". 
     }
   \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
     }
@@ -54,13 +49,6 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
     for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
-  \item{resfac }{Resolution factor, one value or a vector of two numbers, for 
-    the x and y- values respectively. A value > 1 will increase the 
-    resolution. For instance, if \code{resfac} equals \code{3} then for each 
-    adjacent pair of x- and y-values, z will be interpolated to two intermediary points. 
-    This uses simple linear interpolation. If \code{resfac} is one number then
-    the resolution will be increased similarly in x and y-direction.  
-    }
   \item{theta, phi }{The angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. 
     see \link{persp}.
@@ -75,7 +63,7 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     It is usually faster to draw with \code{facets = FALSE}.
     }
   \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
-    set up but before any plotting takes place. 
+    set up (and if applicable, images or contours drawn) but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
     be defined as \code{function(pmat)}. See example.
@@ -88,12 +76,6 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
     values (\code{inttype = 2}) - see \link{persp3D}.
     } 
-  \item{dDepth }{When a contour is added on an image, the image polygons may
-    hide some contour segments. To avoid that, the viewing depth of the segments
-    can be artificially decreased with the factor \code{dDepth} times the 
-    \link{persp} argument \code{expand} (usually = 1), to make them 
-    appear in front of the polygons. Too large values may create visible artifacts.
-    }   
   \item{add }{Logical. If \code{TRUE}, then the contours will be added to the current plot.
     If \code{FALSE} a new plot is started. 
     } 
@@ -108,24 +90,23 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
-    For all functions, the arguments \code{lty, lwd} can be specified.
+    Also the arguments \code{lty, lwd} can be specified.
     
     The arguments after \dots must be matched exactly.
     }
 }
-\note{
-  To make a \code{contour} to appear on top of an image, the viewing depth
-  of the contour segments is artificially decreased. in some cases this 
-  may produce slight artifacts.
+\details{
+  \code{image3D} calls the \link{surf3D} function. The x, y, and z values are 
+  expanded as a matrix. 
 }
 \value{
   Returns the viewing transformation matrix.
   See \link{trans3D}
 }
 \seealso{
-  \link{persp3D} for the function on which \code{contour3D} is based.
+  \link{persp3D} for the function on which \code{image3D} is based.
 
-  \link{contour} for R's 2-D contour function.
+  \link{Image} for \code{plot3D}s 2-D image function.
 }
 \author{Karline Soetaert <karline.soetaert@nioz.nl>
 }
@@ -134,43 +115,41 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
  pm <- par("mfrow")
 
 ## =======================================================================
-## Contours
+## images in x, y, z plane
 ## =======================================================================
 
- contour3D(z = 100, colvar = volcano, zlim = c(0, 150),
-   clab = c("height", "m"))
-
- contour3D(z = volcano, colvar = volcano, lwd = 2, 
-   nlevels = 20, clab = c("height", "m"))
-
-## =======================================================================
-## Composite images and contours in 3D
-## =======================================================================
- persp3D(z = volcano, zlim = c(90, 300), col = "white", 
-         shade = 0.1, d = 2)
- contour3D(z = volcano, colvar = volcano, lwd = 2, 
-         add = TRUE, nlevels = 20, clab = c("height", "m"))
- contour3D(z = 300, colvar = volcano, lwd = 2, col = "grey",
-         add = TRUE, nlevels = 20, clab = c("height", "m"))
-          
-## =======================================================================
-## the viewing depth of contours (dDepth)
-## =======================================================================
  par(mfrow = c(2, 2))
-# too low
- persp3D(z = volcano, col = "white", shade = 0.1)
- contour3D(z = volcano, colvar = volcano, lwd = 2, 
-         add = TRUE, dDepth = 0, col = "black")
 
-# default
- persp3D(z = volcano, col = "white", shade = 0.1)
- contour3D(z = volcano, colvar = volcano, lwd = 2, 
-         add = TRUE, dDepth = 0.1, col = "black")
+# images in x, y, z plane
+ image3D(x = seq(0, 1, 0.1), y = seq(0, 1, 0.1), z = 0.5, 
+   zlim = c(0,1), col = "green")
+ image3D(x = seq(0, 1, 0.1), z = seq(0, 1, 0.1), y = 0.5, 
+   add = TRUE, col = "red")
+ image3D(y = seq(0, 1, 0.1), z = seq(0, 1, 0.1), x = 0.5, 
+   add = TRUE, col = "blue")
+ colkey(col = c("green", "red", "blue"), clim = c(0.5, 3.5), 
+   at = 1:3, labels = c("z", "y", "x"), add = TRUE)
+#
+ image3D(z = 100, colvar = volcano, zlim = c(0, 150),
+   clab = c("height", "m"))
+  
+#
+ image3D( x = 0.5, colvar = volcano, xlim = c(0, 1), 
+   ylim = c(0, 1), zlim = c(0, 1))
 
-# too high
- persp3D(z = volcano, col = "white", shade = 0.1)
- contour3D(z = volcano, colvar = volcano, lwd = 1, 
-         add = TRUE, dDepth = 0.5, col = "black")
+ image3D( y = 0.5, colvar = volcano, add = TRUE)
+
+#
+ image3D( z = 1, colvar = volcano, 
+   x = seq(0, 1, length.out = nrow(volcano)),
+   y = seq(0, 1, length.out = ncol(volcano)), 
+   xlim = c(0, 2), ylim = c(0, 2), zlim = c(0, 2))
+ image3D(y = 2, colvar = volcano, add = TRUE, 
+    x = seq(0, 1, length.out = nrow(volcano)),
+    z = seq(1, 2, length.out = ncol(volcano)))
+ image3D(x = 2, colvar = NULL, col = "orange", add = TRUE, 
+    y = seq(0, 1, length.out = nrow(volcano)),
+    z = seq(1, 2, length.out = ncol(volcano)))
 
 # reset plotting parameters
  par(mfrow = pm)

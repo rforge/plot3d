@@ -1,5 +1,4 @@
-require(plot3D)
-#spheresurf3D(full = FALSE)
-require(plot3D)
-Contour(z = Hypsometry$z, levels = 0)
-Image(Hypsometry$z, contour = list(levels = 0, col = "black"))
+#??contour3D along x, y
+ require(plot3D.rgl)
+persp3D(z = volcano, facets = FALSE, lighting = TRUE, curtain = TRUE, 
+ lphi = 45, ltheta = 45, phi = 0)

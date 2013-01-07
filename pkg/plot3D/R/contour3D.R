@@ -1,42 +1,8 @@
 ## =============================================================================
-## contours and images, x, y matrix or vector; z = matrix
+## contours in 3-D plot
 ## =============================================================================
 
-image3D <- function(x = NULL, 
-                  y = NULL, 
-                  z, colvar = z, ..., 
-                  phi = 40, theta = 40,
-                  col = NULL,  NAcol = "white", 
-                  border = NA, facets = TRUE,
-                  colkey = list(side = 4), resfac = 1, 
-                  contour = FALSE, panel.first = NULL,
-                  clim = NULL, clab = NULL, bty = "b",
-                  inttype = 1, add = FALSE, plot = TRUE){
-
-  if (is.matrix(z))
-    stop ("'z' should be a value for 'image3D'")
-
-  if (length(z) > 1)
-      stop("'z'  should be one value for 'image3D'") 
-  if (is.null(x))
-    x <- seq(0, 1, length.out = nrow(colvar))
-  if (is.null(y))
-    y <- seq(0, 1, length.out = ncol(colvar))
-  z <- matrix(nrow = length(x), ncol = length(y), data = z)  
-    
-  plist <- persp3D (x = x, y = y, z = z, colvar = colvar, 
-                  phi = phi, theta = theta,
-                  col = col,  NAcol = NAcol, 
-                  border = border, facets = facets,
-                  colkey = colkey, resfac = resfac, add = add, 
-                  contour = contour, panel.first = panel.first,
-                  clim = clim, clab = clab, bty = bty,
-                  inttype = inttype, plot = plot, ...)
-  invisible (plist)
-}                  
-
-contour3D <- function(x = NULL, 
-                  y = NULL, 
+contour3D <- function(x = NULL, y = NULL, 
                   z, colvar = z, ..., 
                   phi = 40, theta = 40,
                   col = NULL,  NAcol = "white", 
@@ -51,6 +17,7 @@ contour3D <- function(x = NULL,
     plist <- getplist()
   else
     plist <- NULL
+
  # check input
   if (!ispresent(colvar)) 
     stop ("'colvar' should be present for contour3D")
@@ -67,9 +34,9 @@ contour3D <- function(x = NULL,
     stop("'y' should be a vector")
 
   dot <- splitdotpersp(list(...), bty, FALSE, x, y, z, plist = plist)
-
+  
   contour <- list(args = dot$points) 
-    
+  
   if (! is.matrix(z)) {
     if (length(z) > 1)
       stop("'z'  should be a matrix or one value") 
@@ -94,7 +61,7 @@ contour3D <- function(x = NULL,
   contour$args$col <- col
     
  # swap if decreasing
-  if (all(diff(x) < 0)) {    # swap
+  if (all(diff(x) < 0)) {    
     if (is.null(dot$persp$xlim)) 
       dot$persp$xlim <- rev(range(x))
     x <- rev(x)
@@ -103,7 +70,7 @@ contour3D <- function(x = NULL,
       colvar <- colvar[nrow(colvar):1, ]
   }
  
-  if (all(diff(y) < 0)) {    # swap
+  if (all(diff(y) < 0)) {    
     if (is.null(dot$persp$ylim)) 
       dot$persp$ylim <- rev(range(y))
     y <- rev(y)
@@ -119,7 +86,7 @@ contour3D <- function(x = NULL,
   if (iscolkey) 
     colkey <- check.colkey(colkey)
     
-  if (dot$clog) {                # log transformation of color-values 
+  if (dot$clog) {                
     colvar <- log(colvar)
     clim <- log(clim)
   }
@@ -137,14 +104,14 @@ contour3D <- function(x = NULL,
   if (is.function(panel.first)) 
     panel.first(plist$mat)         
                                  
- # contours
+ # create contours
   segm <- contourfunc(contour, x, y, colvar, plist, cv = colvar, 
     clim = clim, dDepth = dDepth)
    
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "contour3D") 
 
- # plot and update plist
   plist <- plot.struct.3D(plist, segm = segm, plot = plot)  
 
   setplist(plist)   

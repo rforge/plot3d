@@ -23,7 +23,7 @@ plot.plist <- function(x, ...)  {
     shadenames <- c("ltheta", "lphi", "shade", "lighting")
     if (sum( shadenames %in% names(dot)) > 0)
       if (! is.null(x$poly))
-        x <- color3D(x, dot[shadenames])
+        x$poly <- color3D(x$poly, x$scalefac, dot[shadenames], dot$lighting)
   
     if ("alpha" %in% names(dot))
       x <- alpha3D(x, dot[["alpha"]])
@@ -54,6 +54,8 @@ plot.struct.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
 
   if (plot) {
     plotlist3D(plist)
+    if (plist$persp$bty == "f")
+      drawfullbox(plist)
     if (! is.null(plist$colkey))
       drawallcols(plist)
 
@@ -101,40 +103,38 @@ alpha3D <- function(plist, alpha) { # makes colors transparant
 
 ## =============================================================================
 
-color3D <- function(plist, shade) {  # lighting and shading
+color3D <- function(poly, scalefac, shade, lighting) {  # lighting and shading
 
-  poly <- plist$poly
-  lighting <- shade$lighting
   shade$lighting <- NULL
   
   shade <- check.shade(shade, lighting)
 
   light   <- setuplight(shade$lphi, shade$ltheta) [1:3]              
-  px <- poly$x * plist$scalefac$x
-  py <- poly$y * plist$scalefac$y
-  pz <- poly$z * plist$scalefac$z
+  px <- poly$x * scalefac$x
+  py <- poly$y * scalefac$y
+  pz <- poly$z * scalefac$z
   Normals <- normal.points(rbind(px[1,], py[1,], pz[1,]) , 
                            rbind(px[2,], py[2,], pz[2,]) , 
                            rbind(px[3,], py[3,], pz[3,]) )
     
-  ii <- which (! is.na(plist$poly$col))
+  ii <- which (! is.na(poly$col) & poly$col != "transparent" )
   if (length(ii) > 0) {   
     if (shade$type == "shade") 
       pcol <- facetcols.shade(light, Normals, poly$col, shade$shade)
     else if (shade$type == "light") 
       pcol <-  facetcols.light(light, Normals, poly$col, shade)
-    plist$poly$col[ii] <- pcol[ii] 
+    poly$col[ii] <- pcol[ii] 
   }    
 
-  ii <- which (! is.na(plist$poly$border))
+  ii <- which (! is.na(poly$border))
   if (length(ii) > 0) {   
     if (shade$type == "shade") 
       pcol <- facetcols.shade(light, Normals, poly$border, shade$shade)
     else if (shade$type == "light") 
       pcol <-  facetcols.light(light, Normals, poly$border, shade)
-    plist$poly$border[ii] <- pcol[ii] 
+    poly$border[ii] <- pcol[ii] 
   }    
-  plist
+  poly
 }
 
 ## =============================================================================

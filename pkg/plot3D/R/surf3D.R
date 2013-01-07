@@ -55,7 +55,8 @@ surf3D <- function(x, y, z, colvar = z, ...,
     iscolkey <- FALSE
 
   CC <- check.colvar.persp (colvar, z, col, inttype, clim)
-  col <- CC$col; colvar <- CC$colvar
+  col <- CC$col
+  colvar <- CC$colvar
   
   Extend <- inttype == 2
 
@@ -74,7 +75,8 @@ surf3D <- function(x, y, z, colvar = z, ...,
           facets, dot$points$lwd, dot$points$lty, dot$shade, Extend)
 
   if (iscolkey)  
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "surf3D") 
 
   plist <- plot.struct.3D(plist, poly = Poly, plot = plot)  
 

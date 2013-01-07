@@ -2,6 +2,7 @@
 \alias{slice3D}
 \alias{slicecont3D}
 \alias{isosurf3D}
+\alias{triangle3D}
 \alias{voxel3D}
 \alias{createisosurf}
 \alias{createvoxel}
@@ -10,11 +11,11 @@
 }
 \description{
   
-  \code{slice3D} plots a 3-d dataset with a color variable as slices or on surfaces.
+  \code{slice3D} plots a 3-D dataset with a color variable as slices or on surfaces.
 
-  \code{slicecont3D} plots a 3-d dataset with a color variable as contours on slices.
+  \code{slicecont3D} plots a 3-D dataset with a color variable as contours on slices.
   
-  \code{isosurf3D} creates and plots isosurfaces from a 3-d dataset.
+  \code{isosurf3D} creates and plots isosurfaces from a 3-D dataset.
 
   \code{voxel3D} creates and plots isosurfaces as scatterpoints.
 
@@ -39,18 +40,26 @@ slicecont3D (x, y, z, colvar, ..., phi = 40, theta = 40,
          dDepth = 0, add = FALSE, plot = TRUE) 
 
 isosurf3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
-         level = mean(colvar), col = "grey", border = NA, 
-         facets = TRUE, colkey = list(side = 4), 
-         panel.first = NULL, clab = NULL, bty = "b", 
+         level = mean(colvar), isofunc = createisosurf,
+         col = "grey", border = NA, facets = TRUE, 
+         colkey = list(side = 4), panel.first = NULL, 
+         clab = NULL, bty = "b", 
          ltheta = -135, lphi = 0, shade = 0.5, 
          lighting = FALSE, add = FALSE, plot = TRUE) 
-
-createisosurf (x, y, z, colvar, level = mean(colvar))
 
 voxel3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
          level = mean(colvar), eps = 0.01, operator = "=", 
          col = jet.col(100), panel.first = NULL, 
          bty = "b", add = FALSE, plot = TRUE) 
+
+triangle3D (tri, colvar = NULL, ..., phi = 40, theta = 40,
+           col = NULL, NAcol = "white", 
+           border = NA, facets = TRUE,
+           colkey = list(side = 4), panel.first = NULL,
+           lighting = FALSE, clim = NULL, clab = NULL,
+           bty = "b", add = FALSE, plot = TRUE)  
+
+createisosurf (x, y, z, colvar, level = mean(colvar))
 
 createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
              operator = "=")
@@ -64,8 +73,17 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
   \item{colvar }{The variable used for coloring. 
     It should be an array of dimension equal to 
     \code{c(length(x), length(y), length(z))}.
+    For \code{triangle3D}, \code{colvar} should be of length = nrow(tri) / 3.
     It must be present.
     }
+  \item{tri }{A three-columned matrix (x, y, z) with triangle coordinates. 
+    A triangle is defined by three consecutive rows.
+  }  
+  \item{isofunc }{A function defined as \code{function(x, y, z, colvar, level},
+    and that returns the three-columned matrix with triangle coordinates.
+    The default, \code{createisosurf} is not very efficient, a better 
+    alternative is to use function \code{contour3d} from package \code{misc3d}.
+  }
   \item{theta, phi }{the angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. see \link{persp}.
     }
@@ -180,8 +198,12 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
   The \code{isosurf3D} function implements the Marching Cubes algorithm.
   It is quite slow, and should not be used for large values of x, y, z.
 
-  A different (better?) implementation can be found in package \code{misc3d} - where it 
-  is called \code{contour3d}.
+  A different and much faster implementation can be found in package \code{misc3d} 
+  - where it is called \code{contour3d}. 
+  
+  For \code{voxel3D}, coloring is according to the z-variable. A more flexible
+  coloration can be achieved by using \code{createvoxel}, followed by \link{scatter3D}.
+  See examples.
 }
 
 \value{
@@ -189,7 +211,8 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
   See \link{trans3D}
   
   Function \code{createisosurf} returns a three-columned matrix (x, y, z) with 
-  triangles. A triangle is defined by three consecutive rows.
+  triangle coordinatess. One triangle is defined by three consecutive rows.
+  It can be plotted with \code{triangle3D}.
   
   Function \code{createvoxel} returns a list with the elements \code{x, y, z} 
   defining the points that are at a distance of less than 
@@ -295,14 +318,40 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
  plotdev(lighting = TRUE, alpha = 0.2, theta = 0)
 
 # use of creatisosurf
-\dontrun{
  iso <- createisosurf(x, y, z, F, level = 2)
  head(iso)
+ triangle3D(iso, col = "green", shade = 0.3)
+
+\dontrun{
+ # higher resolution
+  x <- y <- z <- seq(-2, 2, length.out = 50)
+  xyz <- mesh(x, y, z)
+  F <- with(xyz, log(x^2 + y^2 + z^2 + 
+                10*(x^2 + y^2) * (y^2 + z^2) ^2))
+
+ # use function contour3d from misc3d to generate the triangles.
+  require(misc3d)
+  isofun <- function(x, y, z, colvar, level) {
+     zz <-  contour3d(f = colvar, level, x, y, z, engine = "none")
+     Tri <- cbind(as.vector(rbind(zz$v1[,1], zz$v2[,1], zz$v3[,1])),
+                  as.vector(rbind(zz$v1[,2], zz$v2[,2], zz$v3[,2])),
+                  as.vector(rbind(zz$v1[,3], zz$v2[,3], zz$v3[,3])))
+     Tri
+  }
+
+# three levels
+  isosurf3D(x, y, z, F, level = seq(0, 4, by = 2), 
+    isofunc = isofun, col = c("red", "blue", "yellow"), 
+    shade = NA, plot = FALSE, clab = "F")  
+  plotdev(lighting = TRUE, alpha = 0.2, theta = 0)
+     
 }
 
 ## =======================================================================
 ## voxel3D example
 ## =======================================================================
+
+ par(mfrow = c(2, 2), mar  = c(2, 2, 2, 2))
 
 # fast but needs high resolution grid
  x <- y <- z <- seq(-2, 2, length.out = 100)
@@ -312,21 +361,18 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
 
  voxel3D(x, y, z, F, level = 4)
 
-
 ## =======================================================================
 ## rotation 
 ## =======================================================================
 
-\dontrun{ # using createvoxel
+ plotdev(theta = 45, phi = 0)
+ plotdev(theta = 90, phi = 10)
+
+# same using createvoxel -  more flexible for coloring
  vox <- createvoxel(x, y, z, F, level = 4)
  scatter3D(vox$x, vox$y, vox$z, colvar = vox$y, 
    bty = "b", colkey = FALSE)
-}
 
- plotdev(theta = 0)
- plotdev(theta = 45, phi = 0)
- plotdev(theta = 90, phi = 10)
- plotdev(theta = 135, phi = 10)
 
 ## =======================================================================
 ## voxel3D to show hypox sites

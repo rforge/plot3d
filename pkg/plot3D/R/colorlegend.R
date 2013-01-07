@@ -19,7 +19,7 @@ is.colkey <- function(colkey, col) {
   iscol <- ispresent(col) 
   
   if (iscol) {
-    if ( length(col) == 1) 
+    if (length(col) == 1) 
       iscol <- FALSE
     else if (length(col) == 2 & col[1] == col[2]) 
       iscol <- FALSE
@@ -67,7 +67,8 @@ check.colkey <- function(colkeypar, add = FALSE) {
       pos = NA, outer = FALSE, font = NA, lty = 1, lwd = 1, 
       lwd.ticks = 1, col.box = NULL, col.axis = NULL, 
       col.ticks = NULL, hadj = NA, padj = NA, 
-      cex.axis = par("cex.axis"), mgp = NULL, tck = NULL, tcl = NULL, las = NULL)
+      cex.axis = par("cex.axis"), mgp = NULL, 
+      tck = NULL, tcl = NULL, las = NULL)
                              
   colkeypar$parleg <- colkeypar$parplt <- NULL
   colkey <- overrulepar(parameter, colkeypar)
@@ -129,11 +130,11 @@ key.parleg <- function(colkey, add) {   # the plotting parameters
 }
 
 ## =============================================================================
-## function to save the color key settings
+## function to save the color key settings in the plotting list
 ## =============================================================================
 
 plistcolkey <- function (plist, colkeypar, col, zlim, zlab = NULL, 
-                         zlog = FALSE, New = TRUE)  {
+                         zlog = FALSE, New = TRUE, type = "scatter3D")  {
   if (is.null(plist$colkey))  {
     plist$colkey <- list()
     plist$numkeys <- 1
@@ -141,7 +142,7 @@ plistcolkey <- function (plist, colkeypar, col, zlim, zlab = NULL,
     plist$numkeys <- plist$numkeys + 1
 
   plist$colkey[[plist$numkeys]] <- list(par = colkeypar, col = col, 
-    zlim = zlim, zlab = zlab, zlog = zlog, New = New)
+    zlim = zlim, zlab = zlab, zlog = zlog, New = New, type = type)
   plist
 } 
                               
@@ -231,7 +232,6 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
 ## R-function to draw a color key
 ## =============================================================================
 ## =============================================================================
-
 
 colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE, 
                    cex.clab = NULL, col.clab = NULL, 

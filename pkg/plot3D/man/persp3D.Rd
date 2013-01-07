@@ -22,7 +22,8 @@ persp3D (x = seq(0, 1, length.out = nrow(z)),
        colkey = list(side = 4), resfac = 1,
        image = FALSE, contour = FALSE, panel.first = NULL,
        clim = NULL, clab = NULL, bty = "b", 
-       lighting = FALSE, inttype = 1, add = FALSE, plot = TRUE)
+       lighting = FALSE, inttype = 1, 
+       curtain = FALSE, add = FALSE, plot = TRUE)
 
 ribbon3D (x = seq(0, 1, length.out = nrow(z)), 
       y = seq(0, 1, length.out = ncol(z)), z, colvar = z, 
@@ -31,8 +32,8 @@ ribbon3D (x = seq(0, 1, length.out = nrow(z)),
       colkey = list(side = 4), resfac = 1, 
       image = FALSE, contour = FALSE, panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",
-      lighting = FALSE, space = 0.4, dir = "x", 
-      add = FALSE, plot = TRUE)
+      lighting = FALSE, space = 0.4, along = "x", 
+      curtain = FALSE, add = FALSE, plot = TRUE)
 
 hist3D (x = seq(0, 1, length.out = nrow(z)),
       y = seq(0, 1, length.out = ncol(z)), z, colvar = z, 
@@ -119,9 +120,11 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     The function should have as argument the transformation matrix, e.g. it should
     be defined as \code{function(pmat)}. See example.
     } 
-  \item{dir }{The direction in which the ribbons are drawn, one of "x", "y" or "xy",
+  \item{along }{The direction along which the ribbons are drawn, one of "x", "y" or "xy",
     for ribbons parallel to the x- y- or both axes. In the latter case, the 
     figure looks like a net.
+    }
+  \item{curtain }{If \code{TRUE}, the ribbon or persp edges will be draped till the bottom. 
     }
   \item{space }{The amount of space (as a fraction of the average bar/ribbon width) 
     left between bars/ribbons. A value inbetween [0, 0.9] (\code{hist3D}) 
@@ -246,7 +249,7 @@ The New S Language. Wadsworth & Brooks/Cole.
  ribbon3D(z = V, colkey = list(width = 0.5, length = 0.5, 
           cex.axis = 0.8, side = 2), clab = "m")
  Vy <- volcano[seq(1, nrow(volcano), by = 3), ]
- ribbon3D(z = Vy, expand = 0.3, space = 0.3, dir = "y", 
+ ribbon3D(z = Vy, expand = 0.3, space = 0.3, along = "y", 
           colkey = list(width = 0.5, length = 0.5, cex.axis = 0.8))
   
 ## =======================================================================
@@ -259,15 +262,13 @@ The New S Language. Wadsworth & Brooks/Cole.
 
  z    <- with(grid, cos(x) * sin(y))
 
- theta <- 40
-
  par(mfrow = c(2,2))
- persp3D(z = z, x = x, y = y, theta = theta)
- persp3D(z = z, x = x, y = y, theta = theta, facets = FALSE)
+ persp3D(z = z, x = x, y = y)
+ persp3D(z = z, x = x, y = y, facets = FALSE, curtain = TRUE)
 
 # ribbons in two directions and larger spaces
- ribbon3D(z = z, x = x, y = y, theta = theta, dir = "xy", space = 0.3)
- hist3D(z = z, x = x, y = y, theta = theta, border = "black")  
+ ribbon3D(z = z, x = x, y = y, along = "xy", space = 0.3)
+ hist3D(z = z, x = x, y = y, border = "black")  
   
 ## =======================================================================
 ## Several persps on one plot
@@ -387,7 +388,7 @@ The New S Language. Wadsworth & Brooks/Cole.
 ## =======================================================================
 
  par(mfrow = c(2, 2))
- VV   <- volcano[seq(1, 87, 10), seq(1, 61, 10)]
+ VV   <- volcano[seq(1, 87, 15), seq(1, 61, 15)]
  hist3D(z = VV, scale = FALSE, expand = 0.01)
 
 # transparent colors
@@ -399,17 +400,24 @@ The New S Language. Wadsworth & Brooks/Cole.
  hist3D(z = VV, scale = FALSE, expand = 0.01, facets = NA)
 
 ## =======================================================================
-## hist3D with greyish background, rotated, rescaled,...
+## hist3D and ribbon3D with greyish background, rotated, rescaled,...
 ## =======================================================================
 
- par(mfrow = c(1, 1))
+ par(mfrow = c(2, 2))
  hist3D(z = VV, scale = FALSE, expand = 0.01, bty = "g", phi = 20,
         col = "#0072B2", border = "black", shade = 0.2, ltheta = 90,
-        space = 0.15, ticktype = "detailed", d = 2)
+        space = 0.3, ticktype = "detailed", d = 2)
 
 # extending the ranges
- plotdev(xlim = c(-0.15, 1.15), ylim = c(-0.15, 1.15), theta = 45)
+ plotdev(xlim = c(-0.2, 1.2), ylim = c(-0.2, 1.2), theta = 45)
 
+ ribbon3D(z = VV, scale = FALSE, expand = 0.01, bty = "g", phi = 20,
+        col = "lightblue", border = "black", shade = 0.2, ltheta = 90,
+        space = 0.3, ticktype = "detailed", d = 2, curtain = TRUE)
+
+ ribbon3D(z = VV, scale = FALSE, expand = 0.01, bty = "g", phi = 20, zlim = c(95,183),
+        col = "lightblue", lighting = TRUE, ltheta = 50, along = "y",
+        space = 0.7, ticktype = "detailed", d = 2, curtain = TRUE)
 
 ## =======================================================================
 ## hist3D for a 1-D data set

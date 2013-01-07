@@ -184,20 +184,15 @@ plotdev(...)
   
  x <- seq(-1.5, 1.5, length.out = Nx)
  y <- seq(-1, 2, length.out = Ny)
-  
- Z <- matrix(nrow = Nx, ncol = Ny, data = 0)
 
- persp3D (x = x, y = y, z = Z, add = TRUE, colvar = NULL, 
+ image3D (x = x, y = y, z = 0, add = TRUE, colvar = NULL, 
           col = "blue", facets = TRUE, plot = FALSE)
 
 # another, small plane at y = 0 - here x and y have to be matrices!
  x <- seq(-1., 1., length.out = 50)
  z <- seq(-1., 1., length.out = 50)
-
- M <- mesh(x, z)
- Y <- matrix(nrow = 50, ncol = 50, data = 0)
  
- surf3D (x = M$x, y = Y, z = M$y, colvar = NULL, 
+ image3D (x = x, y = 0, z = z, colvar = NULL, 
          add = TRUE, col = NA, border = "blue", 
          facets = TRUE, plot = TRUE)       
 
@@ -207,27 +202,27 @@ plotdev(...)
 }
 
 ## ========================================================================
-## Zooming, rescaling, lighint,...
+## Zooming, rescaling, lighting,...
 ## ========================================================================
 
  par(mfrow = c(2, 2)) 
 
 # The volcano
- x <- 1:nrow(volcano)
- y <- 1:ncol(volcano)
-
+ x <- seq(1, nrow(volcano), by = 2)
+ y <- seq(1, ncol(volcano), by = 2)
+ V <- volcano[x,y]
 # plot the volcano
- persp3D (x, y, z = volcano, colvar = volcano, theta = 10, phi = 20, 
+ persp3D (x, y, z = V, colvar = V, theta = 10, phi = 20, 
           box = FALSE, scale = FALSE, expand = 0.3, 
-          clim = range(volcano), plot = FALSE)
+          clim = range(V), plot = FALSE)
 
 # add a plane (image) at z = 170; jetcolored, transparant: only border
- image3D(x, y, z = 170, add = TRUE, clim = range(volcano),
-         colvar = volcano, facets = NA, plot = FALSE)
+ image3D(x, y, z = 170, add = TRUE, clim = range(V), 
+         colvar = V, facets = NA, plot = FALSE)
 
 # add a contour (image) at z = 170; jetcolored, 
- contour3D(x, y, z = 170, add = TRUE, clim = range(volcano),
-           colvar = volcano, facets = NA, plot = FALSE)
+ contour3D(x, y, z = 170, add = TRUE, clim = range(V),
+           colvar = V, facets = NA, plot = FALSE)
 
 # plot it  - 
  plot(getplist())   #  same as plotdev()

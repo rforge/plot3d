@@ -8,20 +8,20 @@
 ## =============================================================================
 
 border3D  <- function(x0, y0, z0, x1, y1, z1,
-                   colvar = NULL,
-                   ..., phi = 40, theta = 40,
+                   colvar = NULL, ..., phi = 40, theta = 40,
                    col = NULL, NAcol = "white",
                    colkey = list(side = 4), 
                    panel.first = NULL,
-                   clim = NULL, clab = NULL, bty = "f", 
-                   add = FALSE,plot = TRUE)  {
+                   clim = NULL, clab = NULL, bty = "b", 
+                   add = FALSE, plot = TRUE)  {
 
   if (add) 
     plist <- getplist()
   else
     plist <- NULL
   
-  dot  <- splitdotpersp(list(...), bty, NULL, c(x0, x1), c(y0, y1), c(z0, z1), plist = plist)
+  dot  <- splitdotpersp(list(...), bty, NULL, 
+    c(x0, x1), c(y0, y1), c(z0, z1), plist = plist)
 
 # checks
   len <- length(x0)
@@ -50,7 +50,7 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
-    if (dot$clog) {                       # log transformation of color-values
+    if (dot$clog) {                    # log transformation of color-values
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -59,7 +59,7 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    Col <- variablecol(colvar, col, NAcol, clim) # generate color scheme
+    Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
@@ -68,7 +68,6 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
     iscolkey <- FALSE
   }
 
-
   if (is.null(plist)) {
     do.call("perspbox",
        c(alist(x = range(c(x0, x1)), y = range(c(y0, y1)),
@@ -76,6 +75,7 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
                phi = phi, theta = theta, plot = plot, col = col), dot$persp))
     plist <- getplist()
   }  
+
   if (is.function(panel.first))
     panel.first(plist$mat)
 
@@ -106,7 +106,8 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
       lty    = c(segm$lty, rep(lty[i], length.out = 12))
     )
   }
- # sort points according to view
+  
+ # sort according to view
   segm$proj <- project(0.5*(segm$x.from + segm$x.to),
                        0.5*(segm$y.from + segm$y.to), 
                        0.5*(segm$z.from + segm$z.to), plist)
@@ -114,9 +115,9 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
   class(segm) <- "segments"
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog)
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "border3D")
 
- # plot it
   plist <- plot.struct.3D(plist, segm = segm, plot = plot)
 
   setplist(plist)   
@@ -128,12 +129,11 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
 ## =============================================================================
 
 rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
-                   colvar = NULL,
-                   ..., phi = 40, theta = 40,
+                   colvar = NULL, ..., phi = 40, theta = 40,
                    col = NULL, NAcol = "white",
                    border = NA, facets = TRUE,
                    colkey = list(side = 4), panel.first = NULL,
-                   clim = NULL, clab = NULL, bty = "f", 
+                   clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
 
   if (add) 
@@ -180,7 +180,7 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
-    if (dot$clog) {                       # log transformation of color-values
+    if (dot$clog) {                    # log transformation of color-values
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -189,7 +189,7 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    Col <- variablecol(colvar, col, NAcol, clim) # generate color scheme
+    Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
@@ -250,9 +250,9 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
   class(poly) <- "poly"
 
   if (iscolkey ) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog)
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "rect3D")
 
- # plot it
   plist <- plot.struct.3D(plist, poly = poly, plot = plot)
 
   setplist(plist)
@@ -269,7 +269,7 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
                    col = NULL, NAcol = "white",
                    border = NA, facets = TRUE,
                    colkey = list(side = 4), panel.first = NULL,
-                   clim = NULL, clab = NULL, bty = "f", 
+                   clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
   if (add) 
     plist <- getplist()
@@ -292,7 +292,7 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
   if (length(z1) != len)
     stop("'z1' should have same length as 'x0'")
 
-  # colors
+ # colors
   if (ispresent(colvar)) {
     if (length(colvar) != len)
       stop("'colvar' should have same length as 'x0', 'y0' and 'z0'")
@@ -306,7 +306,7 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
-    if (dot$clog) {                       # log transformation of color-values
+    if (dot$clog) {                    # log transformation of color-values
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -315,7 +315,7 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    Col <- variablecol(colvar, col, NAcol, clim) # generate color scheme
+    Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
@@ -370,16 +370,16 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
       lty    = c(poly$lty,    rep(lty[i], length.out = 6))
     )
   }
- # sort points according to view
+ # sort according to view
   poly$proj <- project(colMeans(poly$x, na.rm = TRUE),
                        colMeans(poly$y, na.rm = TRUE), 
                        colMeans(poly$z, na.rm = TRUE), plist, FALSE)
   class(poly) <- "poly"
 
   if (iscolkey ) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog)
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "box3D")
 
- # plot it
   plist <- plot.struct.3D(plist, poly = poly, plot = plot)
 
   setplist(plist)

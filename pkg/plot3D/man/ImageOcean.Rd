@@ -103,7 +103,7 @@ Hypsometry
 \dontrun{
  persp3D(z = Hypsometry$z[ii,jj], resfac = 4,  
        contour = list(col = "grey", side = c("zmin", "z")), 
-       zlim = zlim, clab = "depth, m", bty = "bl",
+       zlim = zlim, clab = "depth, m", bty = "bl2",
        xlab = "longitude", ylab = "latitude", zlab = "depth", 
        expand = 0.5, d = 2, phi = 20, theta = 30,
        colkey = list(side = 1, length = 0.5, dist = -0.1))

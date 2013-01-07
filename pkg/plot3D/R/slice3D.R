@@ -37,10 +37,19 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
   }
  
  # Function to add images on a plane as polygons
-  image.plane <- function(xs, ys, zs, paint = FALSE) {
-    ix <- FindInterval(xs, x, all.inside = TRUE)
-    iy <- FindInterval(ys, y, all.inside = TRUE)
-    iz <- FindInterval(zs, z, all.inside = TRUE)
+  image.plane <- function(xs, ys, zs, paint = FALSE, i = 0) {
+    if (i == 1)   # all xs are same
+      ix <-  FindInterval(xs[1], x, all.inside = TRUE)
+    else      
+      ix <- FindInterval(xs, x, all.inside = TRUE)
+    if (i == 2) 
+      iy <- FindInterval(ys[1], y, all.inside = TRUE)
+    else 
+      iy <- FindInterval(ys, y, all.inside = TRUE)
+    if (i == 3) 
+      iz <- FindInterval(zs[1], z, all.inside = TRUE)
+    else 
+      iz <- FindInterval(zs, z, all.inside = TRUE)
     
    # colorvar 
     cv <- matrix(nrow = nrow(xs), ncol = ncol(xs), data = colvar[cbind(ix, iy, iz)])
@@ -55,10 +64,10 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
   } # end function imageplane
 
  # Function to first create a plane and then draw an image on it
-  add.plane <- function(xs, ys, zs) {
+  add.plane <- function(xs, ys, zs, i = 0) {
 
     M <- mesh(xs, ys, zs)
-    image.plane (M$x[,,], M$y[,,], M$z[,,]) # [,,] to make sure it is an array
+    image.plane (M$x[,,], M$y[,,], M$z[,,], i = i) # [,,] to make sure it is an array
 
   }  # end addplane
 
@@ -76,15 +85,17 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
     image.plane(xs, ys, zs, paint = TRUE)  
   
   } else { # xs, ys, zs define the positions in x,y,z on which to plot
-  
-    for (x.s in xs[!is.na(xs)])
-      add.plane(x.s, y, z)
+    if (! is.null(xs))
+      for (x.s in xs[!is.na(xs)])
+        add.plane(x.s, y, z, 1)
      
-    for (y.s in ys[!is.na(ys)]) 
-      add.plane(x, y.s, z)
+    if (! is.null(ys))
+      for (y.s in ys[!is.na(ys)]) 
+        add.plane(x, y.s, z, 2)
     
-    for (z.s in zs[!is.na(zs)]) 
-      add.plane(x, y, z.s)
+    if (! is.null(zs))
+      for (z.s in zs[!is.na(zs)]) 
+        add.plane(x, y, z.s, 3)
   }
   
   return(poly)
@@ -112,14 +123,13 @@ slice3D <- function(x, y, z, colvar, ...,
 
   dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
 
-  iscolkey <- is.colkey(colkey, col)    # check if colkey is needed
+  iscolkey <- is.colkey(colkey, col)    
   if (iscolkey) 
     colkey <- check.colkey(colkey)
 
   if (is.null(clim))
     clim <- range(colvar, na.rm = TRUE)     
 
- # log transformation of color-values 
   if (dot$clog) {
     colvar <- log(colvar)
     clim <- log(clim)
@@ -145,7 +155,8 @@ slice3D <- function(x, y, z, colvar, ...,
                    lighting = lighting)
    
   if (iscolkey)  
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, 
+      dot$clog, type = "slice3D") 
  
   plist <- plot.struct.3D(plist, poly = Poly, plot = plot)  
 

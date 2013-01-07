@@ -3,7 +3,8 @@
 ## =============================================================================
 # x, y, colvar: vector or matrix of same dimension
 
-scatter <- function(x, y, colvar = NULL, ..., col = NULL, NAcol = "white", 
+scatter <- function(x, y, colvar = NULL, ..., 
+                    col = NULL, NAcol = "white", 
                     colkey = list(side = 4), 
                     clim = NULL, clab = NULL, CI = NULL, add = FALSE) {
 
@@ -13,7 +14,6 @@ scatter <- function(x, y, colvar = NULL, ..., col = NULL, NAcol = "white",
   if (isCI) 
     CI <- check.CI(CI, length(x), 2)
   
- # log transformation of color-values 
   clog <- FALSE 
   if (! is.null(dots$log)) {
     if (length(grep("c", dots[["log"]])) > 0) {
@@ -32,7 +32,7 @@ scatter <- function(x, y, colvar = NULL, ..., col = NULL, NAcol = "white",
       if (! is.null(clim)) clim <- log(clim) 
     }
     
-    iscolkey <- is.colkey(colkey, col)         # check if colkey is needed
+    iscolkey <- is.colkey(colkey, col)        
 
     if (iscolkey) {
       colkey <- check.colkey(colkey, add)
@@ -46,7 +46,7 @@ scatter <- function(x, y, colvar = NULL, ..., col = NULL, NAcol = "white",
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     
-    Col <- variablecol(colvar, col, NAcol, clim) # generate color scheme
+    Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else  {  # no colvar
     Col <- col
@@ -84,10 +84,11 @@ scatter <- function(x, y, colvar = NULL, ..., col = NULL, NAcol = "white",
       rect(pu[1], pu[3], pu[2], pu[4], 
         col = grey(0.925), border = grey(0.925))
       grid(col = "white", lty = 1, lwd = 2)
-    } else if (bty == "bl") {
+    } else if (bty %in% c("bl","bl2")) {
       pu <- par("usr")
       rect(pu[1], pu[3], pu[2], pu[4], col = "black")
-      grid(col = "grey", lty = 1, lwd = 2)
+      if (bty == "bl2") 
+        grid(col = "grey", lty = 1, lwd = 2)
     }
   }
   

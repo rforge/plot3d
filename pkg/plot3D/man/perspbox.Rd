@@ -9,7 +9,7 @@
 \usage{
 perspbox (x = seq(0, 1, length.out = nrow(z)), 
           y = seq(0, 1, length.out = ncol(z)), z, 
-          bty = c("f", "b", "b2", "g", "bl", "u", "n"),  ..., 
+          bty = c("b", "b2", "f", "g", "bl", "bl2", "u", "n"),  ..., 
           col.axis = "black", col.panel = NULL, lwd.panel = 1,                     
           col.grid = NULL, lwd.grid = 1, 
           phi = 40, theta = 40, col = NULL,
@@ -32,7 +32,8 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
     \code{"f"} is the full box, the default as from \link{persp}, 
     \code{"b"} has only the back panels visible, when \code{"b2"}
     has back panels and grid lines, \code{"g"} has grey background with white 
-    gridlines, \code{"bl"} has a black background with grey lines.
+    gridlines, \code{"bl"} has a black background, 
+    \code{"bl2"} has a black background with grey lines.
     \code{"u"} means that the user will specify the arguments 
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} manually.
     \code{"n"} means that no box will be drawn. This is the same as setting

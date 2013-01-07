@@ -202,7 +202,7 @@ A color key is added on first margin (\code{side})
 par(mfrow = c(1, 1))
 
 # Actual bathymetry, 4 times increased resolution, with contours
-persp3D(z = Hypsometry$z[ii,jj], xlab = "longitude", bty = "bl",
+persp3D(z = Hypsometry$z[ii,jj], xlab = "longitude", bty = "bl2",
         ylab = "latitude", zlab = "depth", clab = "depth, m", 
         expand = 0.5, d = 2, phi = 20, theta = 30, resfac = 3,  
         contour = list(col = "grey", side = c("zmin", "z")), zlim = zlim, 

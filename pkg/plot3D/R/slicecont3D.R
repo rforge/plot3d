@@ -1,5 +1,5 @@
 ## =============================================================================
-## 3-d representation using contours in x, y or z
+## 3-d representation using contour slices in x, y or z
 ## =============================================================================
 # x, y, z vectors or arrays, colvar: array
 
@@ -48,32 +48,31 @@ slicecont3D <- function(x, y, z, colvar, ...,
   if (is.null(col)) 
     col <- jet.col(100)
   
-  iscolkey <- is.colkey(colkey, col)    # check if colkey is needed
+  iscolkey <- is.colkey(colkey, col)    
   if (iscolkey) 
     colkey <- check.colkey(colkey)
         
   if (is.null(clim))
     clim <- range(colvar, na.rm = TRUE)     
 
- # log transformation of color-values 
   if (dot$clog) {
-     colvar <- log(colvar)
-     clim <- log(clim)
+    colvar <- log(colvar)
+    clim <- log(clim)
   }
 
  # Colors for values = NA 
   if (any (is.na(colvar)) & ! is.null(NAcol) ) {
-     CC <- checkcolors(colvar, col, NAcol, clim)
-     clim   <- CC$lim
-     col    <- CC$col
-     colvar <- CC$colvar
+    CC <- checkcolors(colvar, col, NAcol, clim)
+    clim   <- CC$lim
+    col    <- CC$col
+    colvar <- CC$colvar
   }
 
   crange <- diff(clim)
   N      <- length(col) -1
 
   getcol <- function(v) 
-     col[1 + trunc((v - clim[1])/crange*N)]
+    col[1 + trunc((v - clim[1])/crange*N)]
 
   lwd <- dot$points$lwd
   if (is.null(lwd)) lwd<- 1
@@ -83,7 +82,6 @@ slicecont3D <- function(x, y, z, colvar, ...,
   if (is.null(lty)) lty<- 1
   dot$points$lty   <- NULL
 
- # call persp without doing anything
   if (is.null(plist)) {
     do.call("perspbox", c(alist(x = range(x), y = range(y), 
              z = range(z, na.rm = TRUE),
@@ -92,7 +90,7 @@ slicecont3D <- function(x, y, z, colvar, ...,
     plist <- getplist()
   }  
   if (is.function(panel.first)) 
-      panel.first(plist$mat)         
+    panel.first(plist$mat)         
   Seg <- NULL
   templines <- function(clines, x = NULL, y = NULL, z = NULL) {
     
@@ -141,7 +139,7 @@ slicecont3D <- function(x, y, z, colvar, ...,
   }
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "slicecont3D") 
 
   if (ispresent(border)) {
     for (x.s in xs) 

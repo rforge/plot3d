@@ -22,7 +22,7 @@ arrows3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "f", 
+         clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
 segments3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL, 
@@ -30,7 +30,7 @@ segments3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "f", 
+         clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
 box3D (x0, y0, z0, x1, y1, z1, colvar = NULL, 
@@ -38,7 +38,7 @@ box3D (x0, y0, z0, x1, y1, z1, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", border = NA, facets = TRUE,
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "f", 
+         clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
 border3D(x0, y0, z0, x1, y1, z1, colvar = NULL,
@@ -46,7 +46,7 @@ border3D(x0, y0, z0, x1, y1, z1, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "f", 
+         clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)  
 
 rect3D (x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL, colvar = NULL, 
@@ -54,7 +54,7 @@ rect3D (x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", border = NA, facets = TRUE,
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "f", 
+         clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
 polygon3D (x, y, z, colvar = NULL, 
@@ -62,7 +62,7 @@ polygon3D (x, y, z, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", border = NA, facets = TRUE,
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "f", 
+         clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)  
 }
 
@@ -130,7 +130,7 @@ polygon3D (x, y, z, colvar = NULL,
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
     for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
-  \item{bty }{The type of the perspective box, the default draws full box.
+  \item{bty }{The type of the perspective box, the default draws only the back panels.
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     }

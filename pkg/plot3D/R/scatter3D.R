@@ -24,7 +24,7 @@ scatter3D <- function(x, y, z, colvar = z, ...,
                       col = NULL, NAcol = "white", 
                       colkey = list(side = 4), 
                       panel.first = NULL, clim = NULL, clab = NULL, 
-                      bty = "f", CI = NULL, surf = NULL, 
+                      bty = "b", CI = NULL, surf = NULL, 
                       add = FALSE, plot = TRUE) {
 
   if (add) 
@@ -243,7 +243,6 @@ scatter3D <- function(x, y, z, colvar = z, ...,
     class(pt) <- "pt"
   }
 
- # sort points according to view
   Proj   <- project(x, y, z, plist)
 
   if (! is.null(CI)) 
@@ -252,7 +251,7 @@ scatter3D <- function(x, y, z, colvar = z, ...,
     pt$proj <- Proj
     
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog) 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "scatter3D") 
 
  # plot it
   plist <- plot.struct.3D(plist, pt = pt, CIpt = CIpt, 

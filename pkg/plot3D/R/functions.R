@@ -5,7 +5,7 @@
 ## =============================================================================
 
 ## =============================================================================
-## Extend to embrace points, but not exceeding boundaries
+## Extend/average to embrace points, but not exceeding boundaries
 ## =============================================================================
 
 extend <- function(x) {
@@ -57,7 +57,7 @@ Segments <- function (x0, y0, x1, y1, col, lty, lwd, ...) {
 }
 
 ## =============================================================================
-## List to draw legend/contour?
+## List to draw legend/contour 
 ## =============================================================================
 
 check.args <- function(ll) {
@@ -86,7 +86,7 @@ check.args <- function(ll) {
 }
 
 ## =============================================================================
-## A function to plot contours on bottom or top panel; returns two functions
+## Segments to plot contours on bottom or top panel
 ## =============================================================================
     
 contourfunc <- function(contour, x, y, z, plist, cv = NULL, 
@@ -106,7 +106,8 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
   contour$args$x <- contour$args$y <- contour$args$z <- NULL
   if (is.null(cv))
     cv <- z
-    
+  contour$args$lighting <- contour$args$shade <- NULL
+  
   line.list <- 
     do.call("contourLines", c(alist(x, y, cv), 
       contour$args$nlevels, contour$args$levels))
@@ -166,7 +167,7 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
 
    # interpolate
         zz <- (1-yfac)*((1-xfac)*z[cbind(ix,iy)  ]+xfac*z[cbind(ixp1,iy)]) +
-              yfac*((1-xfac)*z[cbind(ix,iyp1)]+xfac*z[cbind(ixp1,iyp1)])
+                  yfac*((1-xfac)*z[cbind(ix,iyp1)]+xfac*z[cbind(ixp1,iyp1)])
         Col <- getcol(line.list[[i]]$level)
 
         segm <- do.call("addlines", c(alist(segm, line.list[[i]]$x, line.list[[i]]$y, 
@@ -190,7 +191,7 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
 }
           
 ## =============================================================================
-## XY values if image is to be drawn on bottom or top panel
+## polygons if image is to be drawn on bottom or top panel
 ## =============================================================================
 
 XYimage <- function(poly, image, x, y, z,  plist, col) { 
@@ -231,7 +232,7 @@ XYimage <- function(poly, image, x, y, z,  plist, col) {
 
 FindInterval <- function(x, vec, ...) {
 
-  if (all(diff(vec) < 0)) {# swap
+  if (all(diff(vec) < 0)) { 
     vec <- rev(vec)
     res <- c(length(vec):1) [findInterval(x, vec, ...)]-1
   } else 
@@ -403,7 +404,7 @@ variablecol <- function(colvar, col, NAcol, clim) {
   colvar[colvar > clim[2]] <- NA
   rn <- clim[2] - clim[1]
   ifelse (rn != 0, Col <- col[1 + trunc((colvar - clim[1])/rn * 
-      (ncol - 1))], Col <- rep(col[1], ncol))
+    (ncol - 1))], Col <- rep(col[1], ncol))
   Col[is.na(Col)] <- NAcol
   return(Col)
 }
@@ -515,17 +516,15 @@ check.colvar.persp <- function(colvar, z, col, inttype, clim) {
 }
 
 ## =============================================================================
-## =============================================================================
-## DOTS splitted, expanded, extracted. etc..
-## =============================================================================
+## ranges, scaling factors
 ## =============================================================================
 
 setlim <- function(xlim, ylim, zlim, scale, expand) {
+  
   if (is.null(scale))
     scale <- TRUE
   if (is.null(expand))
     expand <- 1
-      
 
   xs <- 0.5 *abs(diff(xlim))
   ys <- 0.5 *abs(diff(ylim))
@@ -542,7 +541,7 @@ setlim <- function(xlim, ylim, zlim, scale, expand) {
   xs <- ifelse (xs == 0, 1, 1 / xs)
   ys <- ifelse (ys == 0, 1, 1 / ys)
   zs <- ifelse (zs == 0, 1, expand / zs)
-  list(x = xs, y = ys, z = zs, xc = xc, yc = yc, zc = zc)
+  list(x = xs, y = ys, z = zs, xc = xc, yc = yc, zc = zc, expand = expand)
 }  
 
 ## =============================================================================
@@ -550,6 +549,7 @@ setlim <- function(xlim, ylim, zlim, scale, expand) {
 ## =============================================================================
 
 check.shade <- function(shadedots, lighting) {
+
   if (is.null(shadedots$lphi))
     shadedots$lphi <- 0
   if (is.na(shadedots$lphi))
@@ -588,7 +588,7 @@ check.shade <- function(shadedots, lighting) {
 ## Split dots in part related to persp/other + set clog, labels
 ## =============================================================================
 
-splitdotpersp <- function(dots, bty = "f", lighting = NULL, 
+splitdotpersp <- function(dots, bty = "b", lighting = NULL, 
    x = NULL, y = NULL, z = NULL, col = NULL, plist = NULL) { 
 
   dots$bty <- bty
