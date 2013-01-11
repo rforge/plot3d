@@ -354,12 +354,12 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
  par(mfrow = c(2, 2), mar  = c(2, 2, 2, 2))
 
 # fast but needs high resolution grid
- x <- y <- z <- seq(-2, 2, length.out = 100)
+ x <- y <- z <- seq(-2, 2, length.out = 70)
  xyz <- mesh(x, y, z)
  F <- with(xyz, log(x^2 + y^2 + z^2 + 
                 10*(x^2 + y^2) * (y^2 + z^2) ^2))
 
- voxel3D(x, y, z, F, level = 4)
+ voxel3D(x, y, z, F, level = 4, pch = ".", cex = 5)
 
 ## =======================================================================
 ## rotation 
