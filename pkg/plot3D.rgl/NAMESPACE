@@ -1,1 +1,1 @@
-export(plotrgl)
+export(plotrgl, zoomrgl, unzoomrgl)

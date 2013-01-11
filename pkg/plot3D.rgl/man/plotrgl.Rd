@@ -8,15 +8,17 @@
 
 }
 \usage{
-plotrgl (new = TRUE, lighting = FALSE, ...) 
+plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...) 
 }
 
 \arguments{
+  \item{lighting }{Logical, when \code{TRUE} will add light.
+  Default is toggled off ; this is similar to shading
+    }
   \item{new }{Logical, when \code{TRUE} will open a new window. 
   When \code{FALSE} will start a new plot in the same window.
     }
-  \item{lighting }{Logical, when \code{TRUE} will add light.
-  Default is toggled off ; this is similar to shading
+  \item{add }{Logical, when \code{TRUE} will add to the current plot.
     }
   \item{... }{Any argument to the \code{rgl} functions, e.g arguments from
     \link{par3d}, \link{open3d} or \link{material3d}.
@@ -270,7 +272,7 @@ plotrgl (new = TRUE, lighting = FALSE, ...)
  plotrgl()
  
 ## =======================================================================
-## hist3D with text
+## scatter3D with text
 ## =======================================================================
  
  with(USArrests, text3D(Murder, Assault, Rape,
