@@ -4,6 +4,8 @@ S3method("Image", "array")
 S3method("Image", "list")
 S3method("plot", "plist")
 
+importFrom(misc3d, computeContour3d)
+
 export(mesh, jet.col, gg.col, ramp.col, alpha.col, colkey, trans3D)
 export(scatter)
 export(Image, Contour, ImageOcean)

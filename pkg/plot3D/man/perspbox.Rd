@@ -19,14 +19,15 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
 \arguments{
   \item{x, y }{Vectors with x and y values. It is sufficient to pass the 
     ranges of the x- and y-values, as they will not be drawn. 
-    It is however required that \code{length(x) = nrow(z)} and 
+    If \code{z} is a matrix, it is required that \code{length(x) = nrow(z)} and 
     \code{length(y) = ncol(z)}.
     }
-  \item{z }{Matrix with z-values. It is sufficient to pass a diagonal 
-    matrix with the range of the z-values, as they will not be drawn. 
+  \item{z }{Matrix or vector with z-values. If \code{z} is a matrix, 
+    it is sufficient to pass a diagonal matrix with the range of the z-values, 
+    as they will not be drawn. 
     }
   \item{bty }{The type of the box; only effective if the \link{persp} 
-    argument \code{box} equals \code{TRUE}.
+    argument \code{box} equals \code{TRUE} (the default).
     Unless \code{bty} is equal to \code{"u"} then the arguments 
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} will be ignored.
     \code{"f"} is the full box, the default as from \link{persp}, 
@@ -62,8 +63,8 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
     If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{additional arguments passed to \link{persp}. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -74,7 +75,7 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
 
 \value{
   Function \code{perspbox} returns the viewing transformation matrix.
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 
 \seealso{

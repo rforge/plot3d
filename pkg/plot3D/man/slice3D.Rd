@@ -15,12 +15,15 @@
 
   \code{slicecont3D} plots a 3-D dataset with a color variable as contours on slices.
   
-  \code{isosurf3D} creates and plots isosurfaces from a 3-D dataset.
+  \code{isosurf3D} plots isosurfaces from a 3-D dataset.
 
-  \code{voxel3D} creates and plots isosurfaces as scatterpoints.
+  \code{voxel3D} plots isosurfaces as scatterpoints.
 
-  Functions \code{createisosurf, createvoxel} create the isosurfaces (traingulations)
-  and voxels (x, y, z) points from volumetric data.
+  \code{createisosurf} create the isosurfaces (triangulations)
+  from volumetric data. Its output can be plotted with \code{triangle3D}.
+
+  \code{createvoxel} creates voxels (x, y, z) points from volumetric data. 
+  Its output can be plotted with \link{scatter3D}.
 }
 \usage{
 slice3D (x, y, z, colvar, ..., phi = 40, theta = 40,
@@ -73,17 +76,17 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
   \item{colvar }{The variable used for coloring. 
     It should be an array of dimension equal to 
     \code{c(length(x), length(y), length(z))}.
-    For \code{triangle3D}, \code{colvar} should be of length = nrow(tri) / 3.
+    For \code{triangle3D}, \code{colvar} should be of length = nrow(\code{tri}) / 3.
     It must be present.
     }
   \item{tri }{A three-columned matrix (x, y, z) with triangle coordinates. 
     A triangle is defined by three consecutive rows.
-  }  
-  \item{isofunc }{A function defined as \code{function(x, y, z, colvar, level},
+    }  
+  \item{isofunc }{A function defined as \code{function(x, y, z, colvar, level)},
     and that returns the three-columned matrix with triangle coordinates.
-    The default, \code{createisosurf} is not very efficient, a better 
-    alternative is to use function \code{contour3d} from package \code{misc3d}.
-  }
+    The default, \code{createisosurf} uses function \link{computeContour3d} 
+    from package \code{misc3d}. 
+    }
   \item{theta, phi }{the angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. see \link{persp}.
     }
@@ -115,7 +118,7 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
     set up but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
-    be defined as \code{function(pmat)}. See last example of \link{persp3D}.
+    be defined as \code{function(pmat)}. See last example and example of \link{persp3D}.
     } 
   \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE}, 
     the label to be written on top of the color key. 
@@ -134,8 +137,9 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
   \item{level }{The level(s) at which the \code{contour} will be generated or the
     isosurfaces generated. 
     
-    There can be more than one level, but for \code{slicecont3D} too many will give a crowded view, and one is often best.
-    For \code{isosurf3D}, the use of multiple values may need transparent colors (and it will be slow).
+    There can be more than one level, but for \code{slicecont3D} too many 
+    will give a crowded view, and one is often best.
+    For \code{isosurf3D}, the use of multiple values may need transparent colors to visualise.
     For \code{voxel3D}, \code{level} should either be one number (if \code{operator}
     equals \code{'=', '<', '>'}) or two numbers (for \code{operator = '<>'}).
     } 
@@ -163,7 +167,7 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
     A point is selected if it closer than \code{eps*diff(range(colvar))} 
     to the required level.
     }
-  \item{operator }{One of '=', '<', '>', '<>' for selection of points equal (within
+  \item{operator }{One of '=', '<', '>', '<>' for selection of points `equal' (within
     precision), larger or smaller than the required level or to be within an 
     interval.
     }
@@ -171,7 +175,8 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
     hide some contour segments. To avoid that, the viewing depth of the segments
     can be artificially decreased with the factor \code{dDepth} times the 
     \link{persp} argument \code{expand} (usually = 1), to make them 
-    appear in front of the polygons. Too large values may create visible artifacts.
+    appear in front of the polygons. 
+    Too large values of \code{dDepth} may create visible artifacts.
     See \link{contour3D}.
     }   
   \item{add }{Logical. If \code{TRUE}, then the slices, voxels or surfaces will be added to the current plot.
@@ -179,7 +184,7 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
      otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    } 
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -195,33 +200,29 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
 }
 
 \note{
-  The \code{isosurf3D} function implements the Marching Cubes algorithm.
-  It is quite slow, and should not be used for large values of x, y, z.
-
-  A different and much faster implementation can be found in package \code{misc3d} 
-  - where it is called \code{contour3d}. 
+  The \code{isosurf3D} function uses function  \code{computeContour3d}, 
+  from package \code{misc3d}, which is based on the marching cubes algorithm.
+  Please cite the package \code{misc3d} (Feng & Tierney, 2008) when using \code{isosurf3D}.
   
-  For \code{voxel3D}, coloring is according to the z-variable. A more flexible
+  For \code{voxel3D}, coloring is always according to the z-variable. A more flexible
   coloration can be achieved by using \code{createvoxel}, followed by \link{scatter3D}.
   See examples.
 }
-
+                         
 \value{
-  Returns the viewing transformation matrix,
-  See \link{trans3D}
+  The plotting functions return the viewing transformation matrix,
+  See \link{trans3D}.
   
   Function \code{createisosurf} returns a three-columned matrix (x, y, z) with 
-  triangle coordinatess. One triangle is defined by three consecutive rows.
+  triangle coordinates. One triangle is defined by three consecutive rows.
   It can be plotted with \code{triangle3D}.
   
   Function \code{createvoxel} returns a list with the elements \code{x, y, z} 
   defining the points that are at a distance of less than 
   \code{eps*diff(range(colvar))} from the required \code{level}.
-  Can be plotted with \link{scatter3D}.
+  Its output can be plotted with \link{scatter3D}.
 }
 \seealso{
-  \link{persp}, for the function on which this implementation is based.
-
   \link{Oxsat} for another example of \code{slice3D}.
 
   \link{plotdev} for zooming, rescaling, rotating a plot.
@@ -304,7 +305,7 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
                 10*(x^2 + y^2) * (y^2 + z^2) ^2))
 
 # use shading for level = 1 - show triangulation with border
- isosurf3D(x, y, z, F, level = 1, shade = 0.5, 
+ isosurf3D(x, y, z, F, level = 1, shade = 0.9, 
            col = "yellow", border = "orange")
 
 # lighting for level - 2
@@ -329,22 +330,11 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
   F <- with(xyz, log(x^2 + y^2 + z^2 + 
                 10*(x^2 + y^2) * (y^2 + z^2) ^2))
 
- # use function contour3d from misc3d to generate the triangles.
-  require(misc3d)
-  isofun <- function(x, y, z, colvar, level) {
-     zz <-  contour3d(f = colvar, level, x, y, z, engine = "none")
-     Tri <- cbind(as.vector(rbind(zz$v1[,1], zz$v2[,1], zz$v3[,1])),
-                  as.vector(rbind(zz$v1[,2], zz$v2[,2], zz$v3[,2])),
-                  as.vector(rbind(zz$v1[,3], zz$v2[,3], zz$v3[,3])))
-     Tri
-  }
-
 # three levels
   isosurf3D(x, y, z, F, level = seq(0, 4, by = 2), 
-    isofunc = isofun, col = c("red", "blue", "yellow"), 
+    col = c("red", "blue", "yellow"), 
     shade = NA, plot = FALSE, clab = "F")  
   plotdev(lighting = TRUE, alpha = 0.2, theta = 0)
-     
 }
 
 ## =======================================================================
@@ -371,7 +361,7 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
 # same using createvoxel -  more flexible for coloring
  vox <- createvoxel(x, y, z, F, level = 4)
  scatter3D(vox$x, vox$y, vox$z, colvar = vox$y, 
-   bty = "b", colkey = FALSE)
+   bty = "g", colkey = FALSE)
 
 
 ## =======================================================================
@@ -410,8 +400,9 @@ Lorensen, W.E. and Cline, H.E.,
 Marching Cubes: a high resolution 3D surface reconstruction algorithm,
 Computer Graphics, Vol. 21, No. 4, pp 163-169 (Proc. of SIGGRAPH), 1987.
 
-\url{http://paulbourke.net/geometry/polygonise/}
-
+Dai Feng, Luke Tierney, Computing and Displaying Isosurfaces in R, 
+Journal of Statistical Software 28(1), 2008.
+URL \url{http://www.jstatsoft.org/v28/i01/}.
 }
 
 \keyword{ hplot }

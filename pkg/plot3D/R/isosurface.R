@@ -433,7 +433,15 @@ CreateTriangle <- function(grid.val, grid.p, level) {
 ##  Function to create isosurface triangles of an array
 ## =============================================================================
 
-createisosurf <- function(x, y, z, colvar, level = mean(colvar)) {
+createisosurf <- function(x, y, z, colvar, level = mean(colvar))  {
+  Tri <- computeContour3d(vol = colvar, maxvol = max(colvar, na.rm = TRUE), 
+     level = level, x = x, y = y, z = z, mask = NULL)
+  colnames(Tri) <- c("x","y","z")
+  invisible(Tri)
+}  
+
+### NOT USED ANYMORE                 
+createisosurf.old <- function(x, y, z, colvar, level = mean(colvar)) {
 
   if (! ispresent(colvar))
     stop("'colvar' has to be defined and be an array of dimension 3")

@@ -21,7 +21,7 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
                      phi = 40, theta = 40, col = NULL,
                      colkey = list(side = 4), plot = TRUE){
 
-  plist <- list(plt = NULL, persp = NULL)
+  plist <- list(type = "3D", plt = NULL, persp = NULL)
   if (plot) 
     plist$plt$ori   <- par("plt")
   plist$persp$box <- FALSE

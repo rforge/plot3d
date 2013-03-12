@@ -19,8 +19,9 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
 \arguments{
   \item{x, y, z }{Matrix (2-D), vector, or one value containing the values 
     where the \link{Image} is to be plotted. 
-    At least one should be one number.
-    If two vectors, the first vector should be of length equal to 
+    At least one of them should be one number, as this will determine where the 
+    Image is to be plotted.
+    If two are vectors vectors, the first vector should be of length equal to 
     \code{nrow(colvar)} and the second should be of length equal to 
     \code{ncol(colvar)}. 
     }
@@ -28,9 +29,9 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
     will toggle off coloration according to \code{colvar}. This gives good results
     only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
     }
-  \item{col }{Colors to be used for the \code{colvar} variable.
+  \item{col }{Color palette to be used for the \code{colvar} variable.
     }
-  \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
+  \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
   \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
     Parameters should be one of 
@@ -66,7 +67,7 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
     set up (and if applicable, images or contours drawn) but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
-    be defined as \code{function(pmat)}. See example.
+    be defined as \code{function(pmat)}. See example of \link{persp3D} and last example of \link{voxel3D}.
     } 
   \item{bty }{The type of the box, the default only drawing background panels.
     Only effective if the \link{persp} 
@@ -76,12 +77,12 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
     interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
     values (\code{inttype = 2}) - see \link{persp3D}.
     } 
-  \item{add }{Logical. If \code{TRUE}, then the contours will be added to the current plot.
+  \item{add }{Logical. If \code{TRUE}, then the Image will be added to the current plot.
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -90,7 +91,7 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
-    Also the arguments \code{lty, lwd} can be specified.
+    Also the arguments \code{lty, lwd} can be specified (when \code{border} is not \code{NA}).
     
     The arguments after \dots must be matched exactly.
     }
@@ -101,10 +102,10 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
 }
 \value{
   Returns the viewing transformation matrix.
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 \seealso{
-  \link{persp3D} for the function on which \code{image3D} is based.
+  \link{surf3D} for the function on which \code{image3D} is based.
 
   \link{Image} for \code{plot3D}s 2-D image function.
 }
@@ -121,12 +122,12 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
  par(mfrow = c(2, 2))
 
 # images in x, y, z plane
- image3D(x = seq(0, 1, 0.1), y = seq(0, 1, 0.1), z = 0.5, 
-   zlim = c(0,1), col = "green")
+ image3D(y = seq(0, 1, 0.1), z = seq(0, 1, 0.1), x = 0.5, 
+   col = "blue", xlim = c(0,1))
  image3D(x = seq(0, 1, 0.1), z = seq(0, 1, 0.1), y = 0.5, 
    add = TRUE, col = "red")
- image3D(y = seq(0, 1, 0.1), z = seq(0, 1, 0.1), x = 0.5, 
-   add = TRUE, col = "blue")
+ image3D(x = seq(0, 1, 0.1), y = seq(0, 1, 0.1), z = 0.5, 
+   add = TRUE, col = "green")
  colkey(col = c("green", "red", "blue"), clim = c(0.5, 3.5), 
    at = 1:3, labels = c("z", "y", "x"), add = TRUE)
 #

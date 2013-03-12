@@ -22,7 +22,7 @@ data(Oxsat)
   \itemize{
    \item \code{lon}, the longitude (dg E), at 2 dg resolution, 180 values. 
    \item \code{lat}, the latitude (dg N), at 2 dg resolution, 90 values.
-   \item \code{depth}, the water depth (m).
+   \item \code{depth}, the water depth (m), 33 values.
    \item \code{val}, the saturation value (\%).   
     \code{val} is an array of dimension (180, 90, 33), (lon, lat, depth).
    \item \code{name}, the long name of the variable.

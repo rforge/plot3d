@@ -9,7 +9,7 @@
 \description{
   \code{jet.col} generates the matlab-type colors.
 
-  \code{gg.col} generates gg-plot-like colors,
+  \code{gg.col} generates gg-plot-like colors.
 
   \code{ramp.col} creates color schemes by interpolation. 
 
@@ -28,10 +28,10 @@ alpha.col (col = "grey", alpha = 0.5)
 \arguments{
   \item{n }{Number of colors to generate.
     }
-  \item{alpha }{Numeric vector of values in the range [0, 1] for alpha 
+  \item{alpha }{Value in the range [0, 1] for alpha 
     transparency channel (0 means transparent and 1 means opaque).
     Transparency is overruled when \code{lighting} or \code{shading}
-    is switched on.
+    is switched on. To combine transparency with lighting or shading, use \link{plotdev}.
     }
   \item{col }{Colors to interpolate, change.
     }
@@ -41,18 +41,17 @@ alpha.col (col = "grey", alpha = 0.5)
   A list with colors.
 }
 \seealso{
-  \link{colorRamp} \link{colorRampPalette} for comparable (and more elaborate) 
+  \link{colorRamp} and \link{colorRampPalette} for comparable (and more elaborate) 
   R-functions.
 }
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
 \references{
-The gg-plot type of colors is a color-blind friendly palette from 
+The gg-plot type of colors \code{gg.plot} is a color-blind friendly palette from 
 \url{http://wiki.stdout.org/rcookbook/Graphs}.
 }
 \details{
-In addition to the color functions described here, colors used in functions based
-on the \link{persp} function can also be adapted by shading and lighting. 
-Shading will overrule lighting.
+In addition to the color functions described here, colors 
+can also be adapted by shading and lighting. Shading will overrule lighting.
 
 To switch on shading, the argument \code{shade} should be given a value inbetween 0 and 1.
 

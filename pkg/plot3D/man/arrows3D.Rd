@@ -1,4 +1,4 @@
-\name{3-D arrows, segments, polygons, boxes}
+\name{3-D arrows, segments, polygons, boxes, rectangles}
 \alias{segments3D}
 \alias{arrows3D}
 \alias{box3D}
@@ -6,13 +6,13 @@
 \alias{rect3D}
 \alias{polygon3D}
 \title{
-  Plots arrows, segments, points, lines, polygons and boxes in 3D perspective.
+  Plots arrows, segments, points, lines, polygons, rectangles and boxes in a 3D perspective plot.
 }
 \description{
   Functions \code{arrows3D} and \code{segments3D} draw arrows and line segments 
   between pairs of points.
   
-  Functions \code{box3D} and \code{border3D} draws boxes between pairs of points. 
+  Functions \code{box3D} and \code{border3D} draw boxes between pairs of points. 
   
   \code{polygon3D} draws polygons; \code{rect3D} draws rectangles.
 }
@@ -88,7 +88,7 @@ polygon3D (x, y, z, colvar = NULL,
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. 
     See \link{persp}.
     }
-  \item{col }{Colors to be used for coloring the arrows or segments 
+  \item{col }{Color palette to be used for coloring the arrows or segments 
     as specified by the \code{colvar} variable. 
     If \code{col} is \code{NULL} and \code{colvar} is specified, 
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
@@ -119,8 +119,8 @@ polygon3D (x, y, z, colvar = NULL,
     set up but before any plotting takes place. 
     This can be useful e.g. for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
-    be defined as \code{function(pmat)}. See last example of \link{persp3D}.
-  } 
+    be defined as \code{function(pmat)}. See example of \link{persp3D} and last example of \link{voxel3D}.
+    } 
   \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE}, 
     the label to be written on top of the color key. 
     The label will be written at the same level as the main title.
@@ -138,8 +138,8 @@ polygon3D (x, y, z, colvar = NULL,
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -163,7 +163,7 @@ polygon3D (x, y, z, colvar = NULL,
 \value{
   Returns the viewing transformation matrix.
 
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 \seealso{
   \link{arrows} for the 2-D arrows function on which \code{arrows3D} is based.
@@ -232,16 +232,16 @@ polygon3D (x, y, z, colvar = NULL,
        col = gg.col(1, alpha = 0.8))
 
  box3D(x0 = seq(-0.8, -0.1, by = 0.1), 
-        y0 = seq(-0.8, -0.1, by = 0.1),
-        z0 = seq(-0.8, -0.1, by = 0.1),
-        x1 = seq(0.8, 0.1, by = -0.1),
-        y1 = seq(0.8, 0.1, by = -0.1),
-        z1 = seq(0.8, 0.1, by = -0.1),
-        col = rainbow(n = 8, alpha = 0.1), 
-        border = "black", lwd = 2, phi = 20)
+       y0 = seq(-0.8, -0.1, by = 0.1),
+       z0 = seq(-0.8, -0.1, by = 0.1),
+       x1 = seq(0.8, 0.1, by = -0.1),
+       y1 = seq(0.8, 0.1, by = -0.1),
+       z1 = seq(0.8, 0.1, by = -0.1),
+       col = rainbow(n = 8, alpha = 0.1), 
+       border = "black", lwd = 2, phi = 20)
 
-# here the perspective does not alwayw work 
-# use ramp.col to set the transparency of a vector of colors
+# here the perspective does not always work 
+# use alpha.col to set the transparency of a vector of colors
  box3D(x0 = runif(3), y0 = runif(3), z0 = runif(3),
        x1 = runif(3), y1 = runif(3), z1 = runif(3),
        col = alpha.col(c("red", "lightblue", "orange"), alpha = 0.5),
@@ -261,12 +261,12 @@ polygon3D (x, y, z, colvar = NULL,
 
 # constant y and with transparent facets
  rect3D(x0 = 0, y0 = 0, z0 = 0, x1 = 1, z1 = 5,
-          ylim = c(0, 1), facets = NA, border = "red",
-          bty = "g", lwd = 2, phi = 20)
+        ylim = c(0, 1), facets = NA, border = "red",
+        bty = "g", lwd = 2, phi = 20)
 
 # add rect at constant z, with colored facet
  rect3D(x0 = 0, y0 = 0, z0 = 0, x1 = 1, y1 = 1,
-          border = "red", add = TRUE)
+        border = "red", add = TRUE)
 
 ## ========================================================================
 ## arrows added to a persp plot 

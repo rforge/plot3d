@@ -5,14 +5,12 @@
 \alias{Image.array}
 \alias{Image.list}
 \title{
- Improved image and contour plot for 2-D and 3-D data.
+ Extended image and contour plots for 2-D (and 3-D) data.
 }
 \description{
-  Image is similar to R's \link{image} function, except that it is possible to 
-  add a colorkey and contours, it has a different default coloring scheme, 
-  it can deal with decreasing x- and y-values, 
-  and it is possible to increase or decrease the resolution by 2-D 
-  linear interpolation. 
+  Image extends R's \link{image} function. Input can be a matrix (2-D) or an array (3-D) or a list.
+  
+  Contour extends R's \link{contour} function.    
 }
 \usage{
 Image (z, ...)
@@ -26,7 +24,7 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
                col = jet.col(100), NAcol = "white", 
                border = NA, facets = TRUE, contour = FALSE, 
                colkey = list(side = 4), resfac = 1, 
-               clab = NULL, theta = 0) 
+               clab = NULL, theta = 0, rasterImage = FALSE) 
 
 \method{Image}{array}(z, margin = c(1, 2), subset, ask = NULL, ...) 
 \method{Image}{list}(z, ...) 
@@ -42,10 +40,10 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
      If a matrix (only for \code{Image}), they should have
      the same dimension as \code{z}.
     }
-  \item{col }{Colors to be used for the \link{image} function or for the contours.
+  \item{col }{Color palette to be used for the \link{image} function or for the contours.
     See details.
     }
-  \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
+  \item{NAcol }{Color to be used for \code{NA} values of \code{z}; default is ``white''. 
     }
   \item{contour }{If \code{TRUE}, then a \link{contour} plot will be 
     added to the image plot, unless \code{x, y} are a matrix. 
@@ -66,8 +64,6 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
     The label will be written at the same level as the main title.
     To lower it, \code{clab} can be made a vector, with the first values empty 
     strings. 
-    To use different color labels for different plots, use a list 
-    (i.e for use with \code{Image.array} and \code{Image.list}).
     } 
   \item{resfac }{Resolution factor, one value or a vector of two numbers, for 
     the x and y- values respectively. A value > 1 will increase the 
@@ -88,12 +84,18 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
     transparent. 
     It is usually faster to draw with \code{facets = FALSE}.
     }
+  \item{rasterImage }{If \code{TRUE}, the function \link{rasterImage} will be
+    used for plotting rather than \link{image} or \link{polygon}. This requires
+    the \code{x} and \code{y} to be a vector with equally spaced elements.
+    Note that by default, \link{rasterImage} linearly interpolates the image,
+    so it will appear smoother.
+    }
   \item{margin }{A vector giving the subscripts which the \code{image} 
     function will be applied over. 
     The image function will loop over the index that is not in \code{margin}.
     For instance, \code{c(1, 2)}, indicates to plot rows(x) and columns(y) and to 
      loop over index \code{3};  
-    \code{c(2, 1)} will do the same but transposed.
+    \code{c(2, 1)} will do the same but the image will be transposed.
     \code{margin} should be a vector with two numbers inbetween \code{1}, and \code{3}.
     }
   \item{ask }{A logical; if \code{TRUE}, the user is asked before each plot, 
@@ -105,8 +107,8 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
     or a vector or integers denoting the indices of the elements over which to loop.
     Missing values are taken as \code{FALSE}.
     }
-  \item{\dots}{additional arguments passed to the plotting methods \link{image} and 
-    \link{contour}. 
+  \item{\dots}{additional arguments passed to the plotting methods \link{image},
+    \link{rasterImage}, \link{polygon} and  \link{contour}. 
     The arguments after \dots must be matched exactly.
     }
 }
@@ -115,16 +117,14 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
   the possibility to add a color key and contourlines, and to increase the 
   resolution in order to make smoother images. It also uses a different color
   scheme, it can deal with decreasing x- and y- values and x and y can be
-  a matrix. 
-  
+  a matrix. In the latter case, the image will be drawn as a set of \link{polygon}s;
+  if \code{x} and \code{y} are a vector, either R-function \link{image} or 
+  \link{rasterImage} will be used.
+
   \code{Image.array} and \code{Image.list} are versions that
   accept a 3 dimensional array respectively a list with z-matrices 
   as their first argument to produce multiple plots.
   
-  If \code{x} and \code{y} are passed as arguments, then they should be either
-  vectors with \code{length(x) = nrow(z)} and \code{length (y) = ncol(z)} or
-  they should be matrices with the same dimensions as \code{z}. 
-
   For argument \code{col} of the \code{Image} function, 
   both \code{NA} and \code{NULL} are allowed, 
   in which case the color will be white, and no color key will be drawn.
@@ -132,8 +132,9 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
   To set the ranges of the z-variable, both arguments \code{zlim} (as in \link{image})
   and \code{clim} (as in the other \code{plot3D} functions) are accepted. 
 
-  For \code{contour3D}, \code{x} and \code{y} should be vectors. 
-
+  Upon returning from the \code{Image} and \code{Contour} functions, the figure coordinates are defined
+  by the main figure (excluding the color key). Thus, one can safely add other 
+  plotting elements.  
 }
 \note{
   Parts of this help page come from the help pages of the R-core function 
@@ -154,10 +155,9 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 
 
 \value{
-  Upon returning from the \code{Image} and \code{Contour} functions, the figure coordinates are defined
-  by the main figure (excluding the color key). Thus, one can safely add other 
-  plotting elements.  
+  Returns nothing.
 }
+
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
 
 \seealso{
@@ -175,14 +175,14 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
  pm <- par("mfrow")
 
 ## =======================================================================
-## Difference between x or y a vector/matrix
+## Difference between x or y a vector/matrix and rasterImage
 ## =======================================================================
 
  par(mfrow = c(2, 2))
  x <- y <- 1:3
  z <- matrix (nrow = 3, ncol = 3, data = 1:9)
- Image(z, x, y)
  Image(z, x, y, border = "black")
+ Image(z, x, y, rasterImage = TRUE, border = "black")
  Image(z, x = matrix(nrow = 3, ncol = 3, data = x), 
        y, border = "black")
  Image(z, x, y, border = "black", theta = 45)
@@ -216,7 +216,7 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 ## =======================================================================
 
  par(mfrow = c(1, 1))
- Image(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+ Image(z = Oxsat$val[, , 1], x = Oxsat$lon, y = Oxsat$lat,
        main = "surface oxygen saturation data 2005", NAcol = "black", 
        clab = c("","","\%"))
 

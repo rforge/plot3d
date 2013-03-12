@@ -5,7 +5,7 @@
  Functions for plotting 3 dimensional shapes
 }
 \description{
-  \code{surf3D} plots a surface in 3-d with a color variable.
+  \code{surf3D} plots a surface in 3-D with a color variable.
 
   \code{spheresurf3D} plots a colored image on a sphere.
 }
@@ -42,7 +42,7 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
   \item{theta, phi }{the angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. see \link{persp}.
     }
-  \item{col }{Colors to be used for coloring the \code{colvar} variable. 
+  \item{col }{Color palette to be used for coloring the \code{colvar} variable. 
     If \code{col} is \code{NULL} and \code{colvar} is specified, 
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
@@ -84,7 +84,7 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
     set up but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
-    be defined as \code{function(pmat)}. See last example of \link{persp3D}.
+    be defined as \code{function(pmat)}. See example of \link{persp3D} and last example of \link{voxel3D}.
     } 
   \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE}, 
     the label to be written on top of the color key. 
@@ -112,8 +112,8 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{Additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -127,7 +127,7 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
 
 \value{
  Returns the viewing transformation matrix,
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 \seealso{
   \link{persp} for the function on which this implementation is based.

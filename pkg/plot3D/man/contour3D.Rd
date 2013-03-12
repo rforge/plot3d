@@ -4,7 +4,7 @@
  Contours in 3-D plots.
 }
 \description{
-  \code{conour3D} adds a \link{contour} in a 3-D plot. 
+  \code{contour3D} adds a \link{contour} in a 3-D plot. 
 }
 \usage{
 contour3D (x = NULL, y = NULL, z, colvar = z, 
@@ -25,17 +25,17 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     \code{y} should be of length equal to \code{ncol(colvar)}. 
     }
   \item{colvar }{The variable used for coloring. If present, it should have the 
-    same dimension of \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
+    same dimension as \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
     will toggle off coloration according to \code{colvar}. This gives good results
     only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
     }
-  \item{col }{Colors to be used for the \code{colvar} variable.
+  \item{col }{Color palette to be used for the \code{colvar} variable.
     If \code{col} is \code{NULL} and \code{colvar} is specified, 
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
     \code{col} will be "black". 
     }
-  \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
+  \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
   \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
     Parameters should be one of 
@@ -78,7 +78,7 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     set up but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
-    be defined as \code{function(pmat)}. See example.
+    be defined as \code{function(pmat)}. See example of \link{persp3D} and last example of \link{voxel3D}.
     } 
   \item{bty }{The type of the box, the default only drawing background panels.
     Only effective if the \link{persp} 
@@ -92,14 +92,15 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     hide some contour segments. To avoid that, the viewing depth of the segments
     can be artificially decreased with the factor \code{dDepth} times the 
     \link{persp} argument \code{expand} (usually = 1), to make them 
-    appear in front of the polygons. Too large values may create visible artifacts.
+    appear in front of the polygons. Too large values of \code{dDepth} 
+    may create visible artifacts.
     }   
   \item{add }{Logical. If \code{TRUE}, then the contours will be added to the current plot.
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -113,18 +114,11 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     The arguments after \dots must be matched exactly.
     }
 }
-\note{
-  To make a \code{contour} to appear on top of an image, the viewing depth
-  of the contour segments is artificially decreased. in some cases this 
-  may produce slight artifacts.
-}
 \value{
   Returns the viewing transformation matrix.
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 \seealso{
-  \link{persp3D} for the function on which \code{contour3D} is based.
-
   \link{contour} for R's 2-D contour function.
 }
 \author{Karline Soetaert <karline.soetaert@nioz.nl>

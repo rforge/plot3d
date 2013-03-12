@@ -17,9 +17,16 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    col = jet.col(100), NAcol = "white", 
                    border = NA, facets = TRUE, 
                    contour = FALSE, colkey = list(side = 4), resfac = 1, 
-                   clab = NULL, theta = 0) {
+                   clab = NULL, theta = 0, rasterImage = FALSE) {
 
-  # check colors  
+
+ if (is.character(z)) {
+   ImageNULL (z = NULL, x = x, y = y, ..., col = z, NAcol = NAcol, 
+              border = border, facets = facets,
+              rasterImage = rasterImage, angle = theta)   
+   return(invisible())
+ } 
+ # check colors  
   if (length(col) == 1)
     if (is.na(col)) 
       col <- NULL
@@ -85,7 +92,7 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
  
  # rotate 
   rotate <- FALSE
-  if (theta != 0) {        
+  if (theta != 0 & ! rasterImage) {        
     if (is.vector(x)) {
       rotate <- TRUE
       x <- matrix (nrow = nrow(z), ncol = ncol(z), data = x)
@@ -185,7 +192,7 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     }
   }
 
-  if (! useimage) {  # use colored polygons if x- and y are matrix
+  if (! useimage | rasterImage) {  # use colored polygons if x- and y are matrix
 
     # create colors
     zmin   <- zlim[1]
@@ -193,15 +200,12 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     N      <- length(col) -1
     Col    <- matrix(nrow = nrow(z), data = col[1 + trunc((z - zmin)/zrange*N)])
 
-    # polygons are painted in the order in which they were defined
-    ix <- rep(1:nrow(x), ncol(x))
-    iy <- as.vector(matrix(nrow = nrow(x), ncol = ncol(x), 
-                    data = 1:ncol(x), byrow =TRUE))
-
  # empty plot
     dotimage$type <- "n"
+    dotimage$xaxs <- "i"
+    dotimage$yaxs <- "i"
     if (!add) {
-      do.call("plot", c(alist(x = x, y = y), dotimage))
+      do.call("plot", c(alist(x = range(x), y = range(y)), dotimage))
     
       plotrect <- !is.null(NAcol)
       if (plotrect) 
@@ -210,22 +214,29 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
           rect(usr[1], usr[3], usr[2], usr[4], col = NAcol)
         }    
     }
-
+  }
+  
+  if (! useimage ) {
     # function to draw polygon
-    poly <- polyfill(x, y, z, Col, NAcol, facets, border, ix, iy, 
-      dots$lwd, dots$lty, Extend = TRUE)
+    poly <- polyfill2D (x, y, Col, facets, border, dots$lwd, dots$lty) 
 
     dots$lwd <- NULL
     do.call("polygon", c(alist(poly$x, poly$y, lwd = poly$lwd, 
       border = poly$border, col = poly$col), 
                        dotother))
  
+  } else if (rasterImage) {
+    addraster (x, y, Col, dotimage[["xlim"]], dotimage[["ylim"]], 
+      theta, dotother)
+
   } else {
-    do.call("image", c(alist(z = z, x = x, y = y, col = col, add = add, zlim = zlim), dotimage))
-    if (!is.na(border)){
-      do.call("abline", c(alist(h = 0.5*(y[-1]+y[-length(y)]), col = border), dotother))
-      do.call("abline", c(alist(v = 0.5*(x[-1]+x[-length(x)]), col = border), dotother))
-    }
+    do.call("image", c(alist(z = z, x = x, y = y, col = col, add = add, 
+      zlim = zlim), dotimage))
+  }
+
+  if (useimage & !is.na(border)){
+    do.call("abline", c(alist(h = 0.5*(y[-1]+y[-length(y)]), col = border), dotother))
+    do.call("abline", c(alist(v = 0.5*(x[-1]+x[-length(x)]), col = border), dotother))
   }
   if (is.null(dots$add)) 
     box()
@@ -254,7 +265,129 @@ Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   }               
    
 }
+## =============================================================================
+## add rasterImage to plot
+## =============================================================================
 
+addraster <- function (x, y, col, xlim, ylim, angle, dots) { 
+  
+  if (is.matrix(x) | is.matrix(y))
+    stop("'x' or 'y' cannot be a matrix if rasterImage is used")
+  dx <- range(diff(x))
+  if (abs(diff(dx)) > 1e-8)
+    stop("'x' should be equally spaced if  rasterImage is used")
+  dy <- range(diff(y))
+  if (abs(diff(dy)) > 1e-8)
+    stop("'y' should be equally spaced if  rasterImage is used")
+
+  if (is.null(xlim)) xlim <- range(x)
+  if (is.null(ylim)) ylim <- range(y)
+
+  if (sign(dx[1]) != sign(diff(xlim)))  
+    col <- col[nrow(col):1, ]
+  if (sign(dy[1]) == sign(diff(ylim)))  
+    col <- col[, ncol(col):1]
+  col <- t(col)
+
+  if (sign(diff(xlim)) == 1)  
+    xlim <- range(x)
+  else
+    xlim <- rev(range(x))
+     
+  if (sign(diff(ylim)) == 1)  
+    ylim <- range(y)
+  else
+    ylim <- rev(range(y))
+    
+  do.call("rasterImage", c(alist(as.raster(col), xlim[1], 
+    ylim[1], xlim[2], ylim[2], angle = angle), dots))
+}
+
+## =============================================================================
+## Image function, z = NULL, col is a matrix of colors
+## =============================================================================
+
+ImageNULL <- function(z = NULL,
+                       x = seq(0, 1, length.out = nrow(col)),
+                       y = seq(0, 1, length.out = ncol(col)), ...,
+                       col, NAcol = "white",
+                       border = NA, facets = TRUE,
+                       rasterImage = FALSE, angle) {
+
+  # check colors
+  if (! is.character(col) | ! is.matrix(col))
+    stop ("'col' should be a matrix of colors if 'z' is NULL")
+
+ # The plotting arguments
+  dots <- splitpardots(list(...))
+  dotimage <- dots$main
+  dotother <- dots$points
+
+  add <- dots[["add"]]
+  if (is.null(add))
+    add <- FALSE
+
+ # x- and y-values
+  if (length(dim(x)) > 2 | length(dim(y)) > 2)
+    stop("'x' or 'y' cannot be an array")
+
+  Nr <- nrow(col)
+  Nc <- ncol(col)
+  if (is.null (x))
+    x <- seq(0, 1, length.out = Nr)
+
+  if (is.null (y))
+    y <- seq(0, 1, length.out = Nc)
+
+ # labels
+  if (is.null(dotimage[["xlab"]]))
+    dotimage[["xlab"]] <- "x"
+  if (is.null(dotimage[["ylab"]]))
+    dotimage[["ylab"]] <- "y"
+
+ # Colors for values = NA
+  col[is.na(col)] <- NAcol
+
+ # empty plot
+  dotimage$type <- "n"
+  dotimage$xaxs <- "i"
+  dotimage$yaxs <- "i"
+  if (!add) {
+    do.call("plot", c(alist(x = range(x), y = range(y)), dotimage))
+
+    plotrect <- !is.null(NAcol)
+    if (plotrect)
+      if (NAcol != "white") {
+        usr <- par("usr")
+        rect(usr[1], usr[3], usr[2], usr[4], col = NAcol)
+      }
+  }
+                                       
+  if (! rasterImage) {
+    if (! is.matrix(x))
+      x <- matrix(nrow = Nr, ncol = Nc, data = x)
+    if (! is.matrix(y))
+      y <- matrix(nrow = Nr, ncol = Nc, data = y, byrow = TRUE)
+
+    if (any (dim(x) - dim(y) != 0))
+      stop("matrices 'x' and 'y' not of same dimension")
+    if (any (dim(x) - dim(col) != 0))
+      stop("matrices 'x' or 'y' and 'col' not of same dimension")
+
+  # function to draw polygon
+    poly <- polyfill2D(x, y, col, facets, border, dots$lwd, dots$lty)
+
+    do.call("polygon", c(alist(poly$x, poly$y, lwd = poly$lwd,
+      border = poly$border, col = poly$col), dotother))
+
+  } else 
+    addraster (x, y, col, dotimage[["xlim"]], dotimage[["ylim"]], 
+      angle, dotother)
+
+  if (is.null(dots$add))
+    box()
+
+}
 ## =============================================================================
 ## Image function, input is an array
 ## =============================================================================
@@ -508,19 +641,4 @@ expanddotslist <- function (dots, n) {
   dd <- if (!is.list(dots )) list(dots) else dots
   rep(dd, length.out = n)
 }
-
-## allow multiple titles for color key legend
-##  if (is.null(Ldots$key.title)) {
-##    key.title <- ""
-##  } else {
-##    key.title <- Ldots$key.title
-##  }
-##  if (np %% (length(key.title)) != 0) 
-##   warning("length of key.title is not a multiple of elements in 'z'")
-  
-## make key.title same length as nz
-##  key.title <- rep(key.title, length.out = np)
-
-
-
 

@@ -1,7 +1,7 @@
 \name{Color key legend}
 \alias{colkey}
 \title{
-   Adds a color legend
+   Plots a color legend
 }
 \description{
   \code{colkey} plots a color legend, either to an existing plot or starting
@@ -159,8 +159,8 @@ colkey (col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
    z = Petal.Length, colvar = as.integer(Species), 
    col = c("red", "blue", "black"), pch = 16, cex = 2,
    clim = c(1, 3), ticktype = "detailed", phi = 20,
-   xlab = "Sepal Length", ylab = "Sepal.Width", 
-   zlab = "Petal.Length",  main = "iris",
+   xlab = "Sepal Length", ylab = "Sepal Width", 
+   zlab = "Petal Length",  main = "iris",
    colkey = list(at = c(1.33, 2, 2.66), side = 1,
    labels = c("setosa", "versicolor", "virginica"))))
 

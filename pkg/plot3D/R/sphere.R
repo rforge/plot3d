@@ -83,10 +83,15 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
       col.lines <- "black"
     
     segm <- NULL
+    if (is.null(    contour$args$nlevels))
+      contour$args$nlevels <- 10
+    if (is.null(    contour$args$levels))
+      contour$args$levels <- pretty(range(cv, na.rm = TRUE), contour$args$nlevels)
     line.list <- do.call("contourLines",
-      c(alist(x = X, y = Y, z = cv), contour$args$nlevels))
+      alist(x = X, y = Y, z = cv, nlevels = contour$args$nlevels, 
+      levels = contour$args$levels))
 
-    contour$args$nlevels <- contour$args$col <- NULL
+    contour$args$nlevels <- contour$args$col <- contour$args$levels <- NULL
 
     for (i in 1:length(line.list)) {
        clines <- line.list[[i]]
@@ -103,7 +108,8 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
           z[isel], col = col.lines, plist = plist, ignorez = FALSE), contour$args))
        }
     }
-    segm$proj <- segm$proj + 1e-1  # put it on foreground...
+    if (! is.null(segm))
+      segm$proj <- segm$proj + 1e-1  # put it on foreground...
 
   } else
     segm <- NULL

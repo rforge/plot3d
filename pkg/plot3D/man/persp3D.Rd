@@ -3,12 +3,10 @@
 \alias{ribbon3D}
 \alias{hist3D}
 \title{
- Perspective plots, ribbons and histograms.
+ Perspective plots, 3-D ribbons and 3-D histograms.
 }
 \description{
-  \code{persp3D} is similar to R's \link{persp} function, except that it is possible to 
-  add a color key, to increase or decrease the resolution, to toggle off 
-  facet coloration. 
+  \code{persp3D} extends R's \link{persp} function. 
   
   \code{ribbon3D} is similar to \code{persp3D} but has ribbon-like colored surfaces.
 
@@ -57,13 +55,13 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     will toggle off coloration according to \code{colvar}. This gives good results
     only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
     }
-  \item{col }{Colors to be used for the \code{colvar} variable.
+  \item{col }{Color palette to be used for the \code{colvar} variable.
     If \code{col} is \code{NULL} and \code{colvar} is specified, 
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
-    \code{col} will be "grey". 
+    \code{col} will be \code{grey}. 
     }
-  \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
+  \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
   \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
     Parameters should be one of 
@@ -103,21 +101,23 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     It is usually faster to draw with \code{facets = FALSE}.
     }
   \item{image }{If \code{TRUE}, an \link{Image} will be plotted at the bottom. 
-    Also allowed is to pass a \code{list} with arguments for the \link{Image} function,
-    in addition to the \code{side} where it should be plotted (optional). 
-    Allowed are a z-value, or \code{side = "zmin", "zmax"}, for positioning at 
+    Also allowed is to pass a \code{list} with arguments for the \link{Image} function.
+    An optional parameter to this \code{list} is the \code{side} where the image 
+    should be plotted. Allowed values for \code{side} are a z-value, 
+    or \code{side = "zmin", "zmax"}, for positioning at 
     bottom or top respectively.  The default is to put the image at the bottom.
     }
   \item{contour }{If \code{TRUE}, a \link{contour} will be plotted at the bottom. 
-    Also allowed is to pass a \code{list} with arguments for the \link{contour} function,
-    in addition to the \code{side} where it should be plotted (optional). 
-    Allowed are a z-value, or \code{side = "zmin", "zmax", "z"},  for positioning at bottom, 
-    top or on the persp plot respectively. The default is to put the contour at the bottom.
+    Also allowed is to pass a \code{list} with arguments for the \link{contour} function.
+    An optional parameter to this \code{list} is the \code{side} where the image 
+    should be plotted. Allowed values for \code{side} are a z-value, 
+    or \code{side = "zmin", "zmax"}, for positioning at 
+    bottom or top respectively.  The default is to put the image at the bottom.
     }
   \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
     set up (and if applicable, images or contours drawn) but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
-    The function should have as argument the transformation matrix, e.g. it should
+    The function should have as argument the transformation matrix (pmat), e.g. it should
     be defined as \code{function(pmat)}. See example.
     } 
   \item{along }{The direction along which the ribbons are drawn, one of "x", "y" or "xy",
@@ -146,8 +146,8 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -156,7 +156,7 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
-    For all functions, the arguments \code{lty, lwd} can be specified; only
+    For all functions, the arguments \code{lty, lwd} can be specified; this is only
     effective is \code{border} is not \code{NA}.
     
     The arguments after \dots must be matched exactly.
@@ -165,52 +165,52 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
 \details{
   \code{persp3D} is an extension to the default \link{persp} plot that has
   the possibility to add a color key, to increase the 
-  resolution in order to make smoother images, ... 
+  resolution in order to make smoother images, 
+  to toggle on or off facet coloration, ... 
   
-  If \code{x} and \code{y} are not \code{NULL}, then they should be either
-  vectors with \code{length(x) = nrow(z)} and \code{length (y) = ncol(z)} OR
-  they should be matrices with the same dimensions as \code{z}. 
-
-  The perspective plots consist of filled polygons. Each polygon is defined by 
-  4 corners and a color, defined in the centre. 
-  There are two interpolation schemes, as set by \code{inttype}. 
+  The perspective plots are drawn as filled polygons. Each polygon is defined by 
+  4 corners and a color, defined in its centre. 
+  When facets are colored, there are two interpolation schemes as set by \code{inttype}. 
 
   The default (\code{inttype = 1}) is similar to R's function \code{persp}, 
   and assumes that the \code{z}-values define the points on the corners of 
-  each polygon. In case a \code{colvar} is defined, this has to be recalculated 
+  each polygon. In case a \code{colvar} is defined, its values are to be recalculated 
   to the middle of each polygon, i.e. the color values need to be of size 
-  (nx-1)(ny-1), and averages are taken from the original data. 
-  This will make the colors (and/or shading) smoother than originally.
+  (nx-1)(ny-1), and averages are taken from the original data 
+  (nx and ny are number of x and y points). 
+  This will make the colors (and/or shading) smoother.
 
-  By setting \code{inttype = 2}, a second slightly different interpolation scheme 
+  By setting \code{inttype = 2}, a second interpolation scheme 
   is selected. This is mainly of use in case a \code{colvar} is defined, and it 
-  is not desirable that this variable is smoothened. 
-  In the second scheme, it is assumed that the \code{z} values and \code{colvar} 
-  values are defined in the centre of the polygons.
+  is not desirable that the colors are smoothened. 
+  In this scheme, it is assumed that the \code{z} values and \code{colvar} 
+  values are both defined in the centre of the polygons.
   To color the facets the x, y, z grid is extended (to a (nx+1)(ny+1) grid), 
-  while the \code{colvar} is used as such. 
+  while \code{colvar} is used as such. 
   This will make the z-values (topography) smoother than the original data.
-  This can be preferred for color variables that have \code{NA} values,
+  This type of interpolation may be preferable for color variables that have \code{NA} values,
   as taking averages tends to increase the \code{NA} region.
 }
 \note{
-  To make a \code{contour} to appear on top of an image, the viewing depth
+  To make a \code{contour} to appear on top of an image, 
+  i.e. when \code{side = "z"}, the viewing depth
   of the contour segments is artificially decreased. In some cases this 
-  may produce slight artifacts.
+  may produce slight artifacts. The viewing depth can be adjusted with argument \code{dDepth},
+  e.g. \code{persp3D(z = volcano, contour = list(side = "z", dDepth = 0.))}
+
 
   Parts of this help page come from the help pages of the R-core function 
    \link{persp}.
 }
 \value{
-  Returns the viewing transformation matrix,
+  Returns, as invisible, the viewing transformation matrix.
 
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 \seealso{
   \link{persp} for the function on which this is based.
 
-  \link{Hypsometry} for an example where axis-panels are colored, 
-    and \link{perspbox} is used.
+  \link{Hypsometry} for an example where axis-panels are colored.
     
   \link{scatter3D} for a combination of a persp surface and data points.  
   
@@ -239,15 +239,17 @@ The New S Language. Wadsworth & Brooks/Cole.
  persp3D(z = volcano, main = "volcano", clab = c("height", "m"))
   
 # keep ratios between x- and y (scale = FALSE) 
-# and between x- and z (expand)
+# change ratio between x- and z (expand)
  persp3D(z = volcano, x = 1: nrow(volcano), y = 1:ncol(volcano),
        expand = 0.3, main = "volcano", facets = FALSE, scale = FALSE,
        clab = "height, m", colkey = list(side = 1, length = 0.5))
 
-# ribbon, in x- and y-direction
+# ribbon, in x--direction
  V <- volcano[, seq(1, ncol(volcano), by = 3)]  # lower resolution
  ribbon3D(z = V, colkey = list(width = 0.5, length = 0.5, 
           cex.axis = 0.8, side = 2), clab = "m")
+
+# ribbon, in y-direction
  Vy <- volcano[seq(1, nrow(volcano), by = 3), ]
  ribbon3D(z = Vy, expand = 0.3, space = 0.3, along = "y", 
           colkey = list(width = 0.5, length = 0.5, cex.axis = 0.8))
@@ -263,27 +265,16 @@ The New S Language. Wadsworth & Brooks/Cole.
  z    <- with(grid, cos(x) * sin(y))
 
  par(mfrow = c(2,2))
+
  persp3D(z = z, x = x, y = y)
+
  persp3D(z = z, x = x, y = y, facets = FALSE, curtain = TRUE)
 
 # ribbons in two directions and larger spaces
  ribbon3D(z = z, x = x, y = y, along = "xy", space = 0.3)
+
  hist3D(z = z, x = x, y = y, border = "black")  
   
-## =======================================================================
-## Several persps on one plot
-## =======================================================================
-
- par(mfrow = c(1, 1))
- clim <- range(volcano)
- persp3D(z = volcano, zlim = c(100, 600), clim = clim, box = FALSE)
-  
- persp3D(z = volcano + 200, clim = clim, colvar = volcano, 
-       add = TRUE, colkey = FALSE)
-
- persp3D(z = volcano + 400, clim = clim, colvar = volcano, 
-       add = TRUE, colkey = FALSE)
-
 ## =======================================================================
 ## Contours and images added
 ## =======================================================================
@@ -300,19 +291,19 @@ The New S Language. Wadsworth & Brooks/Cole.
 
  persp3D(z = Volcano, x = x, y = y, scale = FALSE, 
        contour = list(nlevels = 20, col = "red"), 
-       zlim= c(-200, 200), expand = 0.2,
+       zlim = c(-200, 200), expand = 0.2,
        image = list(col = grey (seq(0, 1, length.out = 100))))
 
  persp3D(z = Volcano, contour = list(side = c("zmin", "z", "350")), 
-       zlim= c(-100, 400), phi = 20, image = list(side = 350))
+       zlim = c(-100, 400), phi = 20, image = list(side = 350))
 
 ## =======================================================================
 ## Use of inttype
 ## =======================================================================
 
  par(mfrow = c(2, 2))
- persp3D(z = volcano, shade = 0.5, colkey = FALSE)
- persp3D(z = volcano, inttype = 2, shade = 0.5, colkey = FALSE)
+ persp3D(z = Volcano, shade = 0.5, colkey = FALSE)
+ persp3D(z = Volcano, inttype = 2, shade = 0.5, colkey = FALSE)
 
  x <- y <- seq(0, 2*pi, length.out = 10)
  z <- with (mesh(x, y), cos(x) *sin(y)) + runif(100)
@@ -345,6 +336,7 @@ The New S Language. Wadsworth & Brooks/Cole.
 ## =======================================================================
 
  par(mfrow = c(1, 1))
+
 # A function that is called after the axes were drawn
  panelfirst <- function(trans) {
     zticks <- seq(100, 180, by = 20)
@@ -384,6 +376,20 @@ The New S Language. Wadsworth & Brooks/Cole.
        bty = "g", ticktype = "detailed")
     
 ## =======================================================================
+## Several persps on one plot
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+ clim <- range(volcano)
+ persp3D(z = volcano, zlim = c(100, 600), clim = clim, box = FALSE)
+  
+ persp3D(z = volcano + 200, clim = clim, colvar = volcano, 
+       add = TRUE, colkey = FALSE)
+
+ persp3D(z = volcano + 400, clim = clim, colvar = volcano, 
+       add = TRUE, colkey = FALSE)
+
+## =======================================================================
 ## hist3D
 ## =======================================================================
 
@@ -393,7 +399,7 @@ The New S Language. Wadsworth & Brooks/Cole.
 
 # transparent colors
  hist3D(z = VV, scale = FALSE, expand = 0.01, 
-   col = jet.col(100, alpha = 0.3),  border = "black")
+   col = jet.col(100, alpha = 0.3), border = "black")
 
  hist3D(z = VV, scale = FALSE, expand = 0.01, facets = FALSE, lwd = 2)
 

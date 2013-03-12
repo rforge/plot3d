@@ -146,8 +146,8 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, ix, iy,
     i2 <- which(is.na(Poly$Y[-5, ]))
     i3 <- which(is.na(Poly$Z[-5, ]))
     ii <- unique(c(i1, i2, i3))
-    Poly$Y[-5, ][ii] <- NA
     Poly$X[-5, ][ii] <- NA
+    Poly$Y[-5, ][ii] <- NA
     Poly$Z[-5, ][ii] <- NA
 
     ina <- apply (Poly$X[-5, ], MARGIN = 2, FUN = function(x) 
@@ -200,3 +200,48 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, ix, iy,
   return(poly)
     
 }
+
+## =============================================================================
+## Same for 2D plots
+## =============================================================================
+
+polyfill2D <- function(x, y, Col, facets, border, lwd, lty) {
+
+ # polygons are painted
+  ix <- rep(1:nrow(x), ncol(x))
+  iy <- as.vector(matrix(nrow = nrow(x), ncol = ncol(x),
+                  data = 1:ncol(x), byrow =TRUE))
+
+  xx <- extend(x)
+  yy <- extend(y)
+
+ # the polygons
+  PolyX <- rbind(xx[cbind(ix,     iy    )],
+                 xx[cbind(ix + 1, iy    )],
+                 xx[cbind(ix + 1, iy + 1)],
+                 xx[cbind(ix,     iy + 1)], NA)
+  PolyY <- rbind(yy[cbind(ix,     iy    )],
+                 yy[cbind(ix + 1, iy    )],
+                 yy[cbind(ix + 1, iy + 1)],
+                 yy[cbind(ix,     iy + 1)], NA)
+
+# The colors
+  Col <- createcolors(facets, border, Col)
+
+  if (is.null(lwd))
+    lwd <- 1
+  if (is.null(lty))
+    lty <- 1
+
+ # update and return polygons.
+  poly <- list(
+       x      = PolyX,
+       y      = PolyY,
+       col    = Col$facet,
+       border = Col$border,
+       lwd    = rep(lwd , length.out = ncol(PolyX)),
+       lty    = rep(lty , length.out = ncol(PolyX)))
+  class(poly) <- "poly"
+  return(poly)
+}
+

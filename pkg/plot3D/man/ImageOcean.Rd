@@ -10,8 +10,6 @@
 (positive) and ocean depth (negative), at 1 dg intervals.
 
 \code{ImageOcean} plots the ocean's bathymetry.
-
-Based on dataset \code{Bathymetry} from the R-package \code{marelac}.
 }
 \usage{
 ImageOcean (...)
@@ -115,6 +113,9 @@ Hypsometry
 }
 \seealso{
   \link{Image}, for the image function that visualises the bathymetry
+}
+\details{
+Hypsometry is based on dataset \code{Bathymetry} from the R-package \code{marelac}.
 }
 \keyword{hplot}
 

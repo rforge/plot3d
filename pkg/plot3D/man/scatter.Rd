@@ -20,8 +20,8 @@
 }
 \usage{
 scatter (x, y, colvar, ..., col = NULL, NAcol = "white", 
-          colkey = list(side = 4), clim = NULL, clab = NULL, 
-          CI = NULL, add = FALSE)
+         colkey = list(side = 4), clim = NULL, clab = NULL, 
+         CI = NULL, add = FALSE)
 
 scatter3D (x, y, z, colvar = z, ..., phi = 40, theta = 40,
            col = NULL, NAcol = "white",  
@@ -31,10 +31,10 @@ scatter3D (x, y, z, colvar = z, ..., phi = 40, theta = 40,
            add = FALSE, plot = TRUE)
           
 text3D (x, y, z, labels, colvar = NULL, ..., 
-          phi = 40, theta = 40, col = NULL, NAcol = "white",  
-          colkey = list(side = 4),
-          panel.first = NULL, clim = NULL, clab = NULL, 
-          bty = "b", add = FALSE, plot = TRUE)
+        phi = 40, theta = 40, col = NULL, NAcol = "white",  
+        colkey = list(side = 4),
+        panel.first = NULL, clim = NULL, clab = NULL, 
+        bty = "b", add = FALSE, plot = TRUE)
 
 points3D (x, y, z, colvar = z, col = NULL, ...)
 
@@ -52,7 +52,7 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
   \item{theta, phi }{the angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. see \link{persp}.
     }
-  \item{col }{Colors to be used for coloring the \code{colvar} variable. 
+  \item{col }{Color palette to be used for coloring the \code{colvar} variable. 
     If \code{col} is \code{NULL} and \code{colvar} is specified, 
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
@@ -81,7 +81,7 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
     set up but before any plotting takes place. 
     This can be useful for drawing background grids or scatterplot smooths. 
     The function should have as argument the transformation matrix, e.g. it should
-    be defined as \code{function(pmat)}. See last example of \link{persp3D}.
+    be defined as \code{function(pmat)}. See example of \link{persp3D} and last example of \link{voxel3D}.
     } 
   \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE}, 
     the label to be written on top of the color key. 
@@ -112,8 +112,8 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-     otherwise the viewing transformation matrix is returned (as invisible). 
-  } 
+    otherwise the viewing transformation matrix is returned (as invisible). 
+    } 
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
@@ -133,7 +133,7 @@ lines3D (x, y, z, colvar = z, col = NULL, ...)
 
 \value{
   Function \code{scatter3D} returns the viewing transformation matrix.
-  See \link{trans3D}
+  See \link{trans3D}.
 }
 \note{
   For \code{scatter} and \code{scatter3D} the plottypes that are supported 

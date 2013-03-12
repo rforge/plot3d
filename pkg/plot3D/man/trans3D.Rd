@@ -16,8 +16,8 @@ trans3D (x, y, z, pmat)
     }
   \item{pmat }{A 4 x 4 viewing transformation matrix, suitable for projecting 
     the 3D coordinates (x,y,z) into the 2D plane using homogeneous 
-    4D coordinates (x,y,z,t); such matrices are returned by by any of the 3-D
-    plotting functions and by \link{persp}().
+    4D coordinates (x,y,z,t); such matrices are returned by any of the 3-D
+    plotting functions from package \code{plot3D} and by \link{persp}().
     }
 }
 
@@ -28,15 +28,14 @@ trans3D (x, y, z, pmat)
     \item{x, y }{the projected 2-D coordinates of the 3-D input \code{x, y, z}}
   }
   
-  In contrast to \link{trans3d}, \code{trans3D} will return x and y of the same
-  class and dimensions as the input x and y.
+  In contrast to \link{trans3d}, \code{trans3D} the returned values x and y 
+  will be of the same class and dimensions as the input x and y.
   If inputted \code{x, y, z} are matrices or arrays, so will the projected
    coordinates be.
 }
 
 \seealso{
-  \link{scatter3D}, \link{slice3D}, \link{surf3D}
-   for examples that use \code{trans3D}.
+  \link{scatter3D}, \link{slice3D}, \link{surf3D}.
 }
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
 

@@ -76,9 +76,21 @@ Contour <- function (z, x = seq(0, 1, length.out = nrow(z)),
       plt.or <- par(plt = colkey$parplt)
   }
 
-  if (! is.vector(x) | ! is.vector(y))
-    stop("'x' and 'y' must be a vector")
-
+  if (! is.vector(x) | ! is.vector(y)) {
+    if (is.array(x)) {
+      if (length(dim(x)) !=  1)
+        stop ("'x' should be a vector or array of dimension 1")
+      x <- as.vector(x)  
+    }
+    if (is.array(y)) {
+      if (length(dim(y)) !=  1)
+        stop ("'y' should be a vector or array of dimension 1")
+      y <- as.vector(y)  
+     }
+     if (! is.vector(x) | ! is.vector(y))
+       stop ("'x' and 'y' should be a vector")
+  }
+  
   if (is.null (x))
     x <- seq(0, 1, length.out = nrow(z))
 
