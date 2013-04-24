@@ -130,7 +130,7 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
   lty <- dot$points$lty; if (is.null(lty)) lty <- 1
 
   Poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
-               lwd = NULL, lty = NULL, proj = NULL)                    
+               lwd = NULL, lty = NULL, img = NULL, proj = NULL)                    
 
   zmin <- min(plist$zlim[1], min(z, na.rm = TRUE))
 
@@ -164,7 +164,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
                y      = cbind(Poly$y, c(ye1, ye2, ye2, ye1, NA)),               
                z      = cbind(Poly$z, c(zmin, zmin, z[1,i], z[1,i], NA)),               
                col    = c(Poly$col, Poly$col[ind]),
-               border = c(Poly$border, Poly$border[ind]))
+               border = c(Poly$border, Poly$border[ind]),
+               img    = Poly$img)
 
         ind <- length(Poly$col)
         
@@ -173,7 +174,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
                y      = cbind(Poly$y, c(ye1, ye2, ye2, ye1, NA)),               
                z      = cbind(Poly$z, c(zmin, zmin, z[Nx,i], z[Nx,i], NA)),               
                col    = c(Poly$col, Poly$col[ind]),
-               border = c(Poly$border, Poly$border[ind]))
+               border = c(Poly$border, Poly$border[ind]),
+               img    = Poly$img)
       }
     }
   }
@@ -205,7 +207,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
                y      = cbind(Poly$y, c(y[1], y[1], y[1], y[1], NA)),
                z      = cbind(Poly$z, c(zmin, zmin, z[i,1], z[i,1], NA)),               
                col    = c(Poly$col, Poly$col[ind]),
-               border = c(Poly$border, Poly$border[ind]))
+               border = c(Poly$border, Poly$border[ind]),
+               img    = Poly$img)
       
         ind <- length(Poly$col)
         
@@ -214,7 +217,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
                y      = cbind(Poly$y, c(y[Ny], y[Ny], y[Ny], y[Ny], NA)),
                z      = cbind(Poly$z, c(zmin, zmin, z[i,Ny], z[i,Ny], NA)),               
                col    = c(Poly$col, Poly$col[ind]),
-               border = c(Poly$border, Poly$border[ind]))
+               border = c(Poly$border, Poly$border[ind]),
+               img    = Poly$img)
       }
     }
   }
@@ -226,9 +230,10 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
                          colMeans(Poly$y, na.rm = TRUE), 
                          colMeans(Poly$z, na.rm = TRUE), plist)
       
-  Poly$lwd    <- rep(lwd , length.out = length(Poly$col))
-  Poly$lty    <- rep(lty , length.out = length(Poly$col))
-  class(Poly) <- "poly"
+  Poly$lwd     <- rep(lwd , length.out = length(Poly$col))
+  Poly$lty     <- rep(lty , length.out = length(Poly$col))
+  Poly$isimg   <- rep(0 , length.out = length(Poly$col))
+  class(Poly)  <- "poly"
 
   if (image$add) 
     Poly <- XYimage (Poly, image, x, y, z, plist, col) 

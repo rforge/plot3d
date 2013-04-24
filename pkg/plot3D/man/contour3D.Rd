@@ -9,8 +9,7 @@
 \usage{
 contour3D (x = NULL, y = NULL, z, colvar = z, 
        ..., phi = 40, theta = 40,
-       col = NULL,  NAcol = "white", border = NA, facets = TRUE,
-       colkey = list(side = 4), resfac = 1,
+       col = NULL, colkey = list(side = 4), resfac = 1,
        panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
        inttype = 1, dDepth = 1e-1, add = FALSE, plot = TRUE)
 }
@@ -34,8 +33,6 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
     \code{col} will be "black". 
-    }
-  \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
   \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
     Parameters should be one of 
@@ -64,15 +61,6 @@ contour3D (x = NULL, y = NULL, z, colvar = z,
   \item{theta, phi }{The angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. 
     see \link{persp}.
-    }
-  \item{border }{The color of the lines drawn around the surface facets.
-    The default, \code{NA}, will disable the drawing of borders.
-    }
-  \item{facets }{If \code{TRUE}, then \code{col} denotes the color of the surface facets. 
-    If \code{FALSE}, then the surface facets are colored ``white'' and the \code{border} 
-    (if \code{NA}) will be colored as specified by \code{col}. 
-    If \code{NA} then the facets will be transparent. 
-    It is usually faster to draw with \code{facets = FALSE}.
     }
   \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
     set up but before any plotting takes place. 

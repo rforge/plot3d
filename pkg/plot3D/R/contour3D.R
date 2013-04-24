@@ -5,9 +5,7 @@
 contour3D <- function(x = NULL, y = NULL, 
                   z, colvar = z, ..., 
                   phi = 40, theta = 40,
-                  col = NULL,  NAcol = "white", 
-                  border = NA, facets = TRUE,
-                  colkey = list(side = 4), resfac = 1, 
+                  col = NULL, colkey = list(side = 4), resfac = 1, 
                   panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",
                   inttype = 1, dDepth = 1e-1, 
@@ -91,10 +89,6 @@ contour3D <- function(x = NULL, y = NULL,
     clim <- log(clim)
   }
 
-  is.facets <- facets
-  if (is.na(facets)) 
-    is.facets <- TRUE
-  
   if (is.null(plist)) {
     do.call("perspbox", c(alist(x, y, z,  
                      phi = phi, theta = theta, plot = plot, 

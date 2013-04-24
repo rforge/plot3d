@@ -6,7 +6,7 @@ arrows3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
                     colvar = NULL, ..., phi = 40, theta = 40,
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4), panel.first = NULL,
-                    clim = NULL, clab = NULL, bty = "b", 
+                    clim = NULL, clab = NULL, bty = "b", type = "simple",
                     add = FALSE, plot = TRUE)  {
   if (add) 
     plist <- getplist()
@@ -92,6 +92,7 @@ arrows3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
                angle  = rep(angle , length.out = len),
                lwd    = rep(lwd   , length.out = len),
                lty    = rep(lty   , length.out = len),
+               type   = rep(type  , length.out = len),
                proj   = Proj)
   class(arr) <- "arr"
 

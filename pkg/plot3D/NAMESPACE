@@ -6,7 +6,8 @@ S3method("plot", "plist")
 
 importFrom(misc3d, computeContour3d)
 
-export(mesh, jet.col, gg.col, ramp.col, alpha.col, colkey, trans3D)
+export(jet.col, jet2.col, gg.col, gg2.col, ramp.col, alpha.col)
+export(colkey, mesh, trans3D)
 export(scatter)
 export(Image, Contour, ImageOcean)
 export(persp3D, hist3D, ribbon3D, perspbox)

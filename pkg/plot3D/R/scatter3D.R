@@ -1,4 +1,4 @@
-lines3D <- function(x, y, z, colvar = z, col = NULL, ...) {
+lines3D <- function(x, y, z, colvar = z, ...) {
   dot <- list(...)
   if (is.null(dot$type)) 
     dot$type <- "l"
@@ -6,11 +6,11 @@ lines3D <- function(x, y, z, colvar = z, col = NULL, ...) {
   invisible(plist) 
 }
 
-points3D <- function(x, y, z, colvar = z, col = NULL, ...) {
+points3D <- function(x, y, z, colvar = z, ...) {
   dot <- list(...)
   if (is.null(dot$type)) 
     dot$type <- "p"
-  plist <- do.call("scatter3D", c(alist(x, y, z, colvar, col = col), dot))
+  plist <- do.call("scatter3D", c(alist(x, y, z, colvar), dot))
   invisible(plist) 
 }
 
@@ -95,7 +95,7 @@ scatter3D <- function(x, y, z, colvar = z, ...,
     panel.first(plist$mat)  
 
   if (! is.null(surf))
-    spoly <- do.call("addpoly", c(alist(poly = NULL, plist = plist), surf))
+    spoly <- do.call("addimg", c(alist(poly = NULL, plist = plist), surf))
   else
     spoly <- NULL
 

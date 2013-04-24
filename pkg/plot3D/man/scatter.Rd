@@ -36,9 +36,9 @@ text3D (x, y, z, labels, colvar = NULL, ...,
         panel.first = NULL, clim = NULL, clab = NULL, 
         bty = "b", add = FALSE, plot = TRUE)
 
-points3D (x, y, z, colvar = z, col = NULL, ...)
+points3D (x, y, z, colvar = z, ...)
 
-lines3D (x, y, z, colvar = z, col = NULL, ...)
+lines3D (x, y, z, colvar = z, ...)
 }
 
 \arguments{

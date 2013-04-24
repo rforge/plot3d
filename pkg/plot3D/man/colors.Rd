@@ -1,6 +1,8 @@
 \name{Colors}
 \alias{jet.col}
+\alias{jet2.col}
 \alias{gg.col}
+\alias{gg2.col}
 \alias{ramp.col}
 \alias{alpha.col}
 \title{
@@ -9,7 +11,9 @@
 \description{
   \code{jet.col} generates the matlab-type colors.
 
-  \code{gg.col} generates gg-plot-like colors.
+  \code{jet2.col} is similar but lacks the deep blue colors
+
+  \code{gg.col} and \code{gg2.col} generate gg-plot-like colors.
 
   \code{ramp.col} creates color schemes by interpolation. 
 
@@ -18,7 +22,11 @@
 \usage{
 jet.col (n = 100, alpha = 1)
 
+jet2.col (n = 100, alpha = 1)
+
 gg.col (n = 100, alpha = 1)
+
+gg2.col (n = 100, alpha = 1)
 
 ramp.col (col = c("grey", "black"), n = 100, alpha = 1)
 
@@ -85,17 +93,18 @@ not be optimal for lighting.
 ## Transparency and various color schemes
 ## =======================================================================
 
- par(mfrow = c(2, 2))
+ par(mfrow = c(3, 3))
  for (alph in c(0.25, 0.75))
    Image(volcano, col = jet.col(100, alpha = alph), 
-         main = paste("alpha = ", alph))  
-
-# ggplot-like colors
- bPalette <- c("#0072B2", "#56B4E9", "#009E73", 
-               "#F0E442", "#CC79A7", "#D55E00", "#000000")
- Image(volcano, col = ramp.col(bPalette))  
-
- Image(volcano, col = ramp.col(c("blue", "yellow", "green", "red")))  
+         main = paste("jet.col, alpha = ", alph))  
+ Image(volcano, main = "jet.col")
+ Image(volcano, col = jet2.col(100), main = "jet2.col")
+ Image(volcano, col = gg.col(100), main = "gg.col")
+ Image(volcano, col = gg2.col(100), main = "gg2.col")
+ Image(volcano, col = rainbow(100), main = "rainbow")
+ Image(volcano, col = terrain.colors(100), main = "terrain.colors")
+ Image(volcano, col = ramp.col(c("blue", "yellow", "green", "red")),
+       main = "ramp.col")  
 
 ## =======================================================================
 ## Shading, lighting -  one color

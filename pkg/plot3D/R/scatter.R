@@ -18,6 +18,8 @@ scatter <- function(x, y, colvar = NULL, ...,
   if (! is.null(dots$log)) {
     if (length(grep("c", dots[["log"]])) > 0) {
       dots[["log"]] <- gsub("c", "", dots[["log"]])
+      if (dots[["log"]] == "")
+        dots[["log"]] <- NULL
       clog <- TRUE
     }
   }

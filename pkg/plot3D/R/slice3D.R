@@ -55,7 +55,7 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
     cv <- matrix(nrow = nrow(xs), ncol = ncol(xs), data = colvar[cbind(ix, iy, iz)])
 
    # add polygon
-    poly <<- addpoly(poly, xs, ys, zs, colvar = cv, plist = plist, 
+    poly <<- addimg(poly, xs, ys, zs, colvar = cv, plist = plist, 
         col = col, NAcol = NAcol, border = border, 
         facets = facets, resfac = 1, clim = clim, lwd = lwd, 
         ltheta = ltheta, lphi = lphi, 

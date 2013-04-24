@@ -8,10 +8,9 @@
 }
 \usage{
 image3D (x = NULL, y = NULL, z = NULL, colvar = NULL, 
-      ..., phi = 40, theta = 40, 
-      col = jet.col(100),  NAcol = "white", 
-      border = NA, facets = TRUE, colkey = list(side = 4), 
-      panel.first = NULL,
+      ..., phi = 40, theta = 40, col = jet.col(100), 
+      NAcol = "white", border = NA, facets = TRUE,
+      colkey = list(side = 4), panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",
       inttype = 1, add = FALSE, plot = TRUE)
 }
@@ -25,9 +24,7 @@ image3D (x = NULL, y = NULL, z = NULL, colvar = NULL,
     \code{nrow(colvar)} and the second should be of length equal to 
     \code{ncol(colvar)}. 
     }
-  \item{colvar }{The variable used for coloring. Values of \code{NULL}, \code{NA}, or \code{FALSE}
-    will toggle off coloration according to \code{colvar}. This gives good results
-    only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
+  \item{colvar }{The variable used for coloring. 
     }
   \item{col }{Color palette to be used for the \code{colvar} variable.
     }

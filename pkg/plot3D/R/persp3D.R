@@ -109,13 +109,15 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   X <- matrix(nrow = nrow(z), ncol = ncol(z), data = x)
   Y <- matrix(nrow = nrow(z), ncol = ncol(z), data = y, byrow = TRUE)
     
+  lwd <- ifelse (is.null (dot$points$lwd), 1, dot$points$lwd)
+  lty <- ifelse (is.null (dot$points$lty), 1, dot$points$lty)
+
   Poly <- paintit (colvar, X, Y, z, plist, col, NAcol, clim, 
-           border, facets, dot$points$lwd, dot$points$lty, 
-           dot$shade, Extend)
+           border, facets, lwd, lty, dot$shade, Extend)
 
   if (curtain) {
     P <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
-               lwd = NULL, lty = NULL, proj = NULL)                    
+               lwd = NULL, lty = NULL, proj = NULL, img = list(), isimg = NULL)                    
  
     zmin <- plist$zlim[1]
     Nx <- length(x)
@@ -123,19 +125,19 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     P <- add.poly(P, 
           cbind(rep(x[1], Ny), rep(x[1], Ny)), cbind(y, y), 
           cbind(rep(zmin, Ny), z[1,]), colvar[1,], 
-          col, NAcol, clim, facets, border)
+          col, NAcol, clim, facets, border, lwd, lty)
     P <- add.poly(P, 
           cbind(rep(x[Nx], Ny), rep(x[Nx], Ny)), cbind(y, y), 
           cbind(rep(zmin, Ny), z[Nx,]), colvar[Nx-1,], 
-          col, NAcol, clim, facets, border)
+          col, NAcol, clim, facets, border, lwd, lty)
     P <- add.poly(P, 
           cbind(x, x), cbind(rep(y[1], Nx), rep(y[1], Nx)), 
           cbind(rep(zmin, Nx), z[,1]), colvar[, 1], 
-          col, NAcol, clim, facets, border)
+          col, NAcol, clim, facets, border, lwd, lty)
     P <- add.poly(P, 
           cbind(x, x), cbind(rep(y[Ny], Nx), rep(y[Ny], Nx)), 
           cbind(rep(zmin, Nx), z[,Ny]), colvar[, Ny-1], 
-          col, NAcol, clim, facets, border)
+          col, NAcol, clim, facets, border, lwd, lty)
     if (! dot$shade$type == "none") {
       P <- color3D(P, plist$scalefac, dot$shade, lighting)
       if (!facets) P$col[] <- "white"
@@ -146,21 +148,20 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
                          colMeans(P$y, na.rm = TRUE), 
                          colMeans(P$z, na.rm = TRUE), plist)
       
-    lwd <- ifelse (is.null (dot$points$lwd), 1, dot$points$lwd)
-    lty <- ifelse (is.null (dot$points$lty), 1, dot$points$lty)
-    P$lwd    <- rep(lwd , length.out = length(P$col))
-    P$lty    <- rep(lty , length.out = length(P$col))
-
     Poly <- 
-      list(x      = cbind(Poly$x, P$x),
-           y      = cbind(Poly$y, P$y),               
-           z      = cbind(Poly$z, P$z),               
-           col    = c(Poly$col, P$col),
-           border = c(Poly$border, P$border),
-           proj   = c(Poly$proj, P$proj),
-           lwd    = c(Poly$lwd, P$lwd),
-           lty    = c(Poly$lty, P$lty)
+      list(x       = cbind(Poly$x, P$x),
+           y       = cbind(Poly$y, P$y),               
+           z       = cbind(Poly$z, P$z),               
+           col     = c(Poly$col, P$col),
+           border  = c(Poly$border, P$border),
+           proj    = c(Poly$proj, P$proj),
+           lwd     = c(Poly$lwd, P$lwd),
+           lty     = c(Poly$lty, P$lty),
+           isimg   = c(Poly$isimg, P$isimg),
+           img     = Poly$img
            )
+  class(Poly) <- "poly"
+           
 
   }
    

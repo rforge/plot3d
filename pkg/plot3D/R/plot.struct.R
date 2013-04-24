@@ -37,7 +37,7 @@ plot.plist <- function(x, ...)  {
 ## =============================================================================
 
 plot.struct.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL, 
-  segm = NULL, labels = NULL, arr = NULL, quiv = NULL, plot = TRUE) {       
+  segm = NULL, labels = NULL, arr = NULL, other = NULL, plot = TRUE) {       
 
   if (plot) {
     if (is.null(plist$plt)) 
@@ -50,7 +50,7 @@ plot.struct.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
       plist <- plotbox(plist)
   }
   
-  plist <- update.3D(plist, pt, CIpt, poly, segm, labels, arr, quiv)
+  plist <- update.3D(plist, pt, CIpt, poly, segm, labels, arr, other)
 
   if (plot) {
     plotlist3D(plist)
@@ -134,6 +134,7 @@ color3D <- function(poly, scalefac, shade, lighting) {  # lighting and shading
       pcol <-  facetcols.light(light, Normals, poly$border, shade)
     poly$border[ii] <- pcol[ii] 
   }    
+  
   poly
 }
 
@@ -208,7 +209,7 @@ proj3D <- function(plist, dot) {
 ## =============================================================================
 
 update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL, 
-       segm = NULL, labels = NULL, arr = NULL, quiv = NULL) {       
+       segm = NULL, labels = NULL, arr = NULL, other = NULL) {       
 # ------------------------------------------------------------------------------
 # update plist with new elements     
 # ------------------------------------------------------------------------------
@@ -269,30 +270,45 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$labels$proj   <- c(plist$labels$proj, labels$proj)
   }
     
-  if (is.null(plist$poly))
-    plist$poly <- poly      
-  else if (! is.null(poly)) {
-    nR1 <- nrow(poly$x) 
-    nR2 <- nrow(plist$poly$x)
-    if (nR1 > nR2) {
-      nR <- matrix(nrow = nR1 - nR2, ncol = ncol(plist$poly$x), data = NA)
-      plist$poly$x <- rbind(plist$poly$x, nR)
-      plist$poly$y <- rbind(plist$poly$y, nR)
-      plist$poly$z <- rbind(plist$poly$z, nR)
-    } else if (nR2 > nR1) {
-      nR <- matrix(nrow = nR2 - nR1, ncol = ncol(poly$x), data = NA)
-      poly$x <- rbind(poly$x, nR)
-      poly$y <- rbind(poly$y, nR)
-      poly$z <- rbind(poly$z, nR)
+  if (! is.null(poly)) {
+    if (is.null(plist$poly)) {
+      plist$poly <- poly      
+      plist$poly$img <- NULL
+    } else {
+      nR1 <- nrow(poly$x) 
+      nR2 <- nrow(plist$poly$x)
+      if (nR1 > nR2) {
+        nR <- matrix(nrow = nR1 - nR2, ncol = ncol(plist$poly$x), data = NA)
+        plist$poly$x <- rbind(plist$poly$x, nR)
+        plist$poly$y <- rbind(plist$poly$y, nR)
+        plist$poly$z <- rbind(plist$poly$z, nR)
+      } else if (nR2 > nR1) {
+        nR <- matrix(nrow = nR2 - nR1, ncol = ncol(poly$x), data = NA)
+        poly$x <- rbind(poly$x, nR)
+        poly$y <- rbind(poly$y, nR)
+        poly$z <- rbind(poly$z, nR)
+      }
+
+      plist$poly$x      <- cbind(plist$poly$x,  poly$x)
+      plist$poly$y      <- cbind(plist$poly$y,  poly$y)
+      plist$poly$z      <- cbind(plist$poly$z,  poly$z)
+      plist$poly$proj   <- c(plist$poly$proj,   poly$proj)
+      plist$poly$lwd    <- c(plist$poly$lwd,    poly$lwd)
+      plist$poly$lty    <- c(plist$poly$lty,    poly$lty)
+      plist$poly$border <- c(plist$poly$border, poly$border)
+      plist$poly$col    <- c(plist$poly$col,    poly$col)
+      plist$poly$isimg  <- c(plist$poly$isimg,  poly$isimg)
     }
-    plist$poly$x      <- cbind(plist$poly$x,  poly$x)
-    plist$poly$y      <- cbind(plist$poly$y,  poly$y)
-    plist$poly$z      <- cbind(plist$poly$z,  poly$z)
-    plist$poly$proj   <- c(plist$poly$proj,   poly$proj)
-    plist$poly$lwd    <- c(plist$poly$lwd,    poly$lwd)
-    plist$poly$lty    <- c(plist$poly$lty,    poly$lty)
-    plist$poly$border <- c(plist$poly$border, poly$border)
-    plist$poly$col    <- c(plist$poly$col,    poly$col)
+    if (! is.null(poly$img)) {        # If polygons form an image - for use with rgl
+      if (is.null(plist$imgnr)) {
+        plist$imgnr <- 0
+        plist$img <- list()
+      } 
+      for (ii in 1: length(poly$img)) {
+        plist$imgnr <- plist$imgnr + 1
+        plist$img[[plist$imgnr]] <- poly$img[[ii]]
+      }
+    }
   }
   
   if (is.null(plist$segm))
@@ -326,6 +342,7 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$arr$lwd    <- c(plist$arr$lwd,    arr$lwd)
     plist$arr$lty    <- c(plist$arr$lty,    arr$lty)
     plist$arr$col    <- c(plist$arr$col,    arr$col)
+    plist$arr$type   <- c(plist$arr$type,   arr$type)
   }                                                                     
   return (plist)
 }
@@ -342,7 +359,7 @@ plotlist3D <- function(plist) {
     segm   <- plist$segm
     labels <- plist$labels
     arr    <- plist$arr
-    quiv   <- plist$quiv
+    other  <- plist$other
 
 # ------------------------------------------------------------------------------
 # project (x, y, z) to plane (x, y) and count number of different structures
@@ -353,9 +370,8 @@ plotlist3D <- function(plist) {
       pol <- trans3D(x = poly$x, y = poly$y, z = poly$z, pmat = plist$mat)
       numStruct <- numStruct + 1          
     }
-    if (! is.null(quiv))  {    
-      quiv.to   <- trans3D(x = quiv$x.to,   y = quiv$y.to,   z = quiv$z.to,   pmat = plist$mat)
-      quiv.from <- trans3D(x = quiv$x.from, y = quiv$y.from, z = quiv$z.from, pmat = plist$mat)
+    if (! is.null(other))  {    
+      stop ("structure 'other' undefined")
       numStruct <- numStruct + 1
     }
     if (! is.null(CIpt$x.from)) {   
@@ -384,7 +400,7 @@ plotlist3D <- function(plist) {
     }    
 
     sortlist <- sort.int(c(pt$proj, CIpt$proj, poly$proj, segm$proj, 
-                           labels$proj, arr$proj, quiv$proj), 
+                           labels$proj, arr$proj, other$proj), 
                          index.return = TRUE)$ix
 
 # ------------------------------------------------------------------------------
@@ -421,20 +437,31 @@ plotlist3D <- function(plist) {
              cex = labels$cex[sortlist],
              font = labels$font[sortlist] )
 
-      } else if (!is.null(arr)) {  # only segments
-        arrows(arr.from$x[sortlist], arr.from$y[sortlist],  
-               arr.to$x[sortlist], arr.to$y[sortlist], 
-               length = arr$length[sortlist],
-               angle = arr$angle[sortlist],
-               code = arr$code[sortlist],
-               col = arr$col[sortlist],
-               lwd = arr$lwd[sortlist],
-               lty = arr$lty[sortlist])
-
-      } else if (!is.null(quiv)) { # only quivers - not in plot3D package
-
-          do.call("Arrows", c(alist(quiv.from$x, quiv.from$y, quiv.to$x, quiv.to$y, 
-             col = quiv$col),  quiv$dot))
+      } else if (!is.null(arr)) {  # only simple arrows
+        ii <- which(arr$type[sortlist] == "simple")
+        ss <- sortlist[ii]
+        if (length(ss) > 0)
+          arrows(arr.from$x[ss], arr.from$y[ss],  
+                 arr.to$x[ss], arr.to$y[ss], 
+                 length = arr$length[ss],
+                 angle = arr$angle[ss],
+                 code = arr$code[ss],
+                 col = arr$col[ss],
+                 lwd = arr$lwd[ss],
+                 lty = arr$lty[ss])
+                 
+                 
+        ii <- which(arr$type[sortlist] %in% c("triangle", "cone"))
+        ss <- sortlist[ii]
+        if (length(ss) > 0) {
+          arrtria(arr.from$x[ss], arr.from$y[ss],  
+                 arr.to$x[ss], arr.to$y[ss], 
+                 code = arr$code[ss],
+                 col = arr$col[ss],
+                 lwd = arr$lwd[ss],
+                 lty = arr$lty[ss], length = arr$length[ss], 
+                 angle = arr$angle[ss])
+        }         
 
       }
       if (is.null(CIpt))
@@ -448,13 +475,13 @@ plotlist3D <- function(plist) {
     Lsegm   <- length(segm$proj)
     Llabels <- length(labels$proj)
     Larr    <- length(arr$proj)
-    Lquiv   <- length(quiv$proj)
+    Lother  <- length(other$proj)
     LCI     <- Lpt + LCIpt
     LCP     <- LCI + Lpoly
     LCPS    <- LCP + Lsegm
     LCPSL   <- LCPS + Llabels
     LCPSLA  <- LCPSL + Larr
-    Ltot    <- LCPSLA + Lquiv
+    Ltot    <- LCPSLA + Lother
 
     type <- rep(0, Ltot)                                   # 0 = points
     type[sortlist > Lpt   & sortlist <= LCI]    <- 1       # points + CI
@@ -462,7 +489,7 @@ plotlist3D <- function(plist) {
     type[sortlist > LCP   & sortlist <= LCPS]   <- 3       # segments
     type[sortlist > LCPS  & sortlist <= LCPSL]  <- 4       # labels
     type[sortlist > LCPSL & sortlist <= LCPSLA] <- 5       # arrows
-    type[sortlist > LCPSLA                    ] <- 6       # quivers
+    type[sortlist > LCPSLA                    ] <- 6       # other - undefined
 
     plotit <- function(ii) {
       i <- sortlist[ii]  
@@ -523,12 +550,29 @@ plotlist3D <- function(plist) {
               col = arr$col[io], 
               lwd = arr$lwd[io], 
               lty = arr$lty[io])
+              
+       if (arr$type[io] == "simple")
+         arrows(arr.from$x[io], arr.from$y[io],  
+              arr.to$x[io], arr.to$y[io], 
+              length = arr$length[io], 
+              angle = arr$angle[io], 
+              code = arr$code[io], 
+              col = arr$col[io], 
+              lwd = arr$lwd[io], 
+              lty = arr$lty[io])
+       else 
+         arrtria(arr.from$x[io], arr.from$y[io],  
+                 arr.to$x[io], arr.to$y[io], 
+                 code = arr$code[io],
+                 col = arr$col[io],
+                 lwd = arr$lwd[io],
+                 lty = arr$lty[io], length = arr$length[io], 
+                 angle = arr$angle[io])
 
    } else if (type[ii] == 6) {
       io <- i - LCPSLA
-      dp <- extractdots(quiv$dot, i)
-      do.call("Arrows", c(alist(quiv$x.from[io], quiv$y.from[io], 
-         quiv$x.to[io], quiv$y.to[io], col = quiv$col[io]), dp))
+      dp <- extractdots(other$dot, i)
+      stop("structure 'other' not defined")  
       }
     
     }
@@ -537,3 +581,57 @@ plotlist3D <- function(plist) {
 #    for (i in 1:length(sortlist)) plotit(i)
 
 }
+
+
+# triangular arrows 
+
+arrtria <- function (x.from, y.from, x.to, y.to, code, 
+    col, lty, lwd, length, angle = 30)       
+{
+  segments(x.from, y.from, x.to, y.to, col = col, lty = lty, lwd = lwd)
+
+ # scales
+  user <- par("usr")
+  pcm <- par("pin") 
+  sx <- diff(user[1:2])/pcm[1]
+  sy <- diff(user[3:4])/pcm[2]
+  
+  eps <- 1e-8
+
+  arrhead <- function (Code) {
+  
+    i <- which (Code == code)
+    if (length(i) == 0) return()
+    Len <- length[i]
+    Col    <- col[i]
+    Angle  <- angle[i]/pi*180
+    Angle[is.nan(Angle)] <- 0
+
+    if (Code %in% c(1, 3)) {
+    	x1 <- x.from[i]
+    	y1 <- y.from[i]
+  	  x0 <- x.to[i]
+  	  y0 <- y.to[i]
+    } else {
+    	x1 <- x.to[i]
+    	y1 <- y.to[i]
+  	  x0 <- x.from[i]
+  	  y0 <- y.from[i]
+    }
+  	xc <- x0 - x1
+   	yc <- y0 - y1
+
+    rot <- atan2(yc/sy, xc/sx) 
+
+   	x <- rbind (x1 - Len * sx * cos(rot+Angle), x1, 
+                x1 - Len * sx * cos(rot-Angle), NA)
+   	y <- rbind (y1 - Len * sy * sin(rot+Angle), y1,  
+                y1 - Len * sy * sin(rot-Angle), NA)
+    polygon(x = x, y = y, col = col[i], border = col[i],
+        lty = lty[i], lwd = lwd[i])                    
+  }
+  arrhead(1)
+  arrhead(2)
+  arrhead(3)
+}
+

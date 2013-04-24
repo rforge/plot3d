@@ -1,5 +1,5 @@
  # a function to create polygons
-  add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border)  {
+  add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border, lwd = 1, lty = 1)  {
 
     nr <- nrow(x) - 1
     nc <- ncol(x) - 1
@@ -43,26 +43,34 @@
       Col <- col[1 + trunc((cv - clim[1])/crange*N)]
     } else 
       Col <- rep(col, length.out = length(cv))
+      
+    Lty <- rep(lty, length.out = length(cv))
+    Lwd <- rep(lwd, length.out = length(cv))
 
  # border and colors 
     Col <- createcolors(facets, border, Col)
-  
- # update and return polygons.
+      
+ # update polygons.
     poly <- 
-      list(x      = cbind(poly$x, PolyX),
-           y      = cbind(poly$y, PolyY),               
-           z      = cbind(poly$z, PolyZ),               
-           col    = c(poly$col, Col$facet),
-           border = c(poly$border, Col$border))
+      list(x       = cbind(poly$x, PolyX),
+           y       = cbind(poly$y, PolyY),               
+           z       = cbind(poly$z, PolyZ),               
+           col     = c(poly$col, Col$facet),
+           border  = c(poly$border, Col$border),
+           lty     = c(poly$lty, Lty),
+           lwd     = c(poly$lwd, Lwd),
+           isimg   = c(poly$isimg, rep(1, length.out = length(cv))),
+           img     = poly$img
+          )
+
     return(poly)
   } 
 
 ## =============================================================================
-## Adding polygons from a surface or persp to a plot
+## Adding polygons from images or persps
 ## =============================================================================
-# x, y, z, colvar: matrices
 
-addpoly <- function(poly, x, y, z, colvar = z, plist,
+addimg <- function(poly, x, y, z, colvar = z, plist,
                      col = NULL, NAcol = "white", 
                      border = NA, facets = TRUE, lwd = 1, lty = 1,
                      resfac = 1, clim = NULL,   
@@ -71,9 +79,10 @@ addpoly <- function(poly, x, y, z, colvar = z, plist,
 
   if (missing(poly) | is.null(poly)) 
     poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
-                 lwd = NULL, lty = NULL, proj = NULL)                    
+                 lwd = NULL, lty = NULL, proj = NULL, isimg = NULL,
+                 img = list())                    
   else if (class(poly) != "poly")
-    stop ("'poly' not of correct type for addpoly")
+    stop ("'poly' not of correct type for addimg")
 
   dot <- splitdotpersp(list(ltheta = ltheta, lphi = lphi, shade = shade), 
                        bty = NULL, lighting, x, y, z, plist = plist)
@@ -101,20 +110,22 @@ addpoly <- function(poly, x, y, z, colvar = z, plist,
     col <- "grey"
   
  # if x and y are a vector: check resfac and convert to matrix
-  if (is.vector(x))  {
-    if (! is.vector(y))
+  X <- x
+  Y <- y
+  if (is.vector(X))  {
+    if (! is.vector(Y))
       stop("'y' should be a vector if 'x' is one")
     if (any(resfac != 1)) {   # change resolution
-      res <- changeres(resfac, x, y, z, colvar)
-      x <- res$x
-      y <- res$y
+      res <- changeres(resfac, X, Y, z, colvar)
+      X <- res$x
+      Y <- res$y
       z <- res$z
       colvar <- res$colvar
     }
-    XY <- mesh(x, y)
+    XY <- mesh(X, Y)
     x <- XY$x
     y <- XY$y
-  }
+  } else { x <- X; y <- Y}
      
  # check class and dimensionality
   if (! is.matrix(x))
@@ -158,24 +169,33 @@ addpoly <- function(poly, x, y, z, colvar = z, plist,
     Col <- col[1 + trunc((colvar - clim[1])/crange*N)]
   } else 
     Col <- rep(col, length.out = length(x))
-
+  
   if (! dot$shade$type == "none") 
     Col <- facetcols (x, y, z, Col, dot$shade)
 
  # border and colors 
   Col <- createcolors(facets, border, Col)
   
- # update and return polygons.
+ # update polygons.
+  numimg <- length(poly$img)    
   poly <- 
-  list(x      = cbind(poly$x, Poly$X),
-       y      = cbind(poly$y, Poly$Y),               
-       z      = cbind(poly$z, Poly$Z),               
-       col    = c(poly$col, Col$facet),
-       border = c(poly$border, Col$border),
-       lwd    = c(poly$lwd, rep(lwd , length.out = length(x))),
-       lty    = c(poly$lty, rep(lty , length.out = length(x))),
-       proj   = c(poly$proj, Proj))
+    list(x      = cbind(poly$x, Poly$X),
+         y      = cbind(poly$y, Poly$Y),               
+         z      = cbind(poly$z, Poly$Z),               
+         col    = c(poly$col, Col$facet),
+         border = c(poly$border, Col$border),
+         lwd    = c(poly$lwd, rep(lwd , length.out = length(x))),
+         lty    = c(poly$lty, rep(lty , length.out = length(x))),
+         proj   = c(poly$proj, Proj),
+         isimg = c(poly$isimg, rep(1, length.out = length(x))),
+         img    = poly$img)
+  if (numimg == 0)
+    poly$img <- list()
+  poly$img[[numimg+1]] <- list(x = X, y = Y, z = z, 
+               col = matrix(nrow = nrow(colvar), ncol = ncol(colvar), data = Col$facet))
+
   class(poly) <- "poly"
+  
   return(poly)
 }
 

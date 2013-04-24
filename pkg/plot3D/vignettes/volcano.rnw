@@ -307,7 +307,7 @@ par(mfrow = c(2, 1), mar = c(2, 2, 2, 2))
 
 # add a contour (image) at z = 170; jetcolored, 
  contour3D(x, y, z = 170, add = TRUE, clim = range(volcano), lwd = 3,
-           colvar = volcano, facets = NA, colkey = FALSE, plot = TRUE)
+           colvar = volcano, colkey = FALSE, plot = TRUE)
 
 ## ======================================================================
 ## Drawing on panels

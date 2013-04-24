@@ -22,7 +22,7 @@ arrows3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL,
          phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "b", 
+         clim = NULL, clab = NULL, bty = "b", type = "simple", 
          add = FALSE, plot = TRUE)
 
 segments3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL, 
@@ -134,6 +134,10 @@ polygon3D (x, y, z, colvar = NULL,
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     }
+  \item{type }{The type of the arrow head, one of \code{"simple"} 
+    (the default, which uses R-function \link{arrows}) or \code{"triangle"} and \code{"cone"}.
+    The latter two are the same in \code{plot3D} (but differ in package \code{plot3D.rgl}).
+    }
   \item{add }{Logical. If \code{TRUE}, then the arrows, segments, ... will be added to the current plot.
     If \code{FALSE} a new plot is started. 
     } 
@@ -189,7 +193,7 @@ polygon3D (x, y, z, colvar = NULL,
  x1 <- x0 + 0.05
 
  Col <- c("red", "blue", "green") 
- arrows3D(x0, y0, z0, x1 = x1, colvar = z0, lwd = 2, 
+ arrows3D(x0, y0, z0, x1 = x1, colvar = z0, lwd = 2, type = "triangle",
           d = 2, length = 0.05, clab = "z-value", col = Col,
           xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
 

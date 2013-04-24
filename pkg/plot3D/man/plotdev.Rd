@@ -231,7 +231,7 @@ plotdev(...)
 
 # add a contour (image) at z = 170; jetcolored, 
  contour3D(x, y, z = 170, add = TRUE, clim = range(V),
-           colvar = V, facets = NA, plot = FALSE)
+           colvar = V, plot = FALSE)
 
 # plot it  - 
  plot(getplist())   #  same as plotdev()

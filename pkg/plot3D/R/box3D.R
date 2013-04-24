@@ -239,7 +239,9 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
       col    = c(poly$col,    Col$facet[i]),
       border = c(poly$border, Col$border[i]),
       lwd    = c(poly$lwd,    lwd[i]),
-      lty    = c(poly$lty,    lty[i])
+      lty    = c(poly$lty,    lty[i]),
+      isimg  = c(poly$isimg, 0)
+      
     )
   }
  # projection depth
@@ -367,7 +369,9 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
       col    = c(poly$col,    rep(Col$facet[i], length.out = 6)),
       border = c(poly$border, rep(Col$border[i], length.out = 6)),
       lwd    = c(poly$lwd,    rep(lwd[i], length.out = 6)),
-      lty    = c(poly$lty,    rep(lty[i], length.out = 6))
+      lty    = c(poly$lty,    rep(lty[i], length.out = 6)),
+      isimg  = c(poly$isimg,  rep(0, length.out = 6))
+      
     )
   }
  # sort according to view

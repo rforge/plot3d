@@ -90,7 +90,7 @@ check.args <- function(ll) {
 ## =============================================================================
     
 contourfunc <- function(contour, x, y, z, plist, cv = NULL, 
-  clim = range(cv), dDepth = NULL) { 
+  clim = range(cv), dDepth = NULL, addborder = TRUE) { 
 
   if (is.null(dDepth))
     dDepth <- contour$args$dDepth
@@ -180,7 +180,7 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
           line.list[[i]]$y, z = rep(zz, length(line.list[[i]]$x)), 
           col = getcol(line.list[[i]]$level), plist = plist), contour$args))
 
-     if (side != "z")      
+     if (side != "z" & addborder)      
       segm <- addlines(segm, x = c(x[1], x[length(x)],x[length(x)], x[1], x[1]),
                y = c(y[1], y[1], y[length(y)],y[length(y)], y[1]), 
                z = rep(zz, length.out = 5), col = "black", plist = plist)
@@ -206,6 +206,10 @@ XYimage <- function(poly, image, x, y, z,  plist, col) {
   if (! is.null(image$args$z)) 
     z <- image$args$z
   image$args$x <- image$args$y <- image$args$z <- NULL
+  
+  lwd <- image$args$lwd; if (is.null(lwd)) lwd <- 1
+  lty <- image$args$lty; if (is.null(lty)) lty <- 1
+  image$args$lwd <- image$args$lty <- NULL
 
   for (side in image$side) {  
 
@@ -217,11 +221,11 @@ XYimage <- function(poly, image, x, y, z,  plist, col) {
       stop ("cannot add image on side ", side)
     else
       zz <- as.numeric(side)
-    
-    xy <- mesh(x, y) 
+#    xy <- mesh(x, y) 
     zmat <- matrix(nrow = length(x), ncol = length(y), data = zz)           
-    poly <- do.call("addpoly", c(alist(poly, xy$x, xy$y, z = zmat, 
-        colvar = z, plist = plist), image$args))
+    poly <- do.call("addimg", c(alist(poly, x, y, z = zmat, 
+        colvar = z, plist = plist, lwd = lwd, lty = lty), image$args))
+        
   }                                                
   return(poly)
 }
@@ -443,7 +447,7 @@ createcolors <- function(isfacets, border, Cols) {
     isnaborder <- is.na(border)
 
   if (is.na(isfacets)) {
-    if (isnaborder)        # karline: added that 3  october....
+    if (isnaborder)        
       border <- Cols
     Cols[] <- NA
 
@@ -606,6 +610,9 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
   if (! is.null(dots[["log"]])) {
     if (length(grep("c", dots[["log"]])) > 0) {
       dots[["log"]] <- gsub("c", "", dots[["log"]])
+      if (dots[["log"]] == "")
+        dots[["log"]] <- NULL
+      
       clog <- TRUE
     }
   }

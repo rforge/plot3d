@@ -19,6 +19,23 @@ jet.col <- function (n = 100, alpha = 1) {
                maxColorValue = 255, alpha = alpha*255))
 }
 
+jet2.col <- function (n = 100, alpha = 1) {
+
+ # red-green-blue colors on scale of 0 to 1
+  red    <- c(0,   0,   255, 255, 128)
+  green  <- c(78,  255, 255, 0,   0  )
+  blue   <- c(255, 255, 0,   0,   0  )
+
+  x.from <- seq (0, 1, length.out = 5)  # scale from 0-1
+  x.to   <- seq (0, 1, length.out = n)
+
+  expand <- function(col)
+    approx(x = x.from, y = col, xout = x.to)$y
+
+  return (rgb(expand(red), expand(green), expand(blue), 
+               maxColorValue = 255, alpha = alpha*255))
+}
+
 alpha.col <- function (col = "grey", alpha = 0.5) {
 
  # red-green-blue colors on scale of 0 to 1
@@ -53,6 +70,11 @@ gg.col <-  function (n = 100, alpha = 1) {
         "#CC79A7", "#D55E00", "#000000"), n = n, alpha = alpha)
 } 
 
+gg2.col <-  function (n = 100, alpha = 1) {
+ 
+  ramp.col(col = c("#0072B2", "#56B4E9", "#009E73", "#F0E442", "#CC79A7", 
+               "#D55E00", "#000000"), n = n, alpha = alpha)
+} 
 
 MeanColors <- function(col) {          #vector with 2 values
   rgb(t(rowMeans(col2rgb(col))), maxColorValue = 255)

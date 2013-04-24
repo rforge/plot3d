@@ -45,7 +45,16 @@ paintit  <- function (colvar, x, y, z, plist, col, NAcol, clim,
  # Draw colored polygons           
   poly <- polyfill(x, y, z, Col[sl$list], NAcol, facets, border, sl$ix, sl$iy,        
             lwd, lty, Extend, sl$Proj[sl$list])                                   
-
+  nr <- nrow(x)
+  nc <- ncol(x)
+  if (! Extend)
+    imgcol <- matrix(nrow = nr-1, ncol = nc-1, data = Col)
+  else {
+    imgcol <- matrix(nrow = nr, ncol = nc, data = Col)
+    x <- extend(x); y <- extend(y); z <- extend(z)
+  }
+  if (!ispresent(facets)) imgcol[] <- NA
+  poly$img <- list(list(x = x, y = y, z = z, col = imgcol))  #first item in list
   invisible(poly)
 }
 
@@ -128,7 +137,7 @@ createpoly <- function (x, y, z, ix, iy, Extend = TRUE) {
                  zz[cbind(ix + 1, iy + 1)],
                  zz[cbind(ix,     iy + 1)], NA)
 
-  list(X = PolyX, Y = PolyY, Z = PolyZ)
+  list(X = PolyX, Y = PolyY, Z = PolyZ, xx = xx, yy = yy, zz = zz)
 
 }
 
@@ -140,7 +149,8 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, ix, iy,
                      lwd, lty, Extend = FALSE, proj = NULL) {
 
   Poly <- createpoly(x, y, z, ix, iy, Extend) 
-
+  
+  
   if (any (is.na(x) | is.na(y) | is.na(z))) {
     i1 <- which(is.na(Poly$X[-5, ]))
     i2 <- which(is.na(Poly$Y[-5, ]))
@@ -193,8 +203,9 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, ix, iy,
        z      = Poly$Z,                                  
        col    = Col$facet,
        border = Col$border,
-       lwd    = rep(lwd , length.out = ncol(Poly$X)),
-       lty    = rep(lty , length.out = ncol(Poly$X)),
+       lwd    = rep(lwd, length.out = ncol(Poly$X)),
+       lty    = rep(lty, length.out = ncol(Poly$X)),
+       isimg  = rep(1, length.out = ncol(Poly$X)), 
        proj   = proj)
   class(poly) <- "poly"
   return(poly)

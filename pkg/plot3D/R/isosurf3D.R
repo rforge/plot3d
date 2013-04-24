@@ -91,6 +91,8 @@ isosurf3D <- function(x, y, z, colvar, ...,
        border = c(Poly$border, Col$border),
        lwd    = c(Poly$lwd, rep(lwd, length.out = ncol(X))),
        lty    = c(Poly$lty, rep(lty, length.out = ncol(X))),
+       isimg  = c(Poly$isimg, rep(0, length.out = ncol(X))),
+       img    = Poly$img,
        proj   = c(Poly$proj, proj))
   }
   
