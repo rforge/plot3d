@@ -1,29 +1,34 @@
-\name{Plot plot3D objects}
+\name{Plot in rgl window}
 \alias{plotrgl}
 \title{
-  Plots 3D objects. 
+  Plot 3D graphs in rgl window. 
 }
 \description{
-  \code{plotrgl} plots objects created with functions from package \code{plot3D} to rgl. 
-
+  \code{plotrgl} plots objects created with functions from package \code{plot3D} 
+  in an rgl window. 
 }
 \usage{
-plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...) 
+plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...) 
 }
 
 \arguments{
   \item{lighting }{Logical, when \code{TRUE} will add light.
-  Default is toggled off ; this is similar to shading
+    Default is with lighting toggled off; this is similar to shading
     }
   \item{new }{Logical, when \code{TRUE} will open a new window. 
-  When \code{FALSE} will start a new plot in the same window.
+    When \code{FALSE} will start a new plot in the same window.
+    Is overruled (to \code{FALSE}) if \code{add} is \code{TRUE}.
     }
   \item{add }{Logical, when \code{TRUE} will add to the current plot.
     }
+  \item{smooth }{Logical, specifying whether Gouraud shading (smooth) 
+    or flat shading should be used. See \link{material3d} from R-package \code{rgl}.
+    (note: if \code{TRUE} then \link{cutrgl} will not work). 
+    This only affects images.
+    }  
   \item{... }{Any argument to the \code{rgl} functions, e.g arguments from
     \link{par3d}, \link{open3d} or \link{material3d}.
     }
-    
 }
 
 \seealso{
@@ -33,61 +38,47 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
   A similar function, \link{plotdev}, from package \code{plot3D} plots the
   3D graphs to the current device (other than a rgl-device). 
 
-  Any function of package \code{plot3D}: see help files of
+  Any function of package \code{plot3D}: see e.g. help files of
   \link{persp3D}, \link{scatter3D}, \link{arrows3D}, \link{slice3D}, \link{surf3D}.
 }
+
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
+
 \note{
- The \link{arrows3D} function is not well translated to rgl: arrow heads are
- written as "^" 
+ Arrows are best reproduced with argument \code{type} from the \link{arrows3D} 
+ function (package \code{plot3D}) set equal to \code{"cone"}, although this does
+ not always work well (there is probably a flaw in how it is implemented).
+ Another option is to use \code{type = "triangle"}, which simply maps the arrows 
+ on the xy-plane, ignoring the z-axis. 
+ In this case, only a view from above (phi = 0) will produce symmetric arrowheads
+ (when \code{scale = TRUE} and \code{expand = 1}).
 
  The translation of \link{scatter3D} ignores the \code{pch} argument but displays
- all symbols as spheres.  
+ all symbols as squares.  
 
- The color key is not plotted in rgl.
+ The color key is not (cannot be) plotted in rgl.
+ 
+ In \code{rgl}, both \code{lty} and \code{lwd} have to be one number. 
+ For \code{lwd}, this has been overruled, i.e. line widths can be a vector. 
+ It is still not possible to use different line types in one type of object. 
 }
+
 \examples{
 # save plotting parameters
  pm <- par("mfrow")
  pmar <- par("mar")
 
 ## =======================================================================
-## Composite images and contours in 3D
+## Composite image and contour in 3D
 ## =======================================================================
 # plot it to traditional window: 
- persp3D(z = volcano, zlim = c(90, 300), col = "white",
-         shade = 0.1, d = 2)
- contour3D(z = volcano, colvar = volcano, lwd = 2,
-         add = TRUE, nlevels = 20, clab = c("height", "m"))
+ persp3D(z = volcano, zlim = c(90, 300))
  contour3D(z = 300, colvar = volcano, lwd = 2, col = "grey",
          add = TRUE, nlevels = 20, clab = c("height", "m"))
 
  plotrgl(new = TRUE) # new window
- 
-## ========================================================================
-## Two spheres
-## ========================================================================
-
- par(mfrow = c(1, 1), mar = c(0, 0, 0, 0))
-
- M  <- mesh(seq(0, 2*pi, length.out = 30),
-            seq(0,   pi, length.out = 30))
- u  <- M$x ; v  <- M$y
-
- x <- cos(u)*sin(v)
- y <- sin(u)*sin(v)
- z <- cos(v)
-
- surf3D(x = 2*x, y = 2*y, z = 2*z, colvar = NULL,
-        facets = NA, col = "blue", lwd = 5)
-
- surf3D(x, y, z, colvar = NULL,
-        col = "red", add = TRUE)
-
- plotrgl(lighting = TRUE)
-
-# similar for current window, rotated:
- plotdev(lighting = TRUE, phi = 20)
+ plotrgl(new = FALSE, lighting = TRUE) 
+ plotrgl(new = FALSE, lighting = TRUE, smooth = TRUE)
   
 ## ========================================================================
 ## A perspective plot and a plane
@@ -95,17 +86,13 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
 
  par(mar = pmar)
 
-# The volcano
+# The volcano in perspective
  x <- 1:nrow(volcano)
  y <- 1:ncol(volcano)
 
-# create and plot the perspective box
- perspbox(x, y, z = volcano, theta = 10, phi = 20,
-          box = FALSE, scale = FALSE, expand = 0.3,
-          colkey = TRUE)
-
-# add volcano
- persp3D (x, y, z = volcano, colvar = volcano, add = TRUE,
+ persp3D (x, y, z = volcano, colvar = volcano, 
+          theta = 10, phi = 20, box = FALSE, 
+          scale = FALSE, expand = 0.3, 
           clim = range(volcano), shade = 0.1, plot = FALSE)
 
 # add a plane (image) at z = 170; jetcolored, transparant: only border
@@ -114,7 +101,7 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
 
 # add a contour (image) at z = 170; jetcolored,
  contour3D(x, y, z = 170, add = TRUE, clim = range(volcano),
-           colvar = volcano, facets = NA, plot = FALSE)
+           colvar = volcano, plot = FALSE)
 
 # plot it as regular plot
  plotdev()
@@ -123,7 +110,7 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
  plotrgl()
 
 ## =======================================================================
-## slices from the oxygen saturation data
+## slices from the oxygen saturation data from package plot3D
 ## =======================================================================
 
  par(mfrow = c(1, 1))
@@ -144,15 +131,11 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
  plotrgl()
 
 ## =======================================================================
-## Ribbon, persp
+## Ribbon
 ## =======================================================================
 
  ribbon3D(z = volcano, contour = TRUE, zlim= c(-100, 200),
           image = TRUE)
- plotrgl()
-
- persp3D(z = volcano, contour = list(side = c("zmin", "z", "350")),
-       zlim= c(-100, 400), phi = 20, image = list(side = 350))
  plotrgl()
  
 ## =======================================================================
@@ -165,21 +148,6 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
  hist3D(z = VV, scale = FALSE, expand = 0.01,
    col = jet.col(100, alpha = 0.3),  border = "black")
  plotrgl(alpha = 0.5)
-
-## =======================================================================
-## hist3D for a 1-D data set
-## =======================================================================
-
- par(mfrow = c(2, 1))
- x <- rchisq(1000, df = 4)
- hs <- hist(x, breaks = 15)
-
- hist3D(x = hs$mids, y = 1, z = matrix(ncol = 1, data = hs$density),
-   bty = "g", ylim = c(0., 2.0), scale = FALSE, expand = 20,
-   border = "black", col = "white", space = 0.1,
-   theta = 20, phi = 20, main = "3-D perspective")
-  
-  plotrgl(lighting = TRUE)
 
 ## =======================================================================
 ## scatters
@@ -219,13 +187,11 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
  ys <- runif(N) * 61
  zs <- runif(N)*50 + 154
 
-# we must specify colvar here, as the default is as from surf3D
  scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16,
    xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215),
-   surf = list(x = M$x, y = M$y, z = volcano,
-       col = jet.col(100), colvar = volcano))
+   surf = list(x = M$x, y = M$y, z = volcano))
 
- plotrgl(lighting = TRUE)
+ plotrgl(lighting = TRUE, smooth = TRUE)
 
 ## =======================================================================
 ## scatter with droplines till the fitted surface
@@ -245,7 +211,7 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
  CIz = matrix(nrow = length(xs), data = c(-disttoz, disttoz))
  CIz[CIz > 0] <- 0
 
-# no arrow head (alen=0)
+# no 'arrow' head (alen=0)
  CI <- list(z = CIz, lwd = 4, alen = 0, col = "black")
 
 # transparent surface; border colored according to z (default colvar)
@@ -302,20 +268,8 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
 
  slice3D(x, y, z, colvar = p, d = 2, theta = 60,
          xs = c(-4, 0), ys = c(-4, 0, 4), zs = c(-4, 0))
- plotrgl()
+ plotrgl(smooth =  TRUE)
  
-## =======================================================================
-## voxel3D
-## =======================================================================
-
- x <- y <- z <- seq(-2, 2, length.out = 50)
- xyz <- mesh(x, y, z)
- F <- with(xyz, log(x^2 + y^2 + z^2 +
-                10*(x^2 + y^2) * (y^2 + z^2) ^2))
-
- voxel3D(x, y, z, F, level = 1)
- plotrgl()
-
 ## =======================================================================
 ## 3D surfaces
 ## =======================================================================
@@ -339,9 +293,11 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
 
  plotrgl()
  
+# no shading or lighting in oridinary device
  surf3D(x, y, z, box = FALSE,
         theta = 60, col = "lightblue")
- plotrgl(lighting = TRUE)
+# light added in rgl
+ plotrgl(lighting = TRUE, smooth = TRUE)
  
 ## =======================================================================
 ## spheresurf3D
@@ -374,6 +330,37 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, ...)
 
  plotrgl(alpha = 0.8)
  
+## =======================================================================
+## Arrows
+## =======================================================================
+
+ z <- seq(0, 2*pi, length.out = 100) 
+ x <- cos(z)
+ y <- sin(z)
+ lines3D(x,y,z, lwd = 2)
+
+ z0 <- z[seq(1, by = 10, length.out = 10)]
+ z1 <- z[seq(9, by = 10, length.out = 10)]
+
+# triangular arrow heads
+ arrows3D(x0 = 10*cos(z0), y0 = sin(z0), z0 = z0,
+          x1 = 10*cos(z1), y1 = sin(z1), z1 = z1, 
+          type = "triangle", length = 0.4, lwd = 4,
+          angle = 20, col = 1:10)
+
+# assymmetrical...
+ plotrgl(lighting = TRUE, alpha = 0.8)
+
+ view3d(phi = 0, fov = 0)
+ 
+# cone arrow heads
+ arrows3D(x0 = 10*cos(z0), y0 = sin(z0), z0 = z0,
+          x1 = 10*cos(z1), y1 = sin(z1), z1 = z1, 
+          type = "cone", length = 0.4, lwd = 4,
+          angle = 20, col = 1:10)
+
+ plotrgl(lighting = TRUE)
+
 # reset plotting parameters
  par(mfrow = pm)
  par(mar = pmar)

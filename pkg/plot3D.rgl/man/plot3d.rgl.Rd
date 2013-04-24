@@ -6,14 +6,17 @@
   Functions to plot multi-dimensional data using \code{rgl}.
 }
 \description{
-  Package \code{plot3D.rgl} provides an interface between function from package
-  \code{plot3D} and package \code{rgl}.
+  Package \code{plot3D.rgl} provides an interface from package
+  \code{plot3D} to package \code{rgl}.
 
-  It will plot most (but not all) features from plots generated with \code{plot3D}, except
-  the color keys and polygons. Scatter plots will be represented by spherical
-  points.  
+  It will plot most (but not all) features from plots generated with \code{plot3D}, 
+  except for the color keys and polygons. 
+  
+  It also also includes rgl implementations of 2-D functions 
+  (arrows, points, contours, images), 
+  which can be zoomed, moved, and sections selected.
+  
 }
-
 \author{
   Karline Soetaert
 }
@@ -25,7 +28,23 @@ Functions from R-package \code{plot3D}.
 
 Functions from R-package \code{rgl}.
 
-\link{plotrgl} the only function in the package.
+\itemize{
+ \item For 3-D graphs:
+  \itemize{
+   \item \link{plotrgl} the main function that translates plot3D graphs to rgl.
+  }
+ \item For 2-D graphs:
+ \itemize{
+   \item \link{arrowsrgl} creates 2-D arrow plots.
+   \item \link{scatterrgl} for point and line plots. 
+   \item \link{imagergl}, \link{contourrgl} an rgl implementation of the image  and contour functions.
+ }
+}
+  Apart from the usual zooming, it is also possible to move the figure in the rgl window
+  (based on an example in the rgl package).
+
+  Rectangular areas can be selected from rgl plots, using \link{cutrgl} while
+  \link{uncutrgl} will restore the original plot.
 }
 
 
