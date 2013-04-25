@@ -1,0 +1,18 @@
+useDynLib(OceanView)
+
+S3method("quiver", "default")
+S3method("quiver", "matrix")
+S3method("quiver", "array")
+S3method("map", "matrix")
+S3method("map", "array")
+S3method("mapsigma", "matrix")
+S3method("mapsigma", "array")
+S3method("extract", "matrix")
+S3method("extract", "array")
+
+export(db2cross)
+export(quiver, quiverrgl, flowpath, vectorplot) 
+export(map, extract, transect, mapsigma, transectsigma)
+export(Mplot, Msplit, Mcommon)        
+export(tracers3D, tracers3Drgl)        
+export(tracers2D, tracers2Drgl)        
