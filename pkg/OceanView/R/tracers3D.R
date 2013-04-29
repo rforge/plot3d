@@ -30,12 +30,13 @@ tracers3D <- function(x, y, z, colvar = NULL, ...,
   
   plist$pt <- NULL
  
-  if (plist$numkeys > 0) {
-    for (i in plist$numkeys:1)
-      if (plist$colkey[[i]]$type == "scatter3D") 
-         plist$colkey[[i]] <- NULL
-    plist$numkeys <- length(plist$colkey)
-  }
+  if (! is.null(plist$numkeys))
+    if (plist$numkeys > 0) {
+      for (i in plist$numkeys:1)
+        if (plist$colkey[[i]]$type == "scatter3D") 
+           plist$colkey[[i]] <- NULL
+      plist$numkeys <- length(plist$colkey)
+    }
   
   setplist(plist)
   do.call("points3D", c(alist(x, y, z, colvar = colvar, 
