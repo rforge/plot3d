@@ -4,7 +4,7 @@
 ## =============================================================================
 # x, y, z, colvar: same length
     
-text3D <- function(x, y, z, labels, colvar = NULL, ..., 
+text3D <- function(x, y, z, labels, ..., colvar = NULL, 
                       phi = 40, theta = 40,
                       col = NULL, NAcol = "white", 
                       colkey = list(side = 4), 

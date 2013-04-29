@@ -1,16 +1,16 @@
-lines3D <- function(x, y, z, colvar = z, ...) {
+lines3D <- function(x, y, z, ...) {
   dot <- list(...)
   if (is.null(dot$type)) 
     dot$type <- "l"
-  plist <- do.call("scatter3D", c(alist(x, y, z, colvar), dot))
+  plist <- do.call("scatter3D", c(alist(x, y, z), dot))
   invisible(plist) 
 }
 
-points3D <- function(x, y, z, colvar = z, ...) {
+points3D <- function(x, y, z,  ...) {
   dot <- list(...)
   if (is.null(dot$type)) 
     dot$type <- "p"
-  plist <- do.call("scatter3D", c(alist(x, y, z, colvar), dot))
+  plist <- do.call("scatter3D", c(alist(x, y, z), dot))
   invisible(plist) 
 }
 
@@ -19,7 +19,7 @@ points3D <- function(x, y, z, colvar = z, ...) {
 ## =============================================================================
 # x, y, z, colvar: same length
     
-scatter3D <- function(x, y, z, colvar = z, ..., 
+scatter3D <- function(x, y, z, ..., colvar = z, 
                       phi = 40, theta = 40,
                       col = NULL, NAcol = "white", 
                       colkey = list(side = 4), 

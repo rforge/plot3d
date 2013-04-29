@@ -3,8 +3,8 @@
 ## =============================================================================
 # x, y, z, colvar: matrices
 
-surf3D <- function(x, y, z, colvar = z, ..., 
-                   phi = 40, theta = 40,
+surf3D <- function(x, y, z, ..., 
+                   colvar = z, phi = 40, theta = 40,
                    col = jet.col(100), NAcol = "white", 
                    border = NA, facets = TRUE,
                    colkey = list(side = 4), 

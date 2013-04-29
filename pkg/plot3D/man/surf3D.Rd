@@ -10,7 +10,7 @@
   \code{spheresurf3D} plots a colored image on a sphere.
 }
 \usage{
-surf3D (x, y, z, colvar = z, ..., phi = 40, theta = 40,
+surf3D (x, y, z, ..., colvar = z, phi = 40, theta = 40,
         col = jet.col(100), NAcol = "white", border = NA, 
         facets = TRUE, colkey = list(side = 4), 
         panel.first = NULL,

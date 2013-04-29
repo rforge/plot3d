@@ -2,8 +2,8 @@
 ## 3-D polygon and triangle function
 ## =============================================================================
 
-polygon3D  <- function(x, y, z, colvar = NULL, 
-                    ..., phi = 40, theta = 40,
+polygon3D  <- function(x, y, z, 
+                    ..., colvar = NULL, phi = 40, theta = 40,
                     col = NULL, NAcol = "white", 
                     border = NA, facets = TRUE,
                     colkey = list(side = 4), panel.first = NULL,

@@ -3,7 +3,7 @@
 ## =============================================================================
 
 arrows3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
-                    colvar = NULL, ..., phi = 40, theta = 40,
+                    ..., colvar = NULL, phi = 40, theta = 40,
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4), panel.first = NULL,
                     clim = NULL, clab = NULL, bty = "b", type = "simple",

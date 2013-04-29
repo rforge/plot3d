@@ -7,8 +7,8 @@
   \code{image3D} adds an \link{Image} in a 3-D plot. 
 }
 \usage{
-image3D (x = NULL, y = NULL, z = NULL, colvar = NULL, 
-      ..., phi = 40, theta = 40, col = jet.col(100), 
+image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL, 
+      phi = 40, theta = 40, col = jet.col(100), 
       NAcol = "white", border = NA, facets = TRUE,
       colkey = list(side = 4), panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",

@@ -49,8 +49,8 @@ createsurfs <- function (x, y, z, colvar, names = c("x", "y", "z")) {
 ## mainn function
 ## =============================================================================
 
-image3D <- function(x = NULL, y = NULL, z = NULL, colvar = NULL, ..., 
-                  phi = 40, theta = 40,
+image3D <- function(x = NULL, y = NULL, z = NULL, ..., 
+                  colvar = NULL, phi = 40, theta = 40,
                   col = jet.col(100),  NAcol = "white", 
                   border = NA, facets = TRUE,
                   colkey = list(side = 4), panel.first = NULL,

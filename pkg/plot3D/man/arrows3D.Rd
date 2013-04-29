@@ -17,49 +17,43 @@
   \code{polygon3D} draws polygons; \code{rect3D} draws rectangles.
 }
 \usage{
-arrows3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL, 
-         ..., 
-         phi = 40, theta = 40,
+arrows3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, ...,  
+         colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", type = "simple", 
          add = FALSE, plot = TRUE)
 
-segments3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, colvar = NULL, 
-         ..., 
-         phi = 40, theta = 40,
+segments3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, ..., 
+         colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
-box3D (x0, y0, z0, x1, y1, z1, colvar = NULL, 
-         ..., 
-         phi = 40, theta = 40,
+box3D (x0, y0, z0, x1, y1, z1, ..., 
+         colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", border = NA, facets = TRUE,
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
-border3D(x0, y0, z0, x1, y1, z1, colvar = NULL,
-         ..., 
-         phi = 40, theta = 40,
+border3D(x0, y0, z0, x1, y1, z1, ..., 
+         colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)  
 
-rect3D (x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL, colvar = NULL, 
-         ..., 
-         phi = 40, theta = 40,
+rect3D (x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL, ..., 
+         colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", border = NA, facets = TRUE,
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)
 
-polygon3D (x, y, z, colvar = NULL, 
-         ..., 
-         phi = 40, theta = 40,
+polygon3D (x, y, z, ..., 
+         colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", border = NA, facets = TRUE,
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 

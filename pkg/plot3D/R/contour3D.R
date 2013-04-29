@@ -3,8 +3,8 @@
 ## =============================================================================
 
 contour3D <- function(x = NULL, y = NULL, 
-                  z, colvar = z, ..., 
-                  phi = 40, theta = 40,
+                  z, ..., 
+                  colvar = z, phi = 40, theta = 40,
                   col = NULL, colkey = list(side = 4), resfac = 1, 
                   panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",

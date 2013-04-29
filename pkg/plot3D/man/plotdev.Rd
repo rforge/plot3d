@@ -120,7 +120,13 @@ plotdev(...)
 
  par(mfrow = c(2, 2), mar = c(2, 2, 2, 2))
 
- persp3D(z = volcano)
+# The volcano at lower resolution
+ x <- seq(1, nrow(volcano), by = 2)
+ y <- seq(1, ncol(volcano), by = 2)
+ V <- volcano[x,y]
+
+ persp3D(z = V)
+
 # rotate
  plotdev(theta = 0)
 

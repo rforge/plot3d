@@ -14,8 +14,8 @@
 }
 \usage{
 persp3D (x = seq(0, 1, length.out = nrow(z)), 
-       y = seq(0, 1, length.out = ncol(z)), z, colvar = z, 
-       ..., phi = 40, theta = 40,
+       y = seq(0, 1, length.out = ncol(z)), z, ..., 
+       colvar = z, phi = 40, theta = 40,
        col = NULL,  NAcol = "white", border = NA, facets = TRUE,
        colkey = list(side = 4), resfac = 1,
        image = FALSE, contour = FALSE, panel.first = NULL,
@@ -24,8 +24,8 @@ persp3D (x = seq(0, 1, length.out = nrow(z)),
        curtain = FALSE, add = FALSE, plot = TRUE)
 
 ribbon3D (x = seq(0, 1, length.out = nrow(z)), 
-      y = seq(0, 1, length.out = ncol(z)), z, colvar = z, 
-      ..., phi = 40, theta = 40, 
+      y = seq(0, 1, length.out = ncol(z)), z, ..., 
+      colvar = z, phi = 40, theta = 40, 
       col = NULL,  NAcol = "white", border = NA, facets = TRUE,
       colkey = list(side = 4), resfac = 1, 
       image = FALSE, contour = FALSE, panel.first = NULL,
@@ -34,8 +34,8 @@ ribbon3D (x = seq(0, 1, length.out = nrow(z)),
       curtain = FALSE, add = FALSE, plot = TRUE)
 
 hist3D (x = seq(0, 1, length.out = nrow(z)),
-      y = seq(0, 1, length.out = ncol(z)), z, colvar = z, 
-      ..., phi = 40, theta = 40, 
+      y = seq(0, 1, length.out = ncol(z)), z, ..., 
+      colvar = z, phi = 40, theta = 40, 
       col = NULL, NAcol = "white", border = NA, facets = TRUE,
       colkey = list(side = 4), image = FALSE, contour = FALSE, 
       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
@@ -47,8 +47,8 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     }
   \item{x, y }{Vectors or matrices with x and y values. 
     If a vector, \code{x} should be of length equal to \code{nrow(z)} and 
-    \code{y} should be equal to \code{ncol(z)}. If a matrix, they should have
-    the same dimension as \code{z}.
+    \code{y} should be equal to \code{ncol(z)}. If a matrix (only for \code{persp3D}), 
+    \code{x} and \code{y} should have the same dimension as \code{z}.
     }
   \item{colvar }{The variable used for coloring. If present, it should have the 
     same dimension of \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
@@ -371,9 +371,16 @@ The New S Language. Wadsworth & Brooks/Cole.
 # this also works:
 #  persp3D(z = volcano, col = "grey", shade = 0.3)
 
-# a box with ggplot-like background and transparent facets
- persp3D(z = volcano, facets = NA, colkey = FALSE, 
-       bty = "g", ticktype = "detailed")
+# tilted x- and y-coordinates of 'volcano'
+ volcx <- matrix(nrow = 87, ncol = 61, data = 1:87)
+ volcx <- volcx + matrix(nrow = 87, ncol = 61, 
+        byrow = TRUE, data = seq(0., 15, length.out = 61))
+
+ volcy <- matrix(ncol = 87, nrow = 61, data = 1:61)
+ volcy <- t(volcy + matrix(ncol = 87, nrow = 61, 
+        byrow = TRUE, data = seq(0., 15, length.out = 87)))
+
+ persp3D(volcano, x = volcx, y = volcy, phi = 80)
     
 ## =======================================================================
 ## Several persps on one plot

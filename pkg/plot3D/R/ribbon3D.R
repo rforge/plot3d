@@ -4,8 +4,8 @@
 
 ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)), 
                    y = seq(0, 1, length.out = ncol(z)), 
-                   z, colvar = z, ..., 
-                   phi = 40, theta = 40,
+                   z, ..., 
+                   colvar = z, phi = 40, theta = 40,
                    col = NULL,  NAcol = "white", 
                    border = NA, facets = TRUE,
                    colkey = list(side = 4), resfac = 1, 

@@ -3,7 +3,7 @@
 ## =============================================================================
 # x, y, colvar: vector or matrix of same dimension
 
-scatter <- function(x, y, colvar = NULL, ..., 
+scatter <- function(x, y, ..., colvar = NULL, 
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4), 
                     clim = NULL, clab = NULL, CI = NULL, add = FALSE) {

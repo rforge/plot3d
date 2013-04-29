@@ -7,8 +7,8 @@
   \code{contour3D} adds a \link{contour} in a 3-D plot. 
 }
 \usage{
-contour3D (x = NULL, y = NULL, z, colvar = z, 
-       ..., phi = 40, theta = 40,
+contour3D (x = NULL, y = NULL, z, 
+       ..., colvar = z, phi = 40, theta = 40,
        col = NULL, colkey = list(side = 4), resfac = 1,
        panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
        inttype = 1, dDepth = 1e-1, add = FALSE, plot = TRUE)

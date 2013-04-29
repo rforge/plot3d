@@ -4,7 +4,7 @@
 
 persp3D <- function(x = seq(0, 1, length.out = nrow(z)), 
                   y = seq(0, 1, length.out = ncol(z)), 
-                  z, colvar = z, ..., 
+                  z, ..., colvar = z, 
                   phi = 40, theta = 40,
                   col = NULL,  NAcol = "white", 
                   border = NA, facets = TRUE,
@@ -22,51 +22,76 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
     
  # check dimensionality
-  if (! is.vector(x) & length(dim(x)) != 1)
-    stop("'x' should be a vector")
+  if (! is.vector(x) & length(dim(x)) == 1)
+    x <- as.vector(x)
     
-  if (! is.vector(y) & length(dim(y)) != 1)
-    stop("'y' should be a vector")
+  if (! is.vector(y) & length(dim(y)) == 1)
+    y <- as.vector(y)
 
+  if (! is.vector(x) & length(dim(x)) > 2)
+    stop("'x' should be a vector or a matrix")
+    
+  if (! is.vector(y) & length(dim(y)) > 2)
+    stop("'y' should be a vector or a matrix")
+
+  if ((is.matrix(x) & ! is.matrix(y)) | (is.matrix(y) & ! is.matrix(x)))
+    stop ("'x' and 'y' should be of same type, i.e. either a vector or a matrix")
+
+  if (is.matrix(x)) {
+    if (any(dim(x) != dim(y)))
+      stop ("'x' and 'y' not of same dimension")
+    if (curtain)
+      stop("cannot combine 'x' a matrix and 'curtain = TRUE'")
+  }  
   if (! is.matrix(z)) {
     if (length(z) > 1)
       stop("'z'  should be a matrix or one value") 
-    z <- matrix(nrow = length(x), ncol = length(y), data = z)  
-
-  } else {
+    if (is.vector(x))  
+      z <- matrix(nrow = length(x), ncol = length(y), data = z)  
+    else
+      z <- matrix(nrow = nrow(x), ncol = ncol(x), data = z)
+  } else if (! is.matrix(x)) {
     if (length(x) != nrow(z))
       stop("'x' should be of length = nrow(z)")
     if (length(y) != ncol(z))
       stop("'y' should be of length = ncol(z)")
-  }
-  
-  if (any(resfac != 1)) {   # change resolution
-    res <- changeres(resfac, x, y, z, colvar)
-    x <- res$x ; y <- res$y ; z <- res$z
-    colvar <- res$colvar
-  }
+  } else
+    if (any(dim(z) != dim(x)))
+      stop ("'z' and 'x' not of same dimension")
+
+ # resolution    
+  if (! is.matrix(x)) {
+    if (any(resfac != 1)) {   # change resolution
+      res <- changeres(resfac, x, y, z, colvar)
+      x <- res$x ; y <- res$y ; z <- res$z
+      colvar <- res$colvar
+    }
   
  # swap if decreasing
-  if (all(diff(x) < 0)) {     
-    if (is.null(dot$persp$xlim)) 
-      dot$persp$xlim <- rev(range(x))
-    x <- rev(x)
-    z <- z[nrow(z):1, ]
-    if (ispresent(colvar)) 
-      colvar <- colvar[nrow(colvar):1, ]
+    if (all(diff(x) < 0)) {     
+      if (is.null(dot$persp$xlim)) 
+        dot$persp$xlim <- rev(range(x))
+      x <- rev(x)
+      z <- z[nrow(z):1, ]
+      if (ispresent(colvar)) 
+        colvar <- colvar[nrow(colvar):1, ]
+    }
+    if (all(diff(y) < 0)) {     
+      if (is.null(dot$persp$ylim)) 
+        dot$persp$ylim <- rev(range(y))
+      y <- rev(y)
+      z <- z[, (ncol(z):1)]
+      if (ispresent(colvar)) 
+        colvar <- colvar[, (ncol(colvar):1)]
+    }
   }
- 
-  if (all(diff(y) < 0)) {     
-    if (is.null(dot$persp$ylim)) 
-      dot$persp$ylim <- rev(range(y))
-    y <- rev(y)
-    z <- z[, (ncol(z):1)]
-    if (ispresent(colvar)) 
-      colvar <- colvar[, (ncol(colvar):1)]
-  }
-
   image   <- check.args(image)
   contour <- check.args(contour)
+  if (image$add & is.matrix(x))  
+      stop("cannot combine 'x' a matrix and 'image'")
+  if (contour$add & is.matrix(x))  
+      stop("cannot combine 'x' a matrix and 'contour'")
+
   if (contour$add | curtain) 
     cv <- colvar
       
@@ -106,9 +131,13 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     panel.first(plist$mat)         
 
  # polygon plotting
-  X <- matrix(nrow = nrow(z), ncol = ncol(z), data = x)
-  Y <- matrix(nrow = nrow(z), ncol = ncol(z), data = y, byrow = TRUE)
-    
+  if (! is.matrix(x)) { 
+    X <- matrix(nrow = nrow(z), ncol = ncol(z), data = x)
+    Y <- matrix(nrow = nrow(z), ncol = ncol(z), data = y, byrow = TRUE)
+  } else {
+    X <- x
+    Y <- y
+  }  
   lwd <- ifelse (is.null (dot$points$lwd), 1, dot$points$lwd)
   lty <- ifelse (is.null (dot$points$lty), 1, dot$points$lty)
 

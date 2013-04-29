@@ -19,26 +19,26 @@
 
 }
 \usage{
-scatter (x, y, colvar, ..., col = NULL, NAcol = "white", 
+scatter (x, y, ..., colvar = NULL, col = NULL, NAcol = "white", 
          colkey = list(side = 4), clim = NULL, clab = NULL, 
          CI = NULL, add = FALSE)
 
-scatter3D (x, y, z, colvar = z, ..., phi = 40, theta = 40,
+scatter3D (x, y, z, ..., colvar = z, phi = 40, theta = 40,
            col = NULL, NAcol = "white",  
            colkey = list(side = 4), panel.first = NULL, 
            clim = NULL, clab = NULL, 
            bty = "b", CI = NULL, surf = NULL, 
            add = FALSE, plot = TRUE)
           
-text3D (x, y, z, labels, colvar = NULL, ..., 
-        phi = 40, theta = 40, col = NULL, NAcol = "white",  
+text3D (x, y, z, labels, ..., 
+        colvar = NULL, phi = 40, theta = 40, col = NULL, NAcol = "white",  
         colkey = list(side = 4),
         panel.first = NULL, clim = NULL, clab = NULL, 
         bty = "b", add = FALSE, plot = TRUE)
 
-points3D (x, y, z, colvar = z, ...)
+points3D (x, y, z, ...)
 
-lines3D (x, y, z, colvar = z, ...)
+lines3D (x, y, z, ...)
 }
 
 \arguments{
@@ -399,7 +399,7 @@ lines3D (x, y, z, colvar = z, ...)
  par(mfrow = c(1, 1))
 # Image of oxygen saturation
  oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
- Image(Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+ Image(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
        contour = TRUE, 
        xlab = "longitude", ylab = "latitude", 
        main = "Oxygen saturation", zlim = oxlim, clab = "\%")
@@ -410,7 +410,7 @@ lines3D (x, y, z, colvar = z, ...)
  O2sat <- c(   90,    95,  92,  85,  100)
                
 # add to image; use same zrange; avoid adding  a color key
- scatter(O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
+ scatter(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
          add = TRUE, cex = 2, colkey = FALSE)
 
 ## =======================================================================
