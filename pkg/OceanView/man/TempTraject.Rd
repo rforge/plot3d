@@ -70,9 +70,9 @@ data(TrackProf)
 ## image plots of raw data
 ## =============================================================================    
 
- Image(z = TrackProf$depth, main = "raw depth values",  
+ image2D(z = TrackProf$depth, main = "raw depth values",  
        xlab = "station nr", ylab = "sample nr", clab = "depth")
- Image(z = TrackProf$temp, main = "raw temperature values",  
+ image2D(z = TrackProf$temp, main = "raw temperature values",  
        xlab = "station nr", ylab = "sample nr", clab = "dgC")
 
 ## =============================================================================    
@@ -87,7 +87,7 @@ data(TrackProf)
    depth = depth)$var
 
 # image with depth increasing downward and increased resolution (resfac)  
- Image(z = Temp_Depth, main = "Temperature-depth",
+ image2D(z = Temp_Depth, main = "Temperature-depth",
        ylim = c(809, 0), y = depth, NAcol ="black", resfac = 2,
        xlab = "station nr", ylab = "depth, m", clab = "dgC")
    
@@ -104,7 +104,7 @@ data(TrackProf)
   
 # use data set TrackProf to add measured temperature, with color key
  with (TrackProf, 
-   scatter(colvar = temp[,1], x = meta[ ,"longitude"],
+   scatter2D(colvar = temp[,1], x = meta[ ,"longitude"],
          y = meta[ ,"latitude"], clab = "temp", 
          add = TRUE, pch = 18, cex = 2))
   
@@ -124,11 +124,11 @@ data(TrackProf)
 }
 
 \seealso{
-  \link{Image} for plotting images, package \code{plot3D}.
+  \link{image2D} for plotting images, package \code{plot3D}.
 
   \link{ImageOcean} for an image of the ocean bathymetry, package \code{plot3D}.
 
-  \link{scatter} for making scatterplots, package \code{plot3D}.
+  \link{scatter2D} for making scatterplots, package \code{plot3D}.
   
   \link{Oxsat} for a 3-D data set, package \code{plot3D}.
 }

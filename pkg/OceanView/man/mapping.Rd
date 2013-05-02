@@ -270,7 +270,7 @@
 
 # a transect
  to <- cbind(seq(-4, 4, length.out = 20), seq(-4, 4, length.out = 20))
- Image( transect(p, x, y, z, to = to)$var)
+ image2D( transect(p, x, y, z, to = to)$var)
 
 ## =======================================================================
 ## change the resolution of a 2-D image
@@ -282,27 +282,27 @@
 
  x  <- 1 : nr
  y  <- 1 : nc
- Image(x = x, y = y, volcano, main = "original")
+ image2D(x = x, y = y, volcano, main = "original")
 
 # increasing the resolution
  x2 <- seq(from = 1, to = nr, by = 0.25)
  y2 <- seq(from = 1, to = nc, by = 0.25)
 
  VOLC1 <- map(volcano, x = x, y = y, xto = x2, yto = y2)$var
- Image(x = x2, y = y2, z = VOLC1, main = "high resolution")
+ image2D(x = x2, y = y2, z = VOLC1, main = "high resolution")
 
 # low resolution
  xb <- seq(from = 1, to = nr, by = 2)
  yb <- seq(from = 1, to = nc, by = 3)
  VOLC2 <- map(volcano, x, y, xb, yb)$var
- Image(VOLC2, main = "low resolution")
+ image2D(VOLC2, main = "low resolution")
 
 # zooming in high resolution
  xc <- seq(10, 40, 0.1)
  yc <- seq(10, 40, 0.1)
 
  VOLC3 <- map(volcano,x, y, xc, yc)$var
- Image(VOLC3, main = "zoom")
+ image2D(VOLC3, main = "zoom")
 
 # Get one value or a grid of values
  map(volcano, x, y, xto = 2.5,     yto = 5)
@@ -316,7 +316,7 @@
 ## =======================================================================
  
  par(mfrow = c(2, 1)) 
- Image(volcano, x = 1:nr, y = 1:nc)
+ image2D(volcano, x = 1:nr, y = 1:nc)
  xyto <- cbind(seq(from = 1,  to = nr, length.out = 20),
                seq(from = 20, to = nc, length.out = 20))
  points(xyto[,1], xyto[,2], pch = 16)
@@ -324,7 +324,7 @@
  (Crossection <- extract (volcano, x = 1:nr, y = 1:nc,
                              xyto = xyto))
 
- scatter(xyto[, 1], Crossection$var, colvar = Crossection$var, 
+ scatter2D(xyto[, 1], Crossection$var, colvar = Crossection$var, 
    type = "b", cex = 2, pch = 16)
 
 ## =======================================================================
@@ -333,7 +333,7 @@
 
  par(mfrow = c(2, 2))
  var <- t(matrix (nrow = 10, ncol = 10, data = 1:10))
- Image(var, ylab = "sigma", main = "values in sigma coordinates",
+ image2D(var, ylab = "sigma", main = "values in sigma coordinates",
        clab = "var")
 
  # The depth at each 'column' 
@@ -348,13 +348,13 @@
 
 # Mapping to the default depth coordinates
  varz <- mapsigma(var = var, sigma = sigma)
- Image(varz$var, y = varz$depth, NAcol = "black", ylim = c(10, 0), 
+ image2D(varz$var, y = varz$depth, NAcol = "black", ylim = c(10, 0), 
        clab = "var", ylab = "depth", 
        main = "depth-coord, low resolution")
 
 # Mapping at higher resolution of depth coordinates
  varz <- mapsigma(var, sigma = sigma, resfac = 10)
- Image(varz$var, y = varz$depth, NAcol = "black", ylim = c(10, 0), 
+ image2D(varz$var, y = varz$depth, NAcol = "black", ylim = c(10, 0), 
        clab = "var", ylab = "depth", 
        main = "depth-coord, high resolution")
 

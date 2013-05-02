@@ -34,7 +34,7 @@ tracers2D <- function(x, y, colvar = NULL, ...,
     Z <- mask$z 
     Z[!is.na(Z)] <- 0
     Z[is.na(Z)]  <- 1
-    do.call ("Image", c(alist(z = Z, x = X, y = Y, colkey = FALSE,
+    do.call ("image2D", c(alist(z = Z, x = X, y = Y, colkey = FALSE,
                col = c("white", maskNAcol)), dm))
     add <- TRUE
   }
@@ -47,7 +47,7 @@ tracers2D <- function(x, y, colvar = NULL, ...,
     if (!add) 
       image$args <- c(image$args, dm)
     
-    do.call("Image", c(alist(colkey = image$colkey), image$args))   
+    do.call("image2D", c(alist(colkey = image$colkey), image$args))   
     add <- TRUE
   }
 
@@ -79,7 +79,7 @@ tracers2D <- function(x, y, colvar = NULL, ...,
     do.call("plot", c(alist(x, y, type = "n"), dm))
   }
   
-  do.call("scatter", c(alist(x, y, colvar = colvar, 
+  do.call("scatter2D", c(alist(x, y, colvar = colvar, 
      col = col, NAcol = NAcol, clim = clim,
      add = add, colkey = colkey),  dp))
   

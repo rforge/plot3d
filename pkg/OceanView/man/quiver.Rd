@@ -113,10 +113,10 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
   \item{type }{The type of the arrow head, one of \code{"triangle"} (the default) or
     \code{"simple"}, which uses R-function \link{arrows}.
     }
-  \item{contour, image }{If present, then a \link{contour} or \link{Image} 
+  \item{contour, image }{If present, then a \link{contour2D} or \link{image2D} 
     plot will be added to the quiver plot. 
     They should be a \code{list} with arguments for the 
-    \link{contour} or \code{Image} function. 
+    \link{contour2D} or \code{image2D} function. 
     }
   \item{clim }{Only if \code{colvar} is specified, the range of the colors, used
     for the color key. 
@@ -246,7 +246,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 
  quiver(u = dX, v = dY, x = x, y = y, scale = 1, add = TRUE, by = 1)
  flowpath(u = dX, v = dY, x = x, y = y, startx = c(-2, 1.1), 
-            starty = c(-1, -1), add = TRUE, arr.len = 0.5,
+            starty = c(-1, -1), add = TRUE, arr.length = 0.5,
             col = "darkgreen", lwd = 3, numarr = 1)
 
 ## =======================================================================
@@ -299,7 +299,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 ## =======================================================================
  par(mfrow = c(1, 1))
 
- Image(x = 1:nrow(volcano), y = 1:ncol(volcano), 
+ image2D(x = 1:nrow(volcano), y = 1:ncol(volcano), 
        z = volcano, contour = TRUE)
 
 # Assume these are streamfunctions, we calculate the velocity field as:
@@ -355,6 +355,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 ## 2-D Data set SyltSurf
 ## =============================================================================
 
+ par(mfrow = c(1, 1))
  with (Syltsurf,
    quiver(x = x, y = y, u = u[ , ,2], v = v[ , ,2], 
      xlim = c(5, 20), ylim = c(10, 25), by = 2, 

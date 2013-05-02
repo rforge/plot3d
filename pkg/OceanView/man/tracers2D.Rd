@@ -50,10 +50,10 @@ tracers2Drgl(x, y, colvar = NULL, ...,
     The default is to draw the color key on side = 4, i.e. in the right margin.
     If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
     } 
-  \item{contour, image }{If \code{TRUE}, then a \link{contour} or \code{Image} 
+  \item{contour, image }{If \code{TRUE}, then a \link{contour2D} or \code{image2D} 
     plot will be added to the quiver plot. 
     Also allowed is to pass a \code{list} with arguments for the 
-    \link{contour} or \code{Image} function. 
+    \link{contour2D} or \link{image2D} function. 
     }
   \item{clim }{Only if \code{colvar} is specified, the range of the colors, used
     for the color key. 
@@ -74,7 +74,7 @@ tracers2Drgl(x, y, colvar = NULL, ...,
     \code{x}, \code{y}, and \code{z} values (and that are named 'x', 'y', 'z'). 
     A \code{mask} cannot be combined with \code{add = TRUE}.
     }
-  \item{\dots}{additional arguments passed to the plotting method \link{scatter}. 
+  \item{\dots}{additional arguments passed to the plotting method \link{scatter2D}. 
     The arguments after \dots must be matched exactly.
     }
 }

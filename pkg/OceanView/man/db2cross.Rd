@@ -54,7 +54,7 @@ db2cross (input, row = 1, col = 2, value = 3) }
  crosstab$z[crosstab$z>1000] <- 1000
  crosstab$z[crosstab$z<0]    <- NA
 
- Image(z = crosstab$z, x = crosstab$x, y = crosstab$y,
+ image2D(z = crosstab$z, x = crosstab$x, y = crosstab$y,
        main = "primary production august 2009 mgC/m2/d", 
        NAcol = "black")
  }

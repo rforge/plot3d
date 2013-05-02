@@ -218,7 +218,7 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
         maskNAcol <- "black"
       mask[!is.na(mask)] <- 0
       mask[is.na(mask)]  <- 1
-      do.call ("Image", c(alist(z = mask, x = X, y = Y, colkey = FALSE,
+      do.call ("image2D", c(alist(z = mask, x = X, y = Y, colkey = FALSE,
                  col = c("white", maskNAcol)), dm))
       add <- TRUE
     }
@@ -230,7 +230,7 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
         image$args$col <- jet.col(100)
       if (!add) 
         image$args <- c(image$args, dm)
-      do.call("Image", c(alist(colkey = image$colkey), image$args))   
+      do.call("image2D", c(alist(colkey = image$colkey), image$args))   
       add <- TRUE
     }
 
@@ -247,7 +247,7 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
       if (!contour$args$add) 
         contour$args <- c(contour$args, dm)
 
-      do.call("Contour", contour$args)
+      do.call("contour2D", contour$args)
       add <- TRUE
     }
   } # plot

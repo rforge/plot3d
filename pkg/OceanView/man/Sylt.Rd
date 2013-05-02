@@ -85,7 +85,7 @@ data(Sylt3D)
  par(mar = c(4, 4, 4, 4))
 
  x <- Syltsurf$x ; y <- Syltsurf$y ; depth <- Syltsurf$depth
- Image(z = depth, x = x, y = y, clab = c("depth", "m"))
+ image2D(z = depth, x = x, y = y, clab = c("depth", "m"))
 
 # position of transect 
  with (Sylttran, points (x, rep(y, length(x)), 
@@ -93,7 +93,7 @@ data(Sylt3D)
 # position of 3-D area
  with (Sylt3D, rect(x[1], y[1], x[length(x)], y[length(y)], lwd = 3))
          
- Image(z = depth, x = x, y = y, clab = c("depth", "m"), log = "z")
+ image2D(z = depth, x = x, y = y, clab = c("depth", "m"), log = "z")
 
 # sigma coordinates of the transect (at time = 10)
  matplot(Sylttran$x, Sylttran$sigma[,,10], type = "l", 
@@ -161,7 +161,7 @@ data(Sylt3D)
  visc <- mapsigma (Sylttran$visc [ , ,1], x = Sylttran$x, 
      sigma = Sylttran$sigma[ , ,1], depth = D, resfac = 3)
 
- Image(visc$var, x = visc$x, y = -visc$depth, ylim = c(-20, 1),
+ image2D(visc$var, x = visc$x, y = -visc$depth, ylim = c(-20, 1),
      main = "eddy viscosity", ylab = "m", xlab = "hour", 
      clab = "m2/s")
      
@@ -182,7 +182,7 @@ data(Sylt3D)
    sigma = t(sig), numdepth = 100, resfac = 5)
  D    <- -visc$depth
 
- Image(visc$var, x = visc$x, y = D, NAcol = "black", ylim = range(D),
+ image2D(visc$var, x = visc$x, y = D, NAcol = "black", ylim = range(D),
    main = "eddy viscosity", ylab = "m", xlab = "hour",     
    clab = "m2/s")
 
@@ -263,11 +263,11 @@ data(Sylt3D)
 }
 
 \seealso{
-  \link{Image} for plotting images, package \code{plot3D}.
+  \link{image2D} for plotting images, package \code{plot3D}.
 
   \link{ImageOcean} for an image of the ocean's bathymetry, package \code{plot3D}.
 
-  \link{scatter} for making scatterplots, package \code{plot3D}.
+  \link{scatter2D} for making scatterplots, package \code{plot3D}.
   
   \link{Oxsat} for a 3-D data set, package \code{plot3D}.
 }

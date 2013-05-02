@@ -66,12 +66,12 @@ data(Ltrans)
  depth <- Chesapeake$depth
  init  <- Chesapeake$init
  
- Image(z = depth, x = lon, y = lat, clab = c("depth", "m"), 
+ image2D(z = depth, x = lon, y = lat, clab = c("depth", "m"), 
    xlab = "lon", ylab = "lat")
 
 # position of particles 
- with (init, scatter (lon, lat, colvar = source, pch = 16, cex = 0.5, 
-   col =  c("green", "orange"), add = TRUE))
+ with (init, scatter2D(lon, lat, colvar = source, pch = 16, cex = 0.5, 
+   col =  c("green", "orange"), add = TRUE, colkey = FALSE))
 
  par (mar = c(2, 2, 2, 2))
 # same, as persp plot
@@ -136,7 +136,7 @@ data(Ltrans)
 ## Tracer output in 2D, rgl
 ## =============================================================================  
  
- imagergl (x = lon, y = lat, z = depth, smooth = TRUE)
+ imagergl (x = lon, y = lat, z = depth)
  for (i in 1:108) {
    tracers2Drgl(Ltrans[, 1, i], Ltrans[, 2, i],  
              colvar = Ltrans[ ,4, i], col = c("green", "orange"))
