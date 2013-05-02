@@ -61,7 +61,7 @@ selectplist <- function (plist, SS) {
  #
  
   if (! is.null(plist$pt)) {
-    pt  <- plist$pt
+    pt  <- plist$pt                  
     ipt <- with (pt, SS(x.mid, y.mid, z.mid))
     if (sum(ipt) > 0)
       plist$pt <- with(pt, list(x.mid = x.mid[ipt], y.mid = y.mid[ipt],

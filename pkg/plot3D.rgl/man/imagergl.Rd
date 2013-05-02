@@ -64,7 +64,7 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
   \item{contour }{If \code{TRUE}, then a \link{contour} plot will be 
     added to the image plot. 
     Also allowed is to pass a \code{list} with arguments for the 
-    \link{Contour} function. 
+    \link{contour2D} function. 
     }
   \item{smooth }{Logical, specifying whether Gouraud shading (smooth) 
     or flat shading should be used. (if \code{TRUE} then function 
@@ -125,7 +125,8 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
   \link{image3D}, \link{contour3D}, \link{scatter3D} and \link{arrows3D} 
    on which the functions are based.
 
-  \link{Image} for \code{plot3D}'s 2-D image function.
+  \link{image2D}, \link{contour2D}, \link{scatter2D}, \link{arrows2D} 
+  for \code{plot3D}'s 2-D image function.
 
   \link{cutrgl} for cutting a rectangular region from the 2D plot.
 }
@@ -169,7 +170,7 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
 
  CI <- list(lwd = 2)
  CI$x <- matrix (nrow = length(x), data = c(rep(0.125, 2*length(x))))
- scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
 
  scatterrgl(x, y, colvar = cv, cex = 2, CI = CI)
  
