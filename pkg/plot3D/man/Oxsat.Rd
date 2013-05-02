@@ -50,7 +50,7 @@ data(Oxsat)
 ## ========================================================================
 
  par(mfrow = c(1, 1))
- Image(z = Oxsat$val[ , , 1], x = Oxsat$lon, y = Oxsat$lat,
+ image2D(z = Oxsat$val[ , , 1], x = Oxsat$lon, y = Oxsat$lat,
        main = "surface oxygen saturation (\%) for 2005")
 
 ## ========================================================================
@@ -58,7 +58,7 @@ data(Oxsat)
 ## ========================================================================
 
  lon <- Oxsat$lon
- Image (z = Oxsat$val, margin = c(2, 3), x = Oxsat$lat, 
+ image2D (z = Oxsat$val, margin = c(2, 3), x = Oxsat$lat, 
         y = Oxsat$depth, subset = (lon > 18 & lon < 23),
         ylim = c(5500, 0), NAcol = "black", zlim = c(0, 110),
         xlab = "latitude", ylab = "depth, m")
@@ -102,7 +102,7 @@ data(Oxsat)
 }
 
 \seealso{
-  \link{Image} for plotting.
+  \link{image2D} for plotting.
 }
 
 \keyword{datasets}

@@ -16,9 +16,9 @@ contour3D (x = NULL, y = NULL, z,
 
 \arguments{
   \item{z }{Matrix (2-D) or one value containing the values where the 
-    \link{Contour} is to be plotted. 
+    \link{contour2D} is to be plotted. 
     }
-  \item{x, y }{Vectors with x and y values, or one value where the \link{Contour} 
+  \item{x, y }{Vectors with x and y values, or one value where the \link{contour2D} 
     is to be plotted. 
     \code{x} should be of length equal to \code{nrow(colvar)} and 
     \code{y} should be of length equal to \code{ncol(colvar)}. 

@@ -106,3 +106,84 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
   invisible(plist$mat)
 
 }
+
+
+
+
+
+## =============================================================================
+## text in 2D
+## =============================================================================
+# x, y, colvar: same length
+    
+text2D <- function(x, y, labels, ..., colvar = NULL, 
+                      col = NULL, NAcol = "white", 
+                      colkey = list(side = 4), 
+                      clim = NULL, clab = NULL, add = FALSE) {
+
+ # checks
+  x     <- as.vector(x)
+  y     <- as.vector(y)
+  
+  if (length(y) != length(x))
+    stop("'y' should have same length as 'x'")
+
+  if (length(labels) != length(x))
+    stop("'labels' should have same length as 'x'")
+
+  dots <- splitpardots(list(...))
+
+  clog <- FALSE
+  if (! is.null(dots$main$log)) {
+    if (length(grep("c", dots[["log"]])) > 0) {
+      dots[["log"]] <- gsub("c", "", dots[["log"]])
+      if (dots[["log"]] == "")
+        dots[["log"]] <- NULL
+      clog <- TRUE
+    }
+  }
+
+ # colors
+  if (! is.null(colvar)) {
+    if (is.null(col))
+      col <- jet.col(100)
+
+    if (clog) {
+      colvar <- log(colvar)
+      if (! is.null(clim)) clim <- log(clim)
+    }
+
+    iscolkey <- is.colkey(colkey, col)
+
+    if (iscolkey) {
+      colkey <- check.colkey(colkey, add)
+      if (! add)
+        par.ori <- par(plt = colkey$parplt)
+    }
+
+    if (length(colvar) != length(x))
+      stop ("length of 'colvar' should be equal to length of 'x', and 'y'")
+
+    if (is.null(clim))
+      clim <- range(colvar, na.rm = TRUE)
+
+    Col <- variablecol(colvar, col, NAcol, clim)
+
+  } else  {  # no colvar
+    Col <- col
+    if (is.null(Col)) Col <- "black"
+    iscolkey <- FALSE
+  }
+
+  if (! add)
+    dots$main <- start2Dplot(dots$main, x, y)
+
+  do.call("text", c(alist(x, y, labels = labels, col = Col), dots$points))
+
+  if (iscolkey) {
+    drawcolkey(colkey, col, clim, clab, clog)
+    if (! add)
+      par(plt = par.ori)
+    par(mar = par("mar"))
+  }
+}

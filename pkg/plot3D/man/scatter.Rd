@@ -3,13 +3,14 @@
 \alias{text3D}
 \alias{points3D}
 \alias{lines3D}
-\alias{scatter}
+\alias{scatter2D}
+\alias{text2D}
 \title{
  Colored scatter plots and text in 2-D and 3-D
 }
 \description{
   
-  \code{scatter and scatter3D} plot a (2- or 3 dimensional) dataset with a color variable as points.
+  \code{scatter2D and scatter3D} plot a (2- or 3 dimensional) dataset with a color variable as points.
 
   \code{text3D} plot a 3-D dataset with a color variable as text labels.
 
@@ -17,12 +18,11 @@
 
   \code{lines3D} is shorthand for \code{\link{scatter3D}(..., type = "l")}
 
+  The 2D functions \code{scatter2D} and \code{text2D} are included
+  for their side effect of having a color key.
+
 }
 \usage{
-scatter (x, y, ..., colvar = NULL, col = NULL, NAcol = "white", 
-         colkey = list(side = 4), clim = NULL, clab = NULL, 
-         CI = NULL, add = FALSE)
-
 scatter3D (x, y, z, ..., colvar = z, phi = 40, theta = 40,
            col = NULL, NAcol = "white",  
            colkey = list(side = 4), panel.first = NULL, 
@@ -39,6 +39,15 @@ text3D (x, y, z, labels, ...,
 points3D (x, y, z, ...)
 
 lines3D (x, y, z, ...)
+
+scatter2D (x, y, ..., colvar = NULL, col = NULL, NAcol = "white", 
+         colkey = list(side = 4), clim = NULL, clab = NULL, 
+         CI = NULL, add = FALSE)
+
+text2D (x, y, labels, ..., colvar = NULL, 
+         col = NULL, NAcol = "white", 
+         colkey = list(side = 4), 
+         clim = NULL, clab = NULL, add = FALSE) 
 }
 
 \arguments{
@@ -96,7 +105,7 @@ lines3D (x, y, z, ...)
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     Note: the \code{bty = "g", "b2", "bl"} can also be specified 
-    for \code{scatter} (if \code{add = FALSE}).
+    for \code{scatter2D} (if \code{add = FALSE}).
     }
   \item{labels }{The text to be written. A vector of length equal to length of
     x, y, z.
@@ -136,14 +145,15 @@ lines3D (x, y, z, ...)
   See \link{trans3D}.
 }
 \note{
-  For \code{scatter} and \code{scatter3D} the plottypes that are supported 
+  For \code{scatter2D} and \code{scatter3D} the plottypes that are supported 
   are: \code{type = "p"},  \code{type = "l"}, \code{type = "h"},
    \code{type = "o"}. For \code{type = "b"},  \code{type = "o"} is used instead.
 }
 \seealso{
   \link{persp} for the function on which this implementation is based.
 
-  \link{mesh}, \link{trans3D}, \code{slice3D}, for other examples of \code{scatter} or \code{scatter3D}.
+  \link{mesh}, \link{trans3D}, \code{slice3D}, for other examples of 
+  \code{scatter2D} or \code{scatter3D}.
 
   \link{plotdev} for zooming, rescaling, rotating a plot.
 
@@ -158,20 +168,20 @@ lines3D (x, y, z, ...)
  pm <- par("mfrow")
 
 ## =======================================================================
-## Scatter; bty can also be set = to one of the perspbox alernatives
+## Scatter2D; bty can also be set = to one of the perspbox alernatives
 ## =======================================================================
 
  par(mfrow = c(2, 2))
  x <- seq(0, 2*pi, length.out = 30)
 
- scatter(x, sin(x), colvar = cos(x), pch = 16, 
+ scatter2D(x, sin(x), colvar = cos(x), pch = 16, 
          ylab = "sin", clab = "cos", cex = 1.5)
- scatter(x, sin(x), colvar = cos(x), type = "l", lwd = 4, bty = "g")
- scatter(x, sin(x), colvar = cos(x), type = "b", lwd = 2, bty = "b2")
- scatter(x, sin(x), colvar = cos(x), type = "h", lwd = 4)
+ scatter2D(x, sin(x), colvar = cos(x), type = "l", lwd = 4, bty = "g")
+ scatter2D(x, sin(x), colvar = cos(x), type = "b", lwd = 2, bty = "b2")
+ scatter2D(x, sin(x), colvar = cos(x), type = "h", lwd = 4)
   
 ## =======================================================================
-## mesh examples and scatter
+## mesh examples and scatter2D
 ## =======================================================================
 
  par(mfrow = c(1, 2))
@@ -180,12 +190,12 @@ lines3D (x, y, z, ...)
 
  grid <- mesh(x, y)
  z    <- with(grid, cos(x) * sin(y))
- Image(z, x = x, y = y)
+ image2D(z, x = x, y = y)
  points(grid)
- scatter(grid$x, grid$y, colvar = z, pch = 20, cex = 2)
+ scatter2D(grid$x, grid$y, colvar = z, pch = 20, cex = 2)
 
 ## =======================================================================
-## scatter with confidence intervals
+## scatter plot with confidence intervals
 ## =======================================================================
 
  par(mfrow = c(2, 2))
@@ -195,17 +205,17 @@ lines3D (x, y, z, ...)
 
  CI <- list(lwd = 2)
  CI$x <- matrix (nrow = length(x), data = c(rep(0.25, 2*length(x))))
- scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
- scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI, type = "b")
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI, type = "b")
 
  CI$y <- matrix (nrow = length(x), data = c(rep(0.05, 2*length(x))))
  CI$col <- "black"
- scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
 
  CI$y[c(2,4,8,10), ] <- NA  # Some points have no CI
  CI$x[c(2,4,8,10), ] <- NA  # Some points have no CI
  CI$alen <- 0.02            # increase arrow head
- scatter(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
 
 ## =======================================================================
 ## A sphere 
@@ -374,13 +384,13 @@ lines3D (x, y, z, ...)
     zmin <- min(-quakes$depth)
     XY <- trans3D(quakes$long, quakes$lat, 
                   z = rep(zmin, nrow(quakes)), pmat = pmat)
-    scatter(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
+    scatter2D(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
             cex = 2, add = TRUE, colkey = FALSE)
  
     xmin <- min(quakes$long)
     XY <- trans3D(x = rep(xmin, nrow(quakes)), y = quakes$lat, 
                   z = -quakes$depth, pmat = pmat)
-    scatter(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
+    scatter2D(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
             cex = 2, add = TRUE, colkey = FALSE)
  }
 
@@ -397,9 +407,9 @@ lines3D (x, y, z, ...)
 ## =======================================================================
  
  par(mfrow = c(1, 1))
-# Image of oxygen saturation
+# image of oxygen saturation
  oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
- Image(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+ image2D(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
        contour = TRUE, 
        xlab = "longitude", ylab = "latitude", 
        main = "Oxygen saturation", zlim = oxlim, clab = "\%")
@@ -410,9 +420,32 @@ lines3D (x, y, z, ...)
  O2sat <- c(   90,    95,  92,  85,  100)
                
 # add to image; use same zrange; avoid adding  a color key
- scatter(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
+ scatter2D(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
          add = TRUE, cex = 2, colkey = FALSE)
 
+## =======================================================================
+## Scatter on a contourplot
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+
+# room for colorkey 
+ PM <- par(mar = par("mar") + c(0, 0, 0, 4))
+
+# contour plot of the ocean's bathymetry
+ Depth <- Hypsometry$z
+ Depth[Depth > 0] <- NA
+ contour2D(z = Depth, x = Hypsometry$x, y = Hypsometry$y, 
+       xlab = "longitude", ylab = "latitude", 
+       col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
+       main = "Oxygen saturation along ship track", colkey = FALSE)
+
+# add to image; with  a color key
+ scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
+         add = TRUE, cex = 2, colkey = TRUE, clab = "\%")
+         
+ par(mar = PM)
+ 
 ## =======================================================================
 ## text3D and scatter3D
 ## =======================================================================
@@ -457,6 +490,18 @@ lines3D (x, y, z, ...)
  text3D(x = rep(1, 4),   y = 1:4, z = rep(0, 4),
        labels  = colnames(VADeaths),
        add = TRUE, adj = 1)
+
+## =======================================================================
+## text2D
+## =======================================================================
+
+ with(USArrests, text2D(x = Murder, y = Assault + 5, colvar = Rape, 
+     xlab = "Murder", ylab = "Assault", clab = "Rape", 
+     main = "USA arrests", labels = rownames(USArrests), cex = 0.6, 
+     adj = 0.5, font = 2))
+
+ with(USArrests, scatter2D(x = Murder, y = Assault, colvar = Rape, 
+     pch = 16, add = TRUE, colkey = FALSE))
 
 # reset plotting parameters
  par(mfrow = pm)

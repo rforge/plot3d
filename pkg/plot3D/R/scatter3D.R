@@ -233,11 +233,12 @@ scatter3D <- function(x, y, z, ..., colvar = z,
  
   } else if (dopoints) {
    # points and confidence intervals
-    pt     <- list(x.mid = x, y.mid = y, z.mid = z,
-                   col = Col,
-                   pch = rep(pch, length.out = len),
-                   cex = rep(cex, length.out = len),
-                   bg = rep(bg, length.out = len)
+    ii <- !is.na(x) *!is.na(y)*!is.na(z)
+    pt     <- list(x.mid = x[ii], y.mid = y[ii], z.mid = z[ii],
+                   col = Col[ii],
+                   pch = rep(pch, length.out = sum(ii)),
+                   cex = rep(cex, length.out = sum(ii)),
+                   bg = rep(bg, length.out = sum(ii))
                    )
     
     class(pt) <- "pt"

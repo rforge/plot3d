@@ -1,18 +1,18 @@
 
 ## =============================================================================
 ## =============================================================================
-## Image S3 functions   - this code can be improved.
+## image2D S3 functions   - this code can be improved.
 ## =============================================================================
 ## =============================================================================
 
-Image <- function(z, ...) UseMethod ("Image")
-Image.default <- function (z, ...) Image.matrix(z, ...)
+image2D <- function(z, ...) UseMethod ("image2D")
+image2D.default <- function (z, ...) image2D.matrix(z, ...)
 
 ## =============================================================================
-## Image function, input is a matrix
+## image2D function, input is a matrix
 ## =============================================================================
 
-Image.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)), 
+image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)), 
                    y = seq(0, 1, length.out = ncol(z)), ..., 
                    col = jet.col(100), NAcol = "white", 
                    border = NA, facets = TRUE, 
@@ -304,7 +304,7 @@ addraster <- function (x, y, col, xlim, ylim, angle, dots) {
 }
 
 ## =============================================================================
-## Image function, z = NULL, col is a matrix of colors
+## image2D function, z = NULL, col is a matrix of colors
 ## =============================================================================
 
 ImageNULL <- function(z = NULL,
@@ -389,10 +389,10 @@ ImageNULL <- function(z = NULL,
 
 }
 ## =============================================================================
-## Image function, input is an array
+## image2D function, input is an array
 ## =============================================================================
 
-Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
+image2D.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
   
   DD <- dim(z)
   if (length(DD) != 3)
@@ -461,7 +461,7 @@ Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
     LL <- c(list(z = zz), ldots)
     LL$main <- title[i1]
     i1 <- i1+1
-    do.call(Image, LL)
+    do.call(image2D, LL)
   }
   if (! is.null(Mtext))
     mtext(text = Mtext, side = 3, outer = TRUE, line = par("oma")[3]-1 )
@@ -469,14 +469,14 @@ Image.array <- function (z, margin = c(1, 2), subset, ask = NULL, ...) {
 }
 
 ## =============================================================================
-## Image of a list of matrices or arrays
+## image2D of a list of matrices or arrays
 ## =============================================================================
 
-Image.list <- function (z, ...) {
+image2D.list <- function (z, ...) {
   
 # check z: list with similar matrices or arrays of dimension at most 3
   if ( all(c("x", "y", "z") %in% names(z)))  {
-    Image.matrix(z = z$z, x = z$x, y = z$y, ...)
+    image2D.matrix(z = z$z, x = z$x, y = z$y, ...)
   } else {
     nz     <- length(z)
     classz <- class(z[[1]])
@@ -543,7 +543,7 @@ Image.list <- function (z, ...) {
         Ldots$clab <- zzlab[[i]]
       
         LL <- c(list(z = z[[i]]), Ldots)
-        do.call(Image, LL)
+        do.call(image2D, LL)
       }
   
       if (! is.null(Mtext))
@@ -614,7 +614,7 @@ Image.list <- function (z, ...) {
           Ldots$zlim <- zzlim[[i]]
           Ldots$clab <- zzlab[[i]]
           LL <- c(list(z = zz), Ldots)
-          do.call(Image, LL)
+          do.call(image2D, LL)
         }
      # to make sure all figures are drawn
         for (i in noplot) 

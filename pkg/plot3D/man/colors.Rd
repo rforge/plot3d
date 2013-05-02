@@ -95,15 +95,15 @@ not be optimal for lighting.
 
  par(mfrow = c(3, 3))
  for (alph in c(0.25, 0.75))
-   Image(volcano, col = jet.col(100, alpha = alph), 
+   image2D(volcano, col = jet.col(100, alpha = alph), 
          main = paste("jet.col, alpha = ", alph))  
- Image(volcano, main = "jet.col")
- Image(volcano, col = jet2.col(100), main = "jet2.col")
- Image(volcano, col = gg.col(100), main = "gg.col")
- Image(volcano, col = gg2.col(100), main = "gg2.col")
- Image(volcano, col = rainbow(100), main = "rainbow")
- Image(volcano, col = terrain.colors(100), main = "terrain.colors")
- Image(volcano, col = ramp.col(c("blue", "yellow", "green", "red")),
+ image2D(volcano, main = "jet.col")
+ image2D(volcano, col = jet2.col(100), main = "jet2.col")
+ image2D(volcano, col = gg.col(100), main = "gg.col")
+ image2D(volcano, col = gg2.col(100), main = "gg2.col")
+ image2D(volcano, col = rainbow(100), main = "rainbow")
+ image2D(volcano, col = terrain.colors(100), main = "terrain.colors")
+ image2D(volcano, col = ramp.col(c("blue", "yellow", "green", "red")),
        main = "ramp.col")  
 
 ## =======================================================================

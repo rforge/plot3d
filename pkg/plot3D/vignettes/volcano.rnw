@@ -22,11 +22,11 @@
 \Plaintitle{Fifty ways to draw a volcano using package plot3D}
 
 \Keywords{
-  volcano, persp3D, Image, plot3D, \proglang{R}
+  volcano, 3D plots, 2D plots, \proglang{R}
 }
 
 \Plainkeywords{
-  volcano, persp3D, Image, plot3D, R
+  volcano, 3D plots, 2D plots, R
 }
 
 
@@ -56,7 +56,7 @@ The Netherlands
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
 %\VignetteIndexEntry{Fifty ways to draw a volcano}
-%\VignetteKeywords{persp3D, Image, Volcano, plot3D}
+%\VignetteKeywords{2D plots, 3D plots, volcano, plot3D}
 %\VignettePackage{plot3D}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
@@ -85,14 +85,14 @@ Volcano <- volcano[seq(1, nrow(volcano), by = 3),
 <<label=imagecontour,include=FALSE>>=
 par(mfrow = c(3, 3), mar = c(3, 3, 3, 2))
 contour(Volcano)
-Contour(Volcano, lwd = 2)
+contour2D(Volcano, lwd = 2)
 image(Volcano)
 image(Volcano, col = jet.col(100))
-Image(Volcano, clab = "m")
-Image(Volcano, facets = FALSE)
-Image(Volcano, contour = TRUE)
-Image(Volcano, contour = list(lwd = 2, col = jet.col(11)))
-Image(Volcano, theta = 30, NAcol = "black")
+image2D(Volcano, clab = "m")
+image2D(Volcano, facets = FALSE)
+image2D(Volcano, contour = TRUE)
+image2D(Volcano, rasterImage = TRUE, contour = list(lwd = 2, col = jet.col(11)))
+image2D(Volcano, theta = 30, NAcol = "black")
 @
 
 \setkeys{Gin}{width=1.0\textwidth}
@@ -102,7 +102,7 @@ Image(Volcano, theta = 30, NAcol = "black")
 <<imagecontour>>
 @
 \end{center}
-\caption{The Image and contour function}
+\caption{The image2D and contour function}
 \label{fig:imagecontour}
 \end{figure}
 \clearpage
@@ -236,7 +236,7 @@ persp3D(z = Volcano, clab = "m",
 persp3D(z = Volcano, clab = c("height", "m"),
       colkey = list(length = 0.5, dist = -0.1, shift = -0.1))
 par(mar = c(4, 4, 2, 2))
-Image(z = Volcano, clab = "height, m",
+image2D(z = Volcano, clab = "height, m",
       colkey = list(dist = -0.20, shift = 0.15,
       side = 3, length = 0.5, width = 0.5,
       cex.clab = 1.2, col.clab = "white", col.axis = "white",
@@ -255,7 +255,7 @@ Image(z = Volcano, clab = "height, m",
 \end{figure}
 
 \clearpage
-\section{Combined persp3D and Image or contour}
+\section{Combined persp3D and image or contour}
 
 <<label=comb,include=FALSE>>=
 par(mfrow = c(2, 2), mar = c(2, 2, 2, 2))
@@ -276,7 +276,7 @@ persp3D(z = Volcano, contour = list(side = c("zmax", "z")), zlim= c(90, 300),
 <<comb>>
 @
 \end{center}
-\caption{combined persp3D and Image}
+\caption{combined persp3D and image2D}
 \label{fig:comb}
 \end{figure}
 
@@ -319,12 +319,12 @@ y <- 1 : ncol(Volcano)
 panelfirst <- function(pmat) {
   XY <- trans3D(x = rep(1, ncol(Volcano)), y = y,
                 z = Volcano[10,], pmat = pmat)
-  scatter(XY$x, XY$y, colvar = Volcano[10,],
+  scatter2D(XY$x, XY$y, colvar = Volcano[10,],
           type = "l", lwd = 3, add = TRUE, colkey = FALSE)
 
   XY <- trans3D(x = x, y = rep(ncol(Volcano), nrow(Volcano)),
                 z = Volcano[,10], pmat = pmat)
-  scatter(XY$x, XY$y, colvar = Volcano[,10],
+  scatter2D(XY$x, XY$y, colvar = Volcano[,10],
           type = "l", lwd = 3, add = TRUE, colkey = FALSE)
 }
 

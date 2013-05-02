@@ -1,6 +1,6 @@
-Contour <- function (z, x = seq(0, 1, length.out = nrow(z)),
+contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    y = seq(0, 1, length.out = ncol(z)), ...,
-                   col = NULL,
+                   col = NULL, NAcol = NULL, 
                    colkey = list(side = 4), resfac = 1,
                    clab = NULL) {
 
@@ -129,7 +129,17 @@ Contour <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (!is.null(dots$levels))
       dots$levels <- log(dots$levels)
 
-  do.call("contour", c(list(z = z, x = x, y = y, col = col, levels = levels), dots))
+  add <- dots$add
+  if (is.null(add))
+    add <- FALSE
+  dots$add <- NULL
+  if (any (is.na(z)) & !is.null(NAcol)) {
+    do.call("image2D", c(list(z = z, x = x, y = y, col = "transparent", 
+      NAcol = NAcol, add = add, colkey = FALSE), dots))
+    add <- TRUE
+  }
+  do.call("contour", c(list(z = z, x = x, y = y, col = col, 
+    levels = levels, add = add), dots))
 
   if (iscolkey)  {
     colkey$at <- levels

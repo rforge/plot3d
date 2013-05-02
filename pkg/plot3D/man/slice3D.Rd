@@ -381,7 +381,7 @@ createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
    x <- matrix(nrow = Nx, ncol = Ny, data = xy$x)
    y <- matrix(nrow = Nx, ncol = Ny, data = xy$y)
    Bat <- Oxsat$val[,,1]; Bat[!is.na(Bat)] <- 1
-   Image(x = x, y = y, z = Bat, NAcol = "black", col = "grey",
+   image2D(x = x, y = y, z = Bat, NAcol = "black", col = "grey",
          add = TRUE, colkey = FALSE)
  }
    

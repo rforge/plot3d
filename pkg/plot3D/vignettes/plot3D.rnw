@@ -89,7 +89,7 @@ The main extensions to these functions are:
 \begin{itemize}
  \item In addition to the x, y (and z) values, there is a color variable 
    (\code{colvar}) which defines the colors. 
-   \footnote{For \code{Image} and \code{Contour} this color variable is called 'z',
+   \footnote{For \code{image2D} and \code{contour2D} this color variable is called 'z',
    for consistency with R's \code{image} function.}.
  \item A color key (\code{colkey}) can be written next to the figure.  
    It is possible to log-transform the color key, rescale it, adjust its position, ...   
@@ -115,9 +115,13 @@ Package \p contains:
    \end{itemize}
  \item Functions defined on the \code{image} or \code{contour} function:
    \begin{itemize}
-     \item \code{Image}, \code{Contour}, for an extended function to visualise 2-D or 3-D data.
+     \item \code{image2D}, \code{contour2D}, for an extended function to visualise 2-D or 3-D data.
      \item \code{ImageOcean}, for an image of the ocean's bathymetry.
    \end{itemize}
+ \item Other functions
+  \item \link{scatter2D}: colored points, lines, ... in 2-D. 
+  \item \link{text2D}, \link{arrows2D}, \link{segments2D}, \link{rect2D}, 
+    \link{polygon2D} for other 2D functions that have a color key.
  \item Colors and colorkeys:
    \begin{itemize}
      \item \code{colkey}: color legendS.
@@ -146,7 +150,7 @@ Many more examples can be found in the package; to run all examples:
  example(slice3D)
  example(scatter3D)
  example(segments3D)
- example(Image)
+ example(image2D)
  example(colkey) 
  example(jet.col) 
  example(perspbox)
@@ -157,21 +161,21 @@ Many more examples can be found in the package; to run all examples:
  example(Oxsat)
 \end{verbatim}
 
-\section{Functions Image and persp3D}
-\code{Image} and \code{persp3D} are extensions of R's \code{image} and \code{persp} 
+\section{Functions image2D and persp3D}
+\code{image2D} and \code{persp3D} are extensions of R's \code{image} and \code{persp} 
 functions.
 The arguments of \code{persp3D} are (see the help file for what they mean):
 <<>>=
 args(persp3D)
 @
 
-Many examples of the use of \code{Image} and \code{persp3D} are in vignette \code{volcano}. 
+Many examples of the use of \code{image2D} and \code{persp3D} are in vignette \code{volcano}. 
 
 Here, a part of the \code{Hypsometry} data set is depicted.
 
 We first plot the data, with the zoomed part. The 0-contour lines are added.
 <<label=hyps,include=FALSE>>=
-Image(Hypsometry, xlab = "longitude", ylab = "latitude", 
+image2D(Hypsometry, xlab = "longitude", ylab = "latitude", 
       contour = list(levels = 0, col = "black"),
       main = "Hypsometry data set", clab = "m")
 rect(-50, 10, -20, 40, lwd = 3)
@@ -320,11 +324,11 @@ Here are 4 applications, showing the different options.
 \label{fig:surf}
 \end{figure}
 
-\subsection{scatter and scatter3D}
-Functions \code{scatter} and \code{scatter3D} draw scatterplots.
+\subsection{scatter2D and scatter3D}
+Functions \code{scatter2D} and \code{scatter3D} draw scatterplots.
 
 <<>>=
-args(scatter)
+args(scatter2D)
 args(scatter3D)
 @
 We first plot the dataset \code{quakes}, and then create a mathematical data set.
@@ -338,14 +342,14 @@ par(mfrow = c(1, 2))
     zmin <- min(-quakes$depth)
     XY <- trans3D(quakes$long, quakes$lat, 
                   z = rep(zmin, nrow(quakes)), pmat = pmat)
-    scatter(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
+    scatter2D(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
             cex = 2, add = TRUE, colkey = FALSE)
 
  
     xmin <- min(quakes$long)
     XY <- trans3D(x = rep(xmin, nrow(quakes)), y = quakes$lat, 
                   z = -quakes$depth, pmat = pmat)
-    scatter(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
+    scatter2D(XY$x, XY$y, colvar = quakes$mag, pch = ".", 
             cex = 2, add = TRUE, colkey = FALSE)
   }
 
@@ -418,16 +422,16 @@ surf3D(-x, -y, -z, colvar = BB, phi = 20, theta = 60, d = 3,
 \end{figure}
 
 \section{Functions based on image}
-The \code{Image} function is an extended version of \code{image}.
+The \code{image2D} function is an extended version of \code{image}.
 It has two S3 methods:
 \begin{verbatim}
-Image(z =, ...)
+image2D(z =, ...)
 
-Image.matrix(z, x = NULL, y = NULL, ...,
+image2D.matrix(z, x = NULL, y = NULL, ...,
              col = jet.col(100), NAcol = "white", facets = TRUE, 
              contour = FALSE, colkey = list(side = 4), resfac = 1, 
              clab = NULL, theta = 0, border = NA) 
-Image.array(z, margin = c(1, 2), subset, ask = NULL, ...) 
+image2D.array(z, margin = c(1, 2), subset, ask = NULL, ...) 
 
 \end{verbatim}
 
@@ -437,10 +441,10 @@ horizontal resolution, and for 33 depth intervals.
 names(Oxsat)
 dim(Oxsat$val)
 @
-We use \code{Image.array} to plot several depth intervals at once, looping over
+We use \code{image2D.array} to plot several depth intervals at once, looping over
 the first and second margin:
-<<label=Image,include=FALSE>>=
-  Image(z = Oxsat$val, subset = 1:8, 
+<<label=image2D,include=FALSE>>=
+  image2D(z = Oxsat$val, subset = 1:8, 
         x = Oxsat$lon, y = Oxsat$lat,
         margin = c(1, 2), NAcol = "black", colkey = FALSE,
         xlab = "longitude", ylab = "latitude", 
@@ -452,12 +456,12 @@ colkey(clim = c(0, 115), clab = c("O2 saturation", "percent"))
 \setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}
 \begin{center}
-<<label=Image,fig=TRUE,echo=FALSE, pdf = FALSE, png = TRUE>>=
-<<Image>>
+<<label=image2D,fig=TRUE,echo=FALSE, pdf = FALSE, png = TRUE>>=
+<<image2D>>
 @
 \end{center}
-\caption{Image function}
-\label{fig:Image}
+\caption{image2D function}
+\label{fig:image2D}
 \end{figure}
 
 \section{Composite figures and color keys}

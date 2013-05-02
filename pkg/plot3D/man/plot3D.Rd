@@ -39,13 +39,15 @@ Functions that are based on the \link{persp} function:
  }
 Functions defined on the \link{image} function:
  \itemize{
-  \item \link{Image}, for an image function to visualise 2-D or 3-D data.
+  \item \link{image2D}, for an image function to visualise 2-D or 3-D data.
   \item \link{ImageOcean}: an image of the ocean's bathymetry.
  }
 Other plotting functions:
  \itemize{
-  \item \link{Contour}, for a contour function to visualise 2-D or 3-D data.
-  \item \link{scatter}: colored points, lines, ... in 2-D. 
+  \item \link{contour2D}, for a contour function to visualise 2-D data and that have a color key.
+  \item \link{scatter2D}: colored points, lines, ... in 2-D. 
+  \item \link{text2D}, \link{arrows2D}, \link{segments2D}, \link{rect2D}, 
+    \link{polygon2D} for other 2D functions that have a color key.
  }
 Colors and colorkey:
  \itemize{
@@ -76,7 +78,7 @@ This is because an assumption is made as to how the perspective plots are viewed
  example(slice3D)
  example(scatter3D)
  example(segments3D)
- example(Image)
+ example(image2D)
  example(image3D)
  example(contour3D)
  example(colkey) 

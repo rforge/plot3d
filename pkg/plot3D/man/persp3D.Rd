@@ -100,8 +100,8 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     If \code{NA} then the facets will be transparent. 
     It is usually faster to draw with \code{facets = FALSE}.
     }
-  \item{image }{If \code{TRUE}, an \link{Image} will be plotted at the bottom. 
-    Also allowed is to pass a \code{list} with arguments for the \link{Image} function.
+  \item{image }{If \code{TRUE}, an image will be plotted at the bottom. 
+    Also allowed is to pass a \code{list} with arguments for the \link{image2D} function.
     An optional parameter to this \code{list} is the \code{side} where the image 
     should be plotted. Allowed values for \code{side} are a z-value, 
     or \code{side = "zmin", "zmax"}, for positioning at 
@@ -320,7 +320,7 @@ The New S Language. Wadsworth & Brooks/Cole.
  V2[3:4, 3:4] <- NA
  V2[4, 5] <- NA
 
- Image(V2, border = "black")
+ image2D(V2, border = "black")
  persp(V2, col = "lightblue")
 
 # averages of V2, with NAs 

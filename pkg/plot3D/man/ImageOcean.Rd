@@ -16,7 +16,7 @@ ImageOcean (...)
 Hypsometry
 }
 \arguments{
-  \item{\dots}{ arguments passed to function \link{Image}. }
+  \item{\dots}{ arguments passed to function \link{image2D}. }
 }  
 \format{  
   A list with the bathymetry (depth) and hypsometry (altitude) of the
@@ -39,12 +39,12 @@ Hypsometry
 ## =======================================================================
 
  par(mfrow = c(2, 1))
- Image(Hypsometry, asp = TRUE, xlab = "dg", ylab = "dg", contour = TRUE)
+ image2D(Hypsometry, asp = TRUE, xlab = "dg", ylab = "dg", contour = TRUE)
 
 # remove ocean
  zz         <- Hypsometry$z
  zz[zz < 0] <- NA
- Image(zz, x = Hypsometry$x, y = Hypsometry$y, NAcol = "black")
+ image2D(zz, x = Hypsometry$x, y = Hypsometry$y, NAcol = "black")
 
 ## =======================================================================
 ## A short version for plotting the Ocean's bathymetry
@@ -112,7 +112,7 @@ Hypsometry
  par(mar = mar)
 }
 \seealso{
-  \link{Image}, for the image function that visualises the bathymetry
+  \link{image2D}, for the image function that visualises the bathymetry
 }
 \details{
 Hypsometry is based on dataset \code{Bathymetry} from the R-package \code{marelac}.

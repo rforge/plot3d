@@ -4,7 +4,7 @@
  Images in 3-D plots.
 }
 \description{
-  \code{image3D} adds an \link{Image} in a 3-D plot. 
+  \code{image3D} adds an image in a 3-D plot. 
 }
 \usage{
 image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL, 
@@ -17,9 +17,9 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
 
 \arguments{
   \item{x, y, z }{Matrix (2-D), vector, or one value containing the values 
-    where the \link{Image} is to be plotted. 
+    where the image is to be plotted. 
     At least one of them should be one number, as this will determine where the 
-    Image is to be plotted.
+    image is to be plotted.
     If two are vectors vectors, the first vector should be of length equal to 
     \code{nrow(colvar)} and the second should be of length equal to 
     \code{ncol(colvar)}. 
@@ -74,7 +74,7 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
     interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
     values (\code{inttype = 2}) - see \link{persp3D}.
     } 
-  \item{add }{Logical. If \code{TRUE}, then the Image will be added to the current plot.
+  \item{add }{Logical. If \code{TRUE}, then the image will be added to the current plot.
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
@@ -104,7 +104,7 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
 \seealso{
   \link{surf3D} for the function on which \code{image3D} is based.
 
-  \link{Image} for \code{plot3D}s 2-D image function.
+  \link{image2D} for \code{plot3D}s 2-D image function.
 }
 \author{Karline Soetaert <karline.soetaert@nioz.nl>
 }

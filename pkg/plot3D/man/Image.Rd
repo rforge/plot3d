@@ -1,33 +1,34 @@
 \name{2D image and contour plots}
-\alias{Image}
-\alias{Contour}
-\alias{Image.matrix}
-\alias{Image.array}
-\alias{Image.list}
+\alias{image2D}
+\alias{contour2D}
+\alias{image2D.matrix}
+\alias{image2D.array}
+\alias{image2D.list}
 \title{
  Extended image and contour plots for 2-D (and 3-D) data.
 }
 \description{
-  Image extends R's \link{image} function. Input can be a matrix (2-D) or an array (3-D) or a list.
+  \code{image2D} extends R's \link{image} function. Input can be a matrix (2-D) or an array (3-D) or a list.
   
-  Contour extends R's \link{contour} function.    
+  \code{contour2D} extends R's \link{contour} function.    
 }
 \usage{
-Image (z, ...)
-Contour (z, x = seq(0, 1, length.out = nrow(z)),
+image2D (z, ...)
+contour2D (z, x = seq(0, 1, length.out = nrow(z)),
          y = seq(0, 1, length.out = ncol(z)), ...,
-         col = NULL, colkey = list(side = 4), resfac = 1,
+         col = NULL, NAcol = NULL, 
+         colkey = list(side = 4), resfac = 1,
          clab = NULL)
 
-\method{Image}{matrix}(z, x = seq(0, 1, length.out = nrow(z)), 
+\method{image2D}{matrix}(z, x = seq(0, 1, length.out = nrow(z)), 
                y = seq(0, 1, length.out = ncol(z)), ...,
                col = jet.col(100), NAcol = "white", 
                border = NA, facets = TRUE, contour = FALSE, 
                colkey = list(side = 4), resfac = 1, 
                clab = NULL, theta = 0, rasterImage = FALSE) 
 
-\method{Image}{array}(z, margin = c(1, 2), subset, ask = NULL, ...) 
-\method{Image}{list}(z, ...) 
+\method{image2D}{array}(z, margin = c(1, 2), subset, ask = NULL, ...) 
+\method{image2D}{list}(z, ...) 
 }
 
 \arguments{
@@ -37,13 +38,14 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
   \item{x, y }{Vectors or matrix with x and y values. 
      If a vector \code{x} should be of length equal to \code{nrow(z)} and 
      \code{y} should be of length equal to \code{ncol(z)}. 
-     If a matrix (only for \code{Image}), they should have
+     If a matrix (only for \code{image2D}), they should have
      the same dimension as \code{z}.
     }
   \item{col }{Color palette to be used for the \link{image} function or for the contours.
     See details.
     }
-  \item{NAcol }{Color to be used for \code{NA} values of \code{z}; default is ``white''. 
+  \item{NAcol }{Color to be used for \code{NA} values of \code{z}; for \code{image2D}, the default is ``white'',
+    for \code{contour2D}, the default is to do nothing. 
     }
   \item{contour }{If \code{TRUE}, then a \link{contour} plot will be 
     added to the image plot, unless \code{x, y} are a matrix. 
@@ -113,7 +115,7 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
     }
 }
 \details{
-  \code{Image} is an extension to the default \link{image} plot that has
+  \code{image2D} is an extension to the default \link{image} plot that has
   the possibility to add a color key and contourlines, and to increase the 
   resolution in order to make smoother images. It also uses a different color
   scheme, it can deal with decreasing x- and y- values and x and y can be
@@ -121,24 +123,24 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
   if \code{x} and \code{y} are a vector, either R-function \link{image} or 
   \link{rasterImage} will be used.
 
-  \code{Image.array} and \code{Image.list} are versions that
+  \code{image2D.array} and \code{image2D.list} are versions that
   accept a 3 dimensional array respectively a list with z-matrices 
   as their first argument to produce multiple plots.
   
-  For argument \code{col} of the \code{Image} function, 
+  For argument \code{col} of the \code{image2D} function, 
   both \code{NA} and \code{NULL} are allowed, 
   in which case the color will be white, and no color key will be drawn.
   
   To set the ranges of the z-variable, both arguments \code{zlim} (as in \link{image})
   and \code{clim} (as in the other \code{plot3D} functions) are accepted. 
 
-  Upon returning from the \code{Image} and \code{Contour} functions, the figure coordinates are defined
+  Upon returning from the \code{image2D} and \code{contour2D} functions, the figure coordinates are defined
   by the main figure (excluding the color key). Thus, one can safely add other 
   plotting elements.  
 }
 \note{
   Parts of this help page come from the help pages of the R-core function 
-   \link{image}, on which the implementation of \code{Image} is based.
+   \link{image}, on which the implementation of \code{image2D} is based.
    
   The first argument, \code{z} determines the color variable. 
   Hence, for consistency with the other functions
@@ -162,8 +164,8 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 
 \seealso{
   \link{jet.col},  \link{ImageOcean}, 
-  \link{Oxsat}, \link{persp3D}, \link{scatter} 
-  for other examples where \code{Image} is used.
+  \link{Oxsat}, \link{persp3D}, \link{scatter2D} 
+  for other examples where \code{image2D} is used.
 
   \link{image} and \link{contour} for the original R functions.
 
@@ -181,11 +183,11 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
  par(mfrow = c(2, 2))
  x <- y <- 1:3
  z <- matrix (nrow = 3, ncol = 3, data = 1:9)
- Image(z, x, y, border = "black")
- Image(z, x, y, rasterImage = TRUE, border = "black")
- Image(z, x = matrix(nrow = 3, ncol = 3, data = x), 
+ image2D(z, x, y, border = "black")
+ image2D(z, x, y, rasterImage = TRUE, border = "black")
+ image2D(z, x = matrix(nrow = 3, ncol = 3, data = x), 
        y, border = "black")
- Image(z, x, y, border = "black", theta = 45)
+ image2D(z, x, y, border = "black", theta = 45)
 
 ## =======================================================================
 ## Adding points and lines
@@ -195,20 +197,20 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
  nr <- nrow(volcano)
  nc <- ncol(volcano)
 
- Image(volcano, x = 1:nr, y = 1:nc,  
+ image2D(volcano, x = 1:nr, y = 1:nc,  
        main = "volcano", clab = "height, m")
 
  abline(v = seq(10, 80, by = 10))
  abline(h = seq(10, 60, by = 10))
  points(50, 30, pch = 3, cex = 5, lwd = 3, col = "white")
 
- Contour(volcano, x = 1:nr, y = 1:nc, lwd = 2,
+ contour2D(volcano, x = 1:nr, y = 1:nc, lwd = 2,
        main = "volcano", clab = "height, m")
 
- Image(volcano, x = 1:nr, y = 1:nc, contour = TRUE,
+ image2D(volcano, x = 1:nr, y = 1:nc, contour = TRUE,
        main = "volcano", clab = "height, m")
 
- Image(volcano, x = 1:nr, y = 1:nc, col = jet.col(12),
+ image2D(volcano, x = 1:nr, y = 1:nc, col = jet.col(12),
        main = "volcano", clab = "height, m")
 
 ## =======================================================================
@@ -216,12 +218,12 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 ## =======================================================================
 
  par(mfrow = c(1, 1))
- Image(z = Oxsat$val[, , 1], x = Oxsat$lon, y = Oxsat$lat,
+ image2D(z = Oxsat$val[, , 1], x = Oxsat$lon, y = Oxsat$lat,
        main = "surface oxygen saturation data 2005", NAcol = "black", 
        clab = c("","","\%"))
 
 # images at first 9 depths - use subset to select them
- Image(z = Oxsat$val, subset = 1:9, 
+ image2D(z = Oxsat$val, subset = 1:9, 
        x = Oxsat$lon, y = Oxsat$lat,
        margin = c(1, 2), NAcol = "black", 
        xlab = "longitude", ylab = "latitude", 
@@ -231,12 +233,12 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 
 # images at latitude - depth section - increase resolution
  z <- Oxsat$val[,  Oxsat$lat > - 5 & Oxsat$lat < 5, ]
- Image(z = z, x = Oxsat$lon, y = Oxsat$depth,
+ image2D(z = z, x = Oxsat$lon, y = Oxsat$depth,
        margin = c(1, 3), NAcol = "black", 
        resfac = 3, ylim = c(5000, 0))
   
 # show position of transects 
- Image(z = Oxsat$val[ , ,1], 
+ image2D(z = Oxsat$val[ , ,1], 
        x = Oxsat$lon, y = Oxsat$lat,
        NAcol = "black")
  abline(h = Oxsat$lat[Oxsat$lat > - 5 & Oxsat$lat < 5])      
@@ -246,7 +248,7 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 ## =======================================================================
 
  listvolcano <- list(volcano = volcano, logvolcano = log(volcano)) 
- Image(listvolcano, x = 1:nr, y = 1:nc, contour = TRUE,
+ image2D(listvolcano, x = 1:nr, y = 1:nc, contour = TRUE,
        main = c("volcano", "log(volcano)"), 
        clab = list("height, m", "log(m)"),
        zlim = list(c(80, 200), c(4.4, 5.5)))
@@ -259,7 +261,7 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 # crude conversion from oxsat to oxygen 
  listoxygen <- list(Oxsat$val, Oxsat$val/100 * 360)
   
- Image(z = listoxygen, 
+ image2D(z = listoxygen, 
        x = Oxsat$lon, y = Oxsat$lat,
        margin = c(1, 2), NAcol = "black", 
        main = c("Oxygen saturation ", " Oxygen concentration"),
@@ -282,10 +284,10 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
  volcy <- t(volcy + matrix(ncol = 87, nrow = 61, 
         byrow = TRUE, data = seq(0., 25, length.out = 87)))
 
- Image(volcano, x = volcx, y = volcy)
+ image2D(volcano, x = volcx, y = volcy)
 
 # use of panel function
- Image(volcano, x = volcx, y = volcy, NAcol = "black", 
+ image2D(volcano, x = volcx, y = volcy, NAcol = "black", 
        panel.first = substitute(box(col = "lightgrey", lwd = 30)))
                                     
 ## =======================================================================
@@ -294,19 +296,19 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 
  par(mfrow = c(2, 2))
 # normal volcano
- Image(volcano, clab = c("height", "m"))
+ image2D(volcano, clab = c("height", "m"))
 
 # logarithmic z-axis
- Image(volcano, log = "z", clab = c("height", "m"),
+ image2D(volcano, log = "z", clab = c("height", "m"),
      main = "log='z'")
 
 # Including NAs
  VOLC <- volcano - 110
  VOLC [VOLC <= 0] <- NA
- Image(VOLC, main = "including NAs and rescaled")
+ image2D(VOLC, main = "including NAs and rescaled")
 
 # both
- Image(VOLC, NAcol = "black", log = "z", zlim = c(1, 100),
+ image2D(VOLC, NAcol = "black", log = "z", zlim = c(1, 100),
      main = "NAs and log = 'z'")
 
 ## =======================================================================
@@ -314,7 +316,7 @@ Contour (z, x = seq(0, 1, length.out = nrow(z)),
 ## =======================================================================
 
  par(mfrow = c(1, 1))
- Image(volcano, contour = list(col = "white", labcex = 0.8))
+ image2D(volcano, contour = list(col = "white", labcex = 0.8))
 
 # reset plotting parameters
  par(mfrow = pm)

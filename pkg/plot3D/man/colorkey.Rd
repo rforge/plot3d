@@ -90,14 +90,14 @@ colkey (col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
 ## =======================================================================
 
  par(mfrow = c(1, 1))
- Image(volcano, xlab = "", clab = "m", 
+ image2D(volcano, xlab = "", clab = "m", 
        colkey = list(side = 1, length = 0.5, width = 0.5))
  colkey(side = 3, clim = range(volcano), add = TRUE)
 
 # 'dist' to put colkey within the image 
 # 'shift' to position colkey to the right or upward
  par(mfrow = c(1, 1))
- Image(volcano, colkey = FALSE)
+ image2D(volcano, colkey = FALSE)
 
  colkey(clim = range(volcano), dist = -0.15, shift = 0.2,
         side = 3, add = TRUE, clab = "key 1", col.clab = "white",
@@ -127,7 +127,7 @@ colkey (col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
 
  par(mfrow = c(1, 1))
  par(mar = par("mar") + c(0, 0, -2, 0))
- Image(volcano, clab = "height, m", 
+ image2D(volcano, clab = "height, m", 
        colkey = list(dist = -0.15, shift = 0.2,
        side = 3, length = 0.5, width = 0.5, 
        cex.clab = 2, col.clab = "white", col.axis = "white", 

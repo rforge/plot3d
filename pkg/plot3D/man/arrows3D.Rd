@@ -1,12 +1,16 @@
 \name{3-D arrows, segments, polygons, boxes, rectangles}
-\alias{segments3D}
 \alias{arrows3D}
+\alias{segments3D}
 \alias{box3D}
 \alias{border3D}
 \alias{rect3D}
 \alias{polygon3D}
+\alias{arrows2D}
+\alias{segments2D}
+\alias{rect2D}
+\alias{polygon2D}
 \title{
-  Plots arrows, segments, points, lines, polygons, rectangles and boxes in a 3D perspective plot.
+  Plots arrows, segments, points, lines, polygons, rectangles and boxes in a 3D perspective plot or in 2D.
 }
 \description{
   Functions \code{arrows3D} and \code{segments3D} draw arrows and line segments 
@@ -15,6 +19,9 @@
   Functions \code{box3D} and \code{border3D} draw boxes between pairs of points. 
   
   \code{polygon3D} draws polygons; \code{rect3D} draws rectangles.
+  
+  The 2D functions \code{arrows2D}, \code{segments2D}, \code{rect2D} and \code{polygon2D} are included
+  for their side effect of having a color key.
 }
 \usage{
 arrows3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, ...,  
@@ -58,6 +65,27 @@ polygon3D (x, y, z, ...,
          colkey = list(side = 4), panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 
          add = FALSE, plot = TRUE)  
+         
+arrows2D (x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
+         col = NULL, NAcol = "white",
+         colkey = list(side = 4),
+         clim = NULL, clab = NULL, add = FALSE)  
+
+segments2D (x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
+         col = NULL, NAcol = "white",
+         colkey = list(side = 4),
+         clim = NULL, clab = NULL, add = FALSE) 
+
+rect2D (x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
+         col = NULL, NAcol = "white",
+         colkey = list(side = 4),
+         clim = NULL, clab = NULL, add = FALSE) 
+         
+polygon2D (x, y, ..., colvar = NULL, 
+         col = NULL, NAcol = "white", 
+         border = NA, facets = TRUE,
+         colkey = list(side = 4), 
+         clim = NULL, clab = NULL, add = FALSE)
 }
 
 \arguments{
@@ -189,7 +217,8 @@ polygon3D (x, y, z, ...,
  Col <- c("red", "blue", "green") 
  arrows3D(x0, y0, z0, x1 = x1, colvar = z0, lwd = 2, type = "triangle",
           d = 2, length = 0.05, clab = "z-value", col = Col,
-          xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8))
+          xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8),
+          main = "arrows3D, points3D, segments3D, border3D")
 
 # add starting point of arrows
  points3D(x0, y0, z0, add = TRUE, colvar = z0, 
@@ -222,12 +251,13 @@ polygon3D (x, y, z, ...,
        y1 = seq(0.8, 0.1, by = -0.1),
        z1 = seq(0.8, 0.1, by = -0.1),
        col = gg.col(8), lty = 2, 
-       lwd = c(1, 4), phi = 20)
+       lwd = c(1, 4), phi = 20, main = "border3D")
 
  box3D(x0 = -0.8, y0 = -0.8, z0 = -0.8, 
        x1 = 0.8, y1 = 0.8, z1 = 0.8, 
        border = "black", lwd = 2, 
-       col = gg.col(1, alpha = 0.8))
+       col = gg.col(1, alpha = 0.8), 
+       main = "box3D")
 
  box3D(x0 = seq(-0.8, -0.1, by = 0.1), 
        y0 = seq(-0.8, -0.1, by = 0.1),
@@ -255,7 +285,7 @@ polygon3D (x, y, z, ...,
         x1 = seq(0.8, 0.1, by = -0.1),
         y1 = seq(0.8, 0.1, by = -0.1),
         col = gg.col(8), border = "black",
-        bty = "g", lwd = 2, phi = 20)
+        bty = "g", lwd = 2, phi = 20, main = "rect3D")
 
 # constant y and with transparent facets
  rect3D(x0 = 0, y0 = 0, z0 = 0, x1 = 1, z1 = 5,
@@ -313,10 +343,50 @@ polygon3D (x, y, z, ...,
 
 # transparent colors (alpha)
  polygon3D(x, y, z, border = "black", lwd = 3,
-   col = gg.col(length(ii) + 1, alpha = 0.8))
+   col = gg.col(length(ii) + 1, alpha = 0.8), 
+   main = "polygon3D")
+
+## ========================================================================
+## 2D examples, with color key
+## ========================================================================
+
+arrows2D(x0 = runif(10), y0 = runif(10), 
+         x1 = runif(10), y1 = runif(10), colvar = 1:10, 
+         code = 3, main = "arrows2D, segments2D")
+
+segments2D(x0 = runif(10), y0 = runif(10), 
+         x1 = runif(10), y1 = runif(10), colvar = 1:10, 
+         lwd = 2, add = TRUE, colkey = FALSE) 
+
+rect2D(x0 = runif(10), y0 = runif(10), 
+       x1 = runif(10), y1 = runif(10), colvar = 1:10, 
+       col = jet.col(alpha = 0.4), lwd = 2, main = "rect2D") 
+
+## ========================================================================
+## polygon2D 
+## ========================================================================
+
+ x <- runif(10)
+ y <- runif(10)
+ 
+ polygon2D(x, y)    # same as polygon
+
+# several polygons, separated by NAs
+ x <- runif(59) 
+ y <- runif(59)
+
+ ii <- seq(5, 55, by  = 5)
+ x[ii] <- y[ii] <- NA 
+
+# transparent colors (alpha)
+ polygon2D(x, y, border = "black", lwd = 3,
+   colvar = 1:(length(ii) + 1), 
+   col = gg.col(alpha = 0.8), 
+   main = "polygon2D")
 
 # restore plotting parameters
  par(mfrow = pm)
+
 }
 \keyword{ hplot } 
 

@@ -3,7 +3,7 @@
 ## =============================================================================
 # x, y, colvar: vector or matrix of same dimension
 
-scatter <- function(x, y, ..., colvar = NULL, 
+scatter2D <- function(x, y, ..., colvar = NULL, 
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4), 
                     clim = NULL, clab = NULL, CI = NULL, add = FALSE) {
@@ -63,37 +63,6 @@ scatter <- function(x, y, ..., colvar = NULL,
       if (length(Col) > 1  )
         useSegments <- TRUE
 
- # function that makes a box type 
-  startplot<- function(){
-    dd <- dots
-    dd$type <- "n"
-    
-    bty <- dots$bty  
-    dots$bty <<- NULL
-    
-    if (is.null(bty)) 
-      bty <- "o"
-
-    if (bty %in% c("b2", "g", "bl")) {
-      dd$bty <- NULL
-    }     
-    do.call("plot", c(alist(x, y, col = Col), dd)) 
-
-    if (bty == "b2")
-      grid(col = "grey", lty = 1, lwd = 2)
-    else if (bty == "g") {
-      pu <- par("usr")
-      rect(pu[1], pu[3], pu[2], pu[4], 
-        col = grey(0.925), border = grey(0.925))
-      grid(col = "white", lty = 1, lwd = 2)
-    } else if (bty %in% c("bl","bl2")) {
-      pu <- par("usr")
-      rect(pu[1], pu[3], pu[2], pu[4], col = "black")
-      if (bty == "bl2") 
-        grid(col = "grey", lty = 1, lwd = 2)
-    }
-  }
-  
   if (useSegments) {
     Type <- dots$type
     len <- length(x)
@@ -107,7 +76,7 @@ scatter <- function(x, y, ..., colvar = NULL,
     LCol <- apply(LCol, MARGIN = 1, FUN = MeanColors)
 
     if (! add) 
-      startplot()
+      dots <- start2Dplot(dots, x, y)
     add <- TRUE
     if (isCI) {plot.CI.2d(CI, x, y, Col) ; isCI <- FALSE}  # do this first
     do.call("points", c(alist(x, y, col = Col), dots)) 
@@ -117,7 +86,7 @@ scatter <- function(x, y, ..., colvar = NULL,
   }
   
   else if (! add) {
-    startplot()
+    dots <- start2Dplot(dots, x, y)
     if (isCI) {
       plot.CI.2d(CI, x, y, Col)   
       isCI <- FALSE
@@ -140,6 +109,48 @@ scatter <- function(x, y, ..., colvar = NULL,
   }    
 
 }
+
+## =============================================================================
+## function that makes a box type
+## =============================================================================
+
+start2Dplot <- function(dots, x, y) {
+  dd <- dots
+  dd$type <- "n"
+
+  bty <- dots$bty
+  dots$bty <- NULL
+
+  if (is.null(bty))
+    bty <- "o"
+
+  if (bty %in% c("b2", "g", "bl")) 
+    dd$bty <- NULL
+    
+  if (is.null(dd$xlab))
+    dd$xlab <- "x"
+      
+  if (is.null(dd$ylab))
+    dd$ylab <- "y"
+
+  do.call("plot", c(alist(x, y), dd))
+
+  if (bty == "b2")
+    grid(col = "grey", lty = 1, lwd = 2)
+  else if (bty == "g") {
+    pu <- par("usr")
+    rect(pu[1], pu[3], pu[2], pu[4],
+      col = grey(0.925), border = grey(0.925))
+    grid(col = "white", lty = 1, lwd = 2)
+  } else if (bty %in% c("bl","bl2")) {
+    pu <- par("usr")
+    rect(pu[1], pu[3], pu[2], pu[4], col = "black")
+    if (bty == "bl2")
+      grid(col = "grey", lty = 1, lwd = 2)
+  }
+  return(dots)
+}
+
 ## =============================================================================
 ## Confidence interval check for scatters (2D and 3D)
 ## =============================================================================

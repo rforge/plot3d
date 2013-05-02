@@ -1,5 +1,5 @@
 ## =============================================================================
-## 3-D polygon and triangle function
+## 3-D polygon function
 ## =============================================================================
 
 polygon3D  <- function(x, y, z, 
@@ -134,6 +134,122 @@ polygon3D  <- function(x, y, z,
 
   setplist(plist)   
   invisible(plist$mat)
+}
+
+
+## =============================================================================
+## 2-D polygon and triangle function
+## =============================================================================
+
+polygon2D  <- function(x, y, ..., colvar = NULL, 
+                    col = NULL, NAcol = "white", 
+                    border = NA, facets = TRUE,
+                    colkey = list(side = 4), 
+                    clim = NULL, clab = NULL, add = FALSE)  {
+
+  dots <- splitpardots(list(...))
+
+  clog <- FALSE
+  if (! is.null(dots$log)) {
+    if (length(grep("c", dots[["log"]])) > 0) {
+      dots[["log"]] <- gsub("c", "", dots[["log"]])
+      if (dots[["log"]] == "")
+        dots[["log"]] <- NULL
+      clog <- TRUE
+    }
+  }
+
+# checks
+  checkinput <- function (x) {
+    if (is.matrix(x)) {
+     x <- as.vector(x)
+     if (is.na (x[length(x)]) )
+       x <- x[-length(x)]
+    }
+    x
+  }
+  x <- checkinput(x)
+  y <- checkinput(y)
+ 
+  if (length(y) != length(x))
+    stop("'y' should have same length as 'x'")
+
+ # check for NAs (and number of polygons)
+  len <- 1
+  if (any (is.na(x) | is.na(y))) {
+    i1 <- which(is.na(x))
+    i2 <- which(is.na(y))
+    ii <- unique(c(i1, i2))
+    if (1 %in% ii | length(x) %in% ii)
+      stop ("first or last element of 'x', or 'y' cannot be 'NA'")
+    di <- diff(sort(c(0, ii, length(x)+1)))-1
+    if (min(di) == 1)
+      stop ("two consecutive elements of 'x' or 'y' cannot be 'NA'")
+    x[ii] <- NA
+    y[ii] <- NA
+
+    len <- length(ii) + 1  # number of polygons!
+
+    xx <- yy <- matrix(nrow = max(di) + 1, ncol = len, data = NA)
+    ii <- c(0, ii, length(x)+ 1)
+    for (i in 1 : len) {
+      iseq <- (ii[i]+1): (ii[i+1]-1)
+      xx[1:length(iseq), i] <- x[iseq]
+      yy[1:length(iseq), i] <- y[iseq]
+    }
+  } else {
+    xx <- matrix(ncol = 1, data = c(x, NA)) 
+    yy <- matrix(ncol = 1, data = c(y, NA)) 
+  }
+  # colors
+  if (ispresent(colvar)) { 
+    if (length(colvar) != len)
+      stop("'colvar' should have same length as number of polygons (= 1+ number of NAs in 'x', 'y' and 'z')")
+    
+    if (is.null(col))
+      col <- jet.col(100)
+    
+    if (length(col) == 1)
+      col <- c(col, col)
+
+    if (is.null(clim)) 
+      clim <- range(colvar, na.rm = TRUE)
+    
+    if (clog) {                       
+      colvar <- log(colvar)
+      clim <- log(clim)
+    }
+
+    iscolkey <- is.colkey(colkey, col) 
+    if (iscolkey) {
+      colkey <- check.colkey(colkey, add)
+      if (! add)
+        par.ori <- par(plt = colkey$parplt)
+    }
+     
+    Col <- variablecol(colvar, col, NAcol, clim) 
+
+  } else {
+    if (is.null(col))
+      col <- "grey"
+    Col <- rep(col, length.out = len)  
+    iscolkey <- FALSE
+  }   
+
+# The colors of facets and border
+  Col <- createcolors(facets, border, Col)  
+
+  if (! add)
+    dots$main <- start2Dplot(dots$main, x, y)
+    
+  do.call("polygon", c(alist(x, y, col = Col$facet, border = Col$border), dots$points))
+
+  if (iscolkey) {
+    drawcolkey(colkey, col, clim, clab, clog)
+    if (! add)
+      par(plt = par.ori)
+    par(mar = par("mar"))
+  }
 }
 
 

@@ -79,7 +79,7 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
 }
 
 \seealso{
-  \link{persp3D}, \link{scatter}, \link{surf3D} for examples where box types 
+  \link{persp3D}, \link{scatter2D}, \link{surf3D} for examples where box types 
    different than the default are used.
    
   \link{Hypsometry} for an example where colored axis-panels are added to a 
