@@ -13,8 +13,8 @@ cutrgl <- function(...) {
   do.call ("plotrglplist", c(alist(plist, lighting = light, new = FALSE, 
     update = FALSE, scale = FALSE, smooth = smooth), dots))
 
-  if (plist$type == "2D") 
-    aspect3d(1,1,1)
+#  if (plist$type == "2D") 
+#    aspect3d(1,1,1)
 
   decorate3d(axes = FALSE, box = TRUE, zlab = "")
 

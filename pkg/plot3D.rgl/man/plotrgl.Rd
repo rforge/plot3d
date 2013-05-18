@@ -72,72 +72,12 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
 ## Composite image and contour in 3D
 ## =======================================================================
 # plot it to traditional window: 
- persp3D(z = volcano, zlim = c(90, 300))
- contour3D(z = 300, colvar = volcano, lwd = 2, col = "grey",
-         add = TRUE, nlevels = 20, clab = c("height", "m"))
+ persp3D(z = volcano, contour = list(side = "zmax"))
 
  plotrgl(new = TRUE) # new window
  plotrgl(new = FALSE, lighting = TRUE) 
  plotrgl(new = FALSE, lighting = TRUE, smooth = TRUE)
   
-## ========================================================================
-## A perspective plot and a plane
-## ========================================================================
-
- par(mar = pmar)
-
-# The volcano in perspective
- x <- 1:nrow(volcano)
- y <- 1:ncol(volcano)
-
- persp3D (x, y, z = volcano, colvar = volcano, 
-          theta = 10, phi = 20, box = FALSE, 
-          scale = FALSE, expand = 0.3, 
-          clim = range(volcano), shade = 0.1, plot = FALSE)
-
-# add a plane (image) at z = 170; jetcolored, transparant: only border
- image3D(x, y, z = 170, add = TRUE, clim = range(volcano),
-         colvar = volcano, facets = NA, plot = FALSE)
-
-# add a contour (image) at z = 170; jetcolored,
- contour3D(x, y, z = 170, add = TRUE, clim = range(volcano),
-           colvar = volcano, plot = FALSE)
-
-# plot it as regular plot
- plotdev()
-
-# plot on rgl device
- plotrgl()
-
-## =======================================================================
-## slices from the oxygen saturation data from package plot3D
-## =======================================================================
-
- par(mfrow = c(1, 1))
- ii <- which (Oxsat$lon > -90 & Oxsat$lon < 90)
- jj <- which (Oxsat$lat > 0 & Oxsat$lat < 90)
-
- xs <- c(Oxsat$lon[ii[1]], Oxsat$lon[ii[length(ii)]])  # E , W boundary
- ys <- c(Oxsat$lat[jj[1]], Oxsat$lat[jj[length(jj)]])  # S , Nboundary
-
- slice3D(colvar = Oxsat$val[ii,jj,], x = Oxsat$lon[ii],
-        y = Oxsat$lat[jj], z = -Oxsat$depth,
-        NAcol = "black", xs = xs, ys = ys, zs = 0,
-        theta = 35, phi = 50, colkey = list(length = 0.5),
-        expand = 0.5, ticktype = "detailed",
-        clab = "\%", main = "Oxygen saturation",
-        xlab = "longitude", ylab = "latitude", zlab = "depth")
-        
- plotrgl()
-
-## =======================================================================
-## Ribbon
-## =======================================================================
-
- ribbon3D(z = volcano, contour = TRUE, zlim= c(-100, 200),
-          image = TRUE)
- plotrgl()
- 
 ## =======================================================================
 ## hist3D
 ## =======================================================================
@@ -150,91 +90,37 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  plotrgl(alpha = 0.5)
 
 ## =======================================================================
-## scatters
+## scatters with fitted surface and droplines (see ?scatter3D)
 ## =======================================================================
 
  par (mfrow = c(1, 1))
- z <- seq(0, 10, 0.2)
- x <- cos(z)
- y <- sin(z)*z
+ with (mtcars, {
 
-# greyish background for the boxtype (bty = "g")
- scatter3D(x, y, z, phi = 0, bty = "g",
-           pch = 20, cex = 2, ticktype = "detailed")
-# add another point
- scatter3D(x = 0, y = 0, z = 0, add = TRUE, colkey = FALSE,
-           pch = 18, cex = 3, col = "black")
+  # linear regression
+   fit <- lm(mpg ~ wt + disp)
 
-# add text
- text3D(x = cos(1:10), y = (sin(1:10)*(1:10) - 1),
-        z = 1:10, colkey = FALSE, add = TRUE,
-        labels = LETTERS[1:10], col = c("black", "red"))
+  # predict values on regular xy grid
+   wt.pred <- seq(1.5, 5.5, length.out = 30)
+   disp.pred <- seq(71, 472, length.out = 30)
+   xy <- expand.grid(wt = wt.pred, 
+                     disp = disp.pred)
 
- plotrgl()
- 
-## =======================================================================
-## Scatter with a surface
-## =======================================================================
+   mpg.pred <- matrix (nrow = 30, ncol = 30, 
+      data = predict(fit, newdata = data.frame(xy), 
+      interval = "prediction"))
 
- par(mfrow = c(1, 1))
+# fitted points for droplines to surface
+   fitpoints <- predict(fit) 
 
-# surface = volcano
- M <- mesh(1:nrow(volcano), 1:ncol(volcano))
+   scatter3D(z = mpg, x = wt, y = disp, pch = 18, cex = 2, 
+      theta = 20, phi = 20, ticktype = "detailed",
+      xlab = "wt", ylab = "disp", zlab = "mpg",  
+      surf = list(x = wt.pred, y = disp.pred, z = mpg.pred, 
+                  facets = NA, fit = fitpoints),
+      main = "mtcars")
+  
+ })
 
-# 100 points above volcano 
- N  <- 100
- xs <- runif(N) * 87
- ys <- runif(N) * 61
- zs <- runif(N)*50 + 154
-
- scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16,
-   xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215),
-   surf = list(x = M$x, y = M$y, z = volcano))
-
- plotrgl(lighting = TRUE, smooth = TRUE)
-
-## =======================================================================
-## scatter with droplines till the fitted surface
-## =======================================================================
-
- M <- mesh(seq(0, 2*pi, length = 30), (1:30)/100)
- z <- with (M, sin(x) + y)
-
-# points 'sampled'
- N <- 30
- xs <- runif(N) * 2*pi
- ys <- runif(N) * 0.3
-
- zs <- sin(xs) + ys + rnorm(N)*0.3
-
- disttoz <- sin(xs) + ys - zs
- CIz = matrix(nrow = length(xs), data = c(-disttoz, disttoz))
- CIz[CIz > 0] <- 0
-
-# no 'arrow' head (alen=0)
- CI <- list(z = CIz, lwd = 4, alen = 0, col = "black")
-
-# transparent surface; border colored according to z (default colvar)
- scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16,
-   xlim = c(0, 2*pi), ylim = c(0, 0.3), zlim = c(-1.7, 1.7),
-   CI = CI, theta = 20, phi = 30, cex = 2, bty = "g",
-   surf = list(x = M$x, y = M$y, z = z,
-       facets = NA, shade = 0.5)
-   )
-
- plotrgl()
- 
-## =======================================================================
-## quakes scatter
-## =======================================================================
- 
- with(quakes, scatter3D(x = long, y = lat, z = -depth, colvar = mag,
-      pch = 16, cex = 1.5, xlab = "longitude", ylab = "latitude",
-      zlab = "depth, km", clab = c("Richter","Magnitude"),
-      main = "Earthquakes off Fiji", ticktype = "detailed",
-      type = "h", theta = 10, d = 2,
-      colkey = list(length = 0.5, width = 0.5, cex.clab = 0.75))
-      )
  plotrgl()
  
 ## =======================================================================
@@ -287,16 +173,13 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  y <- r * cos(phi)
  z <- r * sin(phi) * sin(theta)
 
-# full colored image
- surf3D(x, y, z, colvar = y, colkey = FALSE, shade = 0.5,
-        box = FALSE, theta = 60)
-
- plotrgl()
- 
 # no shading or lighting in oridinary device
- surf3D(x, y, z, box = FALSE,
-        theta = 60, col = "lightblue")
-# light added in rgl
+ surf3D(x, y, z, box = FALSE, theta = 60, col = "lightblue", plot = FALSE)
+
+# add lighting afterwards in R graphics
+ plotdev(lighting = TRUE, lphi = 0) 
+
+# add light and smooth in rgl
  plotrgl(lighting = TRUE, smooth = TRUE)
  
 ## =======================================================================
@@ -314,54 +197,32 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  plotrgl(mouseMode = c("zAxis", "zoom", "fov"))
 
 ## =======================================================================
-## several polygons, separated by NAs
-## =======================================================================
-
-# only polygons up to 4 corners supported
- x <- runif(39) 
- y <- runif(39)
- z <- runif(39)
- ii <- seq(4, 36, by  = 4)
- x[ii] <- y[ii] <- z[ii] <- NA 
-
-# transparent colors (alpha)
- polygon3D(x, y, z, border = "black", lwd = 3,
-   col = gg.col(length(ii) + 1, alpha = 0.8))
-
- plotrgl(alpha = 0.8)
- 
-## =======================================================================
-## Arrows
+## Arrows - has a flaw
 ## =======================================================================
 
  z <- seq(0, 2*pi, length.out = 100) 
  x <- cos(z)
  y <- sin(z)
- lines3D(x,y,z, lwd = 2)
 
  z0 <- z[seq(1, by = 10, length.out = 10)]
  z1 <- z[seq(9, by = 10, length.out = 10)]
 
-# triangular arrow heads
- arrows3D(x0 = 10*cos(z0), y0 = sin(z0), z0 = z0,
-          x1 = 10*cos(z1), y1 = sin(z1), z1 = z1, 
-          type = "triangle", length = 0.4, lwd = 4,
-          angle = 20, col = 1:10)
-
-# assymmetrical...
- plotrgl(lighting = TRUE, alpha = 0.8)
-
- view3d(phi = 0, fov = 0)
- 
 # cone arrow heads
  arrows3D(x0 = 10*cos(z0), y0 = sin(z0), z0 = z0,
           x1 = 10*cos(z1), y1 = sin(z1), z1 = z1, 
           type = "cone", length = 0.4, lwd = 4,
-          angle = 20, col = 1:10)
+          angle = 20, col = 1:10, plot = FALSE)
 
  plotrgl(lighting = TRUE)
 
-# reset plotting parameters
+## =======================================================================
+## 2D plot
+## =======================================================================
+
+ image2D(z = volcano)
+ plotrgl()
+ 
+# reset plotting parameters 
  par(mfrow = pm)
  par(mar = pmar)
 

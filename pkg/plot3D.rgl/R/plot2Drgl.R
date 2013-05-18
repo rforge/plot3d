@@ -32,8 +32,13 @@ plot2Drgl <- function(func.name, x, y, colvar, col, NAcol, clim, add,
 ## =============================================================================
 
 finishplotrgl <- function(dots, namesextra = NULL, add = FALSE) {
-
-  do.call("plotrgl", c(dots[!names(dots) %in% c(namespersp, namesextra)], add = add))
+#  new <- dots $new
+  plist <- getplist()
+  plist$type <- "3D" 
+  setplist(plist)
+  
+  do.call("plotrgl", c(dots[!names(dots) %in% c(namespersp, namesextra)], 
+     add = add))
 
   mouseNULL <- is.null(dots$mouseMode)
   if (mouseNULL) 

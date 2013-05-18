@@ -2,14 +2,23 @@
 ## =============================================================================
 ## RGL versions of the functions in package plot3D
 ## =============================================================================
-
+par3dpars <- c("antialias","cex","family","font","useFreeType","fontname",
+  "FOV","ignoreExtent","modelMatrix", "mouseMode", "projMatrix","bg",
+  "scale","skipRedraw","userMatrix","viewport","zoom","bbox", "windowRect")
 
 plotrgl <- function(lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...) {
 
-  plist <- getplist()
-    
-  plist <- plotrglplist (plist, lighting, new = new, add = add, smooth = smooth, 
-    update = TRUE, scale = TRUE, ...) 
+  plist <- getplist() 
+  if (plist$type =="2D") {
+    plotrgl2D(plist, new = new, add = add, smooth = smooth, plot = TRUE, ...)
+    pp <- getplist()
+    pp$twoD <- plist$twoD
+    pp$converted <- TRUE
+    plist <- pp
+  } else
+    plist <- plotrglplist (plist, lighting, new = new, add = add, smooth = smooth, 
+         update = TRUE, scale = TRUE, ...) 
+
   plist$rgl$userMatrix <- par3d("userMatrix")
   setplist(plist)
   dots <- list(...)
@@ -31,11 +40,11 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   material <- dots[names(dots) %in% materialnames] 
   material$lit <- lighting
   if (new) 
-    do.call("open3d", dots[!names(dots) %in% materialnames])
+    do.call("open3d", dots[names(dots) %in% par3dpars]) #[!names(dots) %in% materialnames])
   else {
     if (! add)
       rgl.clear()
-    do.call("material3d", dots[!names(dots) %in% materialnames])
+    do.call("material3d", dots[names(dots) %in% par3dpars]) #dots[!names(dots) %in% materialnames])
   }
   if (! is.null(material))
     do.call("material3d", material)
@@ -381,3 +390,69 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
   arrhead(2)
   arrhead(3)
 }
+
+
+
+
+
+
+plotrgl2D <- function(plist, new, add, smooth, plot = FALSE, ...) {
+  
+  checkdots <-  function(pdots, dots, add) {
+    if (! add) {
+      if (! is.null(dots$xlim)) 
+        pdots$xlim <- dots$xlim
+      if (! is.null(dots$ylim)) 
+        pdots$ylim <- dots$ylim
+    }
+    pdots$colkey <- pdots$clab <- pdots$facets <- pdots$resfac <- pdots$theta <- NULL 
+    pdots$rasterImage <- NULL 
+    pdots$new <- new
+    pdots
+  }
+  
+  img2Dnr <- cont2Dnr <- scat2Dnr <- arr2Dnr <- segm2Dnr <- rect2Dnr <- poly2Dnr <- 0
+  dots <- list(...)
+#  if (add)
+#    new <- FALSE
+#  if (new) 
+#    do.call("open3d", dots[names(dots) %in% par3dpars]) #[!names(dots) %in% materialnames]) 
+#  else if (! add)
+#      rgl.clear()
+#  add <- TRUE
+  p <- plist$twoD
+  for (i in 1:length(p$order)) {
+    plt <- p$order[i]
+    if (plt  == "image") {
+      img2Dnr <- img2Dnr + 1
+      Dots <- checkdots(p$img2D[[img2Dnr]], dots, add)
+      do.call ("imagergl", c(alist(add = add, smooth = smooth), Dots))
+    } else if (plt  == "contour") {
+      cont2Dnr <- cont2Dnr + 1
+      Dots <- checkdots(p$cont2D[[cont2Dnr]], dots, add)
+      do.call ("contourrgl", c(alist(add = add), Dots))
+    } else if (plt == "scatter") {
+      scat2Dnr <- scat2Dnr + 1
+      Dots <- checkdots(p$scat2D[[scat2Dnr]], dots, add)
+      do.call ("scatterrgl", c(alist(add = add), Dots))
+    } else if (plt == "arrows") {
+      arr2Dnr <- arr2Dnr + 1
+      Dots <- checkdots(p$arr2D[[arr2Dnr]], dots, add)
+      do.call ("arrowsrgl", c(alist(add = add), Dots))
+    } else if (plt == "segments") {
+      segm2Dnr <- segm2Dnr + 1
+      Dots <- checkdots(p$segm2D[[segm2Dnr]], dots, add)
+      do.call ("segmentsrgl", c(alist(add = add), Dots))
+    } else if (plt == "rect") {
+      stop("rect not supported in rgl")
+    } else if (plt == "polygon") {
+      stop("polygons not supported in rgl")
+    }
+    add <- TRUE
+    new <- FALSE
+  }
+  
+  invisible(plist)
+ 
+}
+
