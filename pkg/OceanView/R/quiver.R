@@ -141,17 +141,6 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
   dp    <- dots$points
   dm    <- dots$main 
 
- # log transformation of color-values 
-  clog <- FALSE 
-  if (! is.null(dots$log)) {
-    if (length(grep("c", dots[["log"]])) > 0) {
-      dots[["log"]] <- gsub("c", "", dots[["log"]])
-      if (dots[["log"]] == "")
-        dots[["log"]] <- NULL
-      clog <- TRUE
-    }
-  }
-
   # colors and color variable
   if (! is.null(colvar)) {
     varlim <- clim
@@ -171,7 +160,7 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
     if (is.null(col))
       col <- jet.col(100)
 
-    if (clog) {
+    if (dots$clog) {
       colvar <- log(colvar)
       if (! is.null(clim)) 
         clim <- log(clim) 
@@ -286,7 +275,8 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
   
     if (iscolkey) {
 #      drawcolkey(colkey, col, clim, clab, cex.clab, clog) 
-      do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, clog = clog, add = TRUE)))
+      do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
+        clog = dots$clog, add = TRUE)))
       if (! add) 
         par(plt = plt.or)  
       par(mar = par("mar"))

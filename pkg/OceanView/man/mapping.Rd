@@ -31,10 +31,10 @@
   \code{transect} takes a cross section across an array (\code{var}). 
   Result is a matrix.
 
-  \code{mapsigma} maps a matrix \code{var} containing values defined at (x, sigma) coordinates 
-  to (x, depth) coordinates.
-  The depths corresponding to the sigma values in \code{var} are in input matrix sigma.
-  The result is a matrix which will contain \code{NA}s where the depth-coordinates
+  \code{mapsigma} maps a matrix or array \code{var} containing values defined at (x, sigma) (or (x, y, sigma)) coordinates 
+  to (x, depth) (or (x, y, depth)) coordinates.
+  The depths corresponding to the sigma values in \code{var} are in an input matrix or array called \code{sigma} with same dimensions as \code{var}.
+  The result is a matrix or array which will contain \code{NA}s where the depth-coordinates
   extend beyond the sigma values.
 
 }
@@ -42,10 +42,10 @@
   map        (var, ...)
   
   \method{map}{matrix}(var, x, y, xto = NULL, yto = NULL, 
-          resfac = 1, ...)
+          resfac = 1, na.rm = TRUE, ...)
 
   \method{map}{array}(var, x, y, z, xto = NULL, yto = NULL, zto = NULL, 
-          resfac = 1, ...)
+          resfac = 1, na.rm = TRUE, ...)
 
   extract    (var, ...)
 
@@ -57,10 +57,10 @@
 
   mapsigma   (var, ...)
   
-  \method{mapsigma}{matrix}(var = NULL, sigma, x = NULL,  
+  \method{mapsigma}{matrix}(var = NULL, sigma, signr = 2, x = NULL,  
     depth = NULL, numdepth = NULL, xto = NULL, resfac = 1, ...)
     
-  \method{mapsigma}{array}(var = NULL, sigma, x = NULL, y = NULL, 
+  \method{mapsigma}{array}(var = NULL, sigma, signr = 3, x = NULL, y = NULL, 
     depth = NULL, numdepth = NULL, xto = NULL, yto = NULL, 
     resfac = 1, ...)
 
@@ -127,9 +127,12 @@
     }
   \item{sigma }{The sigma coordinates, a matrix or array with the same dimension 
     as \code{var}. The sigma coordinates should 
-    refer to the second or third dimension in \code{var} for a \code{matrix}
-    and \code{array} respectively.
+    refer to the column as defined by \code{signr}.
     }
+  \item{signr }{The position of the sigma coordinates, in the matrix or array. 
+    The default is the second or third dimension in \code{var} for a \code{matrix}
+    and \code{array} respectively.
+    }    
   \item{depth }{The depth (often referred to as 'z') coordinates to which matrix 
     \code{var} has to be mapped. 
     If \code{NULL} then \code{seq(min(sigma), max(sigma), length.out = numdepth)}. 
@@ -149,7 +152,14 @@
     in x, y- and z-direction. 
     \code{resfac} is overruled if \code{xto}, \code{yto} or \code{zto} is specified.
     }
-  \item{... }{any other arguments.}  
+  \item{na.rm }{How to treat \code{NA}s in the matrix or array \code{var}.
+    If \code{TRUE}, they are ignored while interpolating; this will make the 
+    size of \code{NA} regions smaller; if \code{FALSE}, the size of the \code{NA} 
+    region will increase.
+    }  
+    
+  \item{... }{any other arguments.
+    }  
 }
 \details{
   S3-function \code{map} can be used to increase or decrease 
@@ -220,10 +230,12 @@
     \itemize{
      \item{var }{A matrix with columns in depth-coordinates.
           }
-     \item{x }{The 'x'-coordinates referring to the rows of \code{var}.
-          }
      \item{depth }{The depth-coordinates, also known as 'z'-coordinates, 
-          referring to the columns of \code{var}.
+          referring to the dimension of \code{var} as specified by \code{signr}.
+          }
+     \item{x }{The 'x'-coordinates referring to the first dimension of \code{var}, except for the depth.
+          }
+     \item{y }{Only if \code{var} is an array, the 'y'-coordinates referring to the second dimension of \code{var}, except for the depth.
           }
     }
 }
@@ -357,6 +369,37 @@
  image2D(varz$var, y = varz$depth, NAcol = "black", ylim = c(10, 0), 
        clab = "var", ylab = "depth", 
        main = "depth-coord, high resolution")
+
+## =======================================================================
+##  mapsigma: mapping to depth for data Sylttran (x, sigma, time)
+## =======================================================================
+
+# depth values 
+ D <- seq(-1, 20, by = 0.5)
+ dim(Sylttran$visc)
+
+# sigma coordinates are the second dimension (signr)
+# resolution is increased for 'x' and decreased for 'time'
+ 
+ visc <- mapsigma(Sylttran$visc, x = Sylttran$x, y = Sylttran$time,
+  sigma = Sylttran$sigma, signr = 2, depth = D, resfac = c(2, 1, 0.4))
+
+# changed dimensions 
+ dim(visc$var)
+
+ image2D(visc$var, x = visc$x, y = -visc$depth, ylim = c(-20, 1), 
+  main = paste("eddy visc,", format(visc$y, digits = 2), " hr"), 
+  ylab = "m", xlab = "x", clab = c("","m2/s"), 
+  clim = range(visc$var, na.rm = TRUE))
+  
+ par(mfrow = c(1, 1))
+# make depth the last dimension
+ cv <- aperm(visc$var, c(1, 3, 2))
+
+# visualise as slices
+ slice3D(colvar = cv, x = visc$x, y = visc$y, z = -visc$depth, 
+   phi = 10, theta = 60, ylab = "time",
+   xs = NULL, zs = NULL, ys = visc$y, NAcol = "transparent")
 
 # restore plotting parameters
  par(mfrow = pm)

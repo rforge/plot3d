@@ -7,30 +7,109 @@ extract <- function(var, ...) UseMethod ("extract")
 ## =============================================================================
 ## change resolution of a vector
 ## =============================================================================
-
 changeresvec <- function(x, resfac) {
   resfac[is.na(resfac)] <- 1
 
-  diffx <- c(diff(x), 0)
+  diffx <- diff(x) 
   xto <- x
   RX <- 1/resfac
   Nx <- length(x)
   if (resfac > 1)
-    for (i in 1: resfac)  
-      xto <- c(xto, x + diffx * i*RX)
+    for (i in 1: (resfac-1))  
+      xto <- c(xto, x[-length(x)] + diffx * i*RX)
 
   else if (resfac < 0.99) 
     xto <- x[as.integer(seq(1, Nx, length.out = Nx*resfac))]
 
-  xto <- unique(sort(xto))
+  xto <- sort(xto)
   return(xto)
+}
+# same as from plot3D....
+remapxy <- function (z, x, y, xto, yto) {
+    Nx <- length(x)    
+    Ny <- length(y)
+    
+    dx <- c(diff(x), 1)     # 1 for last value
+    dy <- c(diff(y), 1)
+
+ # find embracing values : first interval
+    ix <- FindInterval(xto, x)
+    iy <- FindInterval(yto, y)
+ # interpolation facotr
+    xfac <- (xto - x[ix])/dx[ix]
+    yfac <- (yto - y[iy])/dy[iy]
+ # expand for all combinations..
+    gg <- expand.grid(ix, iy)
+    ix <- gg[, 1]
+    iy <- gg[, 2]
+ # next inetrval
+    ixp1 <- pmin(ix + 1, Nx)
+    iyp1 <- pmin(iy + 1, Ny)
+    gg <- expand.grid(xfac, yfac)
+    xfac <- gg[, 1]
+    yfac <- gg[, 2]
+ # interpolate
+    M <- (1 - yfac) * ((1 - xfac) * z[cbind(ix, iy)] + xfac * 
+        z[cbind(ixp1, iy)]) + yfac * ((1 - xfac) * z[cbind(ix, 
+        iyp1)] + xfac * z[cbind(ixp1, iyp1)])
+    return(matrix(nrow = length(xto), ncol = length(yto), data = M))
+}
+
+## =============================================================================
+
+remapxyNA <- function(z, x = x, y = y, xto = x, yto = y) {
+    Nx <- length(x)
+    Ny <- length(y)
+
+    dx <- c(diff(x), 1)
+    dy <- c(diff(y), 1)
+
+    ix <- FindInterval(xto, x)
+    iy <- FindInterval(yto, y)
+
+    xfac <- (xto - x[ix])/dx[ix]
+    yfac <- (yto - y[iy])/dy[iy]
+
+    gg <- expand.grid(ix, iy)
+    ix <- gg[, 1]
+    iy <- gg[, 2]
+    ixp1 <- pmin(ix + 1, Nx)
+    iyp1 <- pmin(iy + 1, Ny)
+
+    gg <- expand.grid(xfac, yfac)
+    xfac <- gg[, 1]
+    yfac <- gg[, 2]
+
+    f <- zz <- matrix(nrow = length(xfac), ncol = 4)
+    zz[, 1] <- z[cbind(ix, iy)]
+    f[, 1]  <- (1 - yfac) *(1 - xfac)
+
+    zz[, 2] <- z[cbind(ix, iyp1)]
+    f[, 2]  <- yfac * (1 - xfac)
+
+    f[, 3]  <- (1 - yfac) * xfac
+    zz[, 3] <- z[cbind(ixp1, iy)]
+ 
+    f[, 4]  <- yfac * xfac
+    zz[, 4] <- z[cbind(ixp1, iyp1)]
+
+    naii <- is.na(zz)
+    f[naii] <- 0
+    zz[naii] <- 0
+     
+    rows <- rowSums(f)
+    f <- f/rowSums(f)
+    
+    M <- colSums(f * zz)
+    return(matrix(nrow = length(xto), ncol = length(yto), data = M))
 }
 
 ## =============================================================================
 ## 2-D mapping, x, y a vector, var a matrix
 ## =============================================================================
 
-map.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, ...) {
+map.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, 
+  na.rm = TRUE,...) {
 
   if (is.array(x)) {
     if (length(dim(x)) !=  1)
@@ -75,9 +154,6 @@ map.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, ...) {
   if (min(yto) < min(y) | max(yto) > max(y))
     stop("'y' should embrace 'yto'")
 
-  dx  <- c(diff(x), 1)  # 1= for last value
-  dy  <- c(diff(y), 1)
-
   Du <- dim(var)
 
   if (length(Du) != 2)
@@ -87,34 +163,128 @@ map.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, ...) {
   if (Du[2] != Ny)
     stop("'var' and 'y' not compatible: 2nd dimension not equal to length (y)")
 
+  if (na.rm & any(is.na(var)))
+    M <- remapxyNA(var, x, y, xto, yto)
+  else
+    M <- remapxy(var, x, y, xto, yto)
+
+  list (var = M, x = xto, y = yto)
+}
+
+## =============================================================================
+## THREE DIMENSIONS
+## =============================================================================
+
+remapxyz <- function(var, x, y, z, xto, yto, zto) {
+  Nx <- length(x)
+  Ny <- length(y)
+  Nz <- length(z)
+  dx  <- c(diff(x), 1)  # 1= for last value
+  dy  <- c(diff(y), 1)
+  dz  <- c(diff(z), 1)
+
  # find embracing values : first interval
   ix <- FindInterval(xto, x)
   iy <- FindInterval(yto, y)
+  iz <- FindInterval(zto, z)
 
- # interpolation factor
+ # interpolation factors
   xfac <- (xto-x[ix])/dx[ix]
   yfac <- (yto-y[iy])/dy[iy]
+  zfac <- (zto-z[iz])/dz[iz]
 
  # expand for all combinations..
-  gg <- expand.grid(ix, iy)
+  gg <- expand.grid(ix,iy,iz)
   ix <- gg[,1]
   iy <- gg[,2]
+  iz <- gg[,3]
     
- # next interval
+  # next interval
   ixp1 <- pmin(ix+1, Nx)
   iyp1 <- pmin(iy+1, Ny)
+  izp1 <- pmin(iz+1, Nz)
 
-  gg <- expand.grid(xfac, yfac)
+  gg <- expand.grid(xfac,yfac,zfac)
   xfac <- gg[,1]
   yfac <- gg[,2]
+  zfac <- gg[,3]
 
- # interpolate
-   MM <- 
-   (1-yfac)*((1-xfac)*var[cbind(ix, iy)  ]+xfac*var[cbind(ixp1, iy)]) +
-      yfac *((1-xfac)*var[cbind(ix, iyp1)]+xfac*var[cbind(ixp1, iyp1)])
+  # interpolate
+   MM <-   (1 - zfac) *
+      ((1-yfac)*((1-xfac)*var[cbind(ix,iy,iz)  ]+xfac*var[cbind(ixp1,iy,iz)]) +
+          yfac *((1-xfac)*var[cbind(ix,iyp1,iz)]+xfac*var[cbind(ixp1,iyp1,iz)])
+      ) + zfac* (
+      (1-yfac)*((1-xfac)*var[cbind(ix,iy,izp1)  ]+xfac*var[cbind(ixp1,iy,izp1)]) +
+          yfac*((1-xfac)*var[cbind(ix,iyp1,izp1)]+xfac*var[cbind(ixp1,iyp1,izp1)]))
+   return(array(dim = c(length(xto), length(yto), length(zto)), data = MM))
+}
 
-  list (var = matrix(nrow = length(xto), ncol = length(yto), data = MM), 
-    x = xto, y = yto)
+## =============================================================================
+
+remapxyzNA <- function(var, x, y, z, xto, yto, zto) {
+  Nx <- length(x)
+  Ny <- length(y)
+  Nz <- length(z)
+
+  dx  <- c(diff(x), 1)  # 1= for last value
+  dy  <- c(diff(y), 1)
+  dz  <- c(diff(z), 1)
+
+ # find embracing values : first interval
+  ix <- FindInterval(xto, x)
+  iy <- FindInterval(yto, y)
+  iz <- FindInterval(zto, z)
+
+ # interpolation factors
+  xfac <- (xto-x[ix])/dx[ix]
+  yfac <- (yto-y[iy])/dy[iy]
+  zfac <- (zto-z[iz])/dz[iz]
+
+ # expand for all combinations..
+  gg <- expand.grid(ix,iy,iz)
+  ix <- gg[,1]
+  iy <- gg[,2]
+  iz <- gg[,3]
+    
+  # next interval
+  ixp1 <- pmin(ix+1, Nx)
+  iyp1 <- pmin(iy+1, Ny)
+  izp1 <- pmin(iz+1, Nz)
+
+  gg <- expand.grid(xfac,yfac,zfac)
+  xfac <- gg[,1]
+  yfac <- gg[,2]
+  zfac <- gg[,3]
+
+  # interpolate
+  f <- zz <- matrix(nrow = length(xfac), ncol = 8)
+  zz[ , 1] <- var[cbind(ix, iy, iz)]
+  f[ , 1]  <- (1-zfac) * (1-yfac) * (1-xfac)
+  zz[ , 2] <- var[cbind(ixp1, iy, iz)]
+  f[ , 2]  <- (1-zfac) * (1-yfac) * (xfac) 
+  zz[ , 3] <- var[cbind(ix, iyp1, iz)]
+  f[ , 3]  <- (1-zfac) * (yfac) * (1-xfac)
+  zz[ , 4] <- var[cbind(ixp1, iyp1, iz)]
+  f[ , 4]  <- (1-zfac) * (yfac) * (xfac) 
+  zz[ , 5] <- var[cbind(ix, iy, izp1)]
+  f[ , 5]  <- (zfac) * (1-yfac) * (1-xfac)
+  zz[ , 6] <- var[cbind(ixp1, iy, izp1)]
+  f[ , 6]  <- (zfac) * (1-yfac) * (xfac) 
+  zz[ , 7] <- var[cbind(ix, iyp1, izp1)]
+  f[ , 7]  <- (zfac) * (yfac) * (1-xfac)
+  zz[ , 8] <- var[cbind(ixp1, iyp1, izp1)]
+  f[ , 8]  <- (zfac) * (yfac) * (xfac) 
+
+  naii <- is.na(zz)
+  f[naii] <- 0
+  zz[naii] <- 0
+     
+  rows <- rowSums(f)
+  f <- f/rowSums(f)
+  
+  MM <- colSums(f * zz)
+
+   return(array(dim = c(length(xto), length(yto), length(zto)), data = MM))
 }
 
 ## =============================================================================
@@ -122,7 +292,7 @@ map.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, ...) {
 ## =============================================================================
 
 map.array <- function(var, x, y, z, xto = NULL, yto = NULL, 
-  zto = NULL, resfac = 1, ...) {
+  zto = NULL, resfac = 1, na.rm = TRUE, ...) {
 
   if (is.array(x)) {
     if (length(dim(x)) !=  1)
@@ -174,10 +344,6 @@ map.array <- function(var, x, y, z, xto = NULL, yto = NULL,
   if (min(zto) < min(z) | max(zto) > max(z))
     stop("'z' should embrace 'zto'")
 
-  dx  <- c(diff(x), 1)  # 1= for last value
-  dy  <- c(diff(y), 1)
-  dz  <- c(diff(z), 1)
-
   Du <- dim(var)
 
   if (length(Du) != 3)
@@ -189,43 +355,12 @@ map.array <- function(var, x, y, z, xto = NULL, yto = NULL,
   if (Du[3] != Nz)
     stop("'var' and 'z' not compatible: 3rd dimension not equal to length (z)")
 
- # find embracing values : first interval
-  ix <- FindInterval(xto, x)
-  iy <- FindInterval(yto, y)
-  iz <- FindInterval(zto, z)
-
- # interpolation factor
-  xfac <- (xto-x[ix])/dx[ix]
-  yfac <- (yto-y[iy])/dy[iy]
-  zfac <- (zto-z[iz])/dz[iz]
-
- # expand for all combinations..
-  gg <- expand.grid(ix,iy,iz)
-  ix <- gg[,1]
-  iy <- gg[,2]
-  iz <- gg[,3]
-    
-  # next interval
-  ixp1 <- pmin(ix+1, Nx)
-  iyp1 <- pmin(iy+1, Ny)
-  izp1 <- pmin(iz+1, Nz)
-
-  gg <- expand.grid(xfac,yfac,zfac)
-  xfac <- gg[,1]
-  yfac <- gg[,2]
-  zfac <- gg[,3]
-
-  # interpolate
-   MM <-   (1 - zfac) *
-      ((1-yfac)*((1-xfac)*var[cbind(ix,iy,iz)  ]+xfac*var[cbind(ixp1,iy,iz)]) +
-          yfac *((1-xfac)*var[cbind(ix,iyp1,iz)]+xfac*var[cbind(ixp1,iyp1,iz)])
-      ) + zfac* (
-      (1-yfac)*((1-xfac)*var[cbind(ix,iy,izp1)  ]+xfac*var[cbind(ixp1,iy,izp1)]) +
-          yfac*((1-xfac)*var[cbind(ix,iyp1,izp1)]+xfac*var[cbind(ixp1,iyp1,izp1)]))
-
-
-  list (var = array(dim = c(length(xto), length(yto), length(zto)), data = MM), 
-    x = xto, y = yto, z = zto)
+  if (na.rm & any(is.na(z)))
+    M <- remapxyzNA(var, x, y, z, xto, yto, zto)
+  else
+    M <- remapxyz(var, x, y, z, xto, yto, zto)
+  
+  list (var = M, x = xto, y = yto, z = zto)
 }
 
 ## =============================================================================

@@ -3,17 +3,7 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
                        by = 1, arr = FALSE, xfac = NULL, 
                        clim = NULL, clab = NULL, add = FALSE) {
   
-  dots <- list(...)
-  clog <- FALSE
-  if (!is.null(dots$log)) {
-    if (length(grep("c", dots[["log"]])) > 0) {
-      dots[["log"]] <- gsub("c", "", dots[["log"]])
-      if (dots[["log"]] == "")
-        dots[["log"]] <- NULL
-      clog <- TRUE  
-    }
-  }
-  dots <- splitpardots(dots)
+  dots <- splitpardots(list(...))
  
   if (!is.null(colvar)) {
     varlim <- clim
@@ -22,7 +12,7 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
 
     if (is.null(col)) 
       col <- jet.col(100)
-    if (clog) {
+    if (dots$clog) {
       colvar <- log(colvar)
       if (!is.null(clim)) 
         clim <- log(clim)
@@ -106,7 +96,8 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
     do.call("segments", Ls)
     
     if (iscolkey) {
-      do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, clog = clog, add = TRUE)))
+      do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
+        clog = dots$clog, add = TRUE)))
       if (! add) 
         par(plt = plt.or)  
       par(mar = par("mar"))

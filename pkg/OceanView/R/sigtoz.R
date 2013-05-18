@@ -10,35 +10,43 @@ mapsigma <- function(var, ...) UseMethod ("mapsigma")
 
 mapsigma.matrix <- function (var = NULL, 
                              sigma,      
+                             signr = 2,
                              x = NULL,
                              depth = NULL,
                              numdepth = NULL, 
                              xto = NULL,
                              resfac = 1, ...) {
+  if (is.null(signr)) 
+    signr <- 2
+
   if (is.null(var)) 
     var <- matrix(nrow = nrow(sigma), ncol = ncol(sigma), data = 1)
 
   if (any (dim(var) - dim(sigma) != 0))
     stop ("'sigma' and 'var' not of same dimension")
     
+  DD <- dim(var)
+  Dxy <- DD[-signr]
   if (is.null(x))
-    x <- seq(0, 1, length.out = nrow(var))
-  
-  yto <- y <-   z <-  seq(0, 1, length.out = ncol(var) )
+    x <- seq(0, 1, length.out = Dxy[1])
+
+  yto <- y <- seq(0, 1, length.out = DD[signr] )
   resfac <- abs(rep(resfac, length.out = 2))
   changeres <- FALSE
   if (any(resfac > 1)) {
     if (is.null(xto))
-      xto <- changeresvec(x, resfac[1])
-    yto <- changeresvec(y, resfac[2])
+      xto <- changeresvec(1:Dxy, resfac[1])
+    yto <- changeresvec(1:DD[signr], resfac[2])
     changeres <- TRUE
   } else 
     if (! is.null(xto) )
       changeres <- TRUE
 
   if (changeres) {
-    var <- map(var, x = x, y = y, xto = xto, yto = yto)$var
-    sigma <- map(sigma, x = x, y = y, xto = xto, yto = yto)$var
+    var <- map(var, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
+    sigma <- map(sigma, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
+    xy <- (1:2)[-signr]
+    x <- changeresvec(x, resfac[xy])
   }
   
   Nr <- nrow(var)
@@ -50,20 +58,28 @@ mapsigma.matrix <- function (var = NULL,
 
   if (nrow(sigma) != Nr | ncol(sigma) != Nc)
     stop ("'sigma' should be of same dimension as matrix 'var'")
- 
-  Mnew <- matrix(nrow = Nr, ncol = length(depth), data =NA)
+
+  if (signr == 2) { 
+    Mnew <- matrix(nrow = Nr, ncol = length(depth), data =NA)
   
-  for (i in 1:Nr) 
-    if (any(! is.na(sigma[i, ])))
-      Mnew[i,] <- Approx(x = sigma[i,], y = var[i,], xout = depth)$y 
-     
-  list (var = Mnew, depth = depth, x = xto)
+    for (i in 1:Nr) 
+      if (any(! is.na(sigma[i, ])))
+        Mnew[i,] <- Approx(x = sigma[i,], y = var[i,], xout = depth)$y 
+  } else {
+    Mnew <- matrix(nrow = length(depth), ncol = Nc, data =NA)
+  
+    for (i in 1:Nc) 
+      if (any(! is.na(sigma[ ,i])))
+        Mnew[ ,i] <- Approx(x = sigma[ ,i], y = var[,i], xout = depth)$y 
+  }   
+  list (var = Mnew, depth = depth, x = x)
 }
 
 ## =============================================================================
 
 mapsigma.array <- function (var = NULL, 
                             sigma,
+                            signr = 3,
                             x = NULL,
                             y = NULL, 
                             depth = NULL,
@@ -71,6 +87,9 @@ mapsigma.array <- function (var = NULL,
                             xto = NULL,
                             yto = NULL,
                             resfac = 1, ...) {
+  if (is.null(signr)) 
+    signr <- 3
+
   if (is.null(var)) 
     var <- array(dim = dim(sigma), data = 1)
 
@@ -83,46 +102,71 @@ mapsigma.array <- function (var = NULL,
   lenD <- length(DD)
   if (lenD > 3)
     stop ("dimension of 'sigma' or 'var' can not be > 3")
-    
+  
+  Dxy <- DD[-signr]
   if (is.null(x))
-    x <- seq(0, 1, length.out = DD[1])
+    x <- seq(0, 1, length.out = Dxy[1])
 
   if (is.null(y))
-    y <- seq(0, 1, length.out = DD[2])
-
-  zto <- z <- seq(0, 1, length.out = DD[3])
-
+    y <- seq(0, 1, length.out = Dxy[2])
   
+  zto <- z <- seq(0, 1, length.out = DD[signr])
+
   resfac <- abs(rep(resfac, length.out = 3))
   changeres <- FALSE
   if (any(resfac > 1)) {
     if (is.null(xto))
-      xto <- changeresvec(x, resfac[1])
+      xto <- changeresvec(1:Dxy[1], resfac[1])
     if (is.null(yto))
-      yto <- changeresvec(y, resfac[2])
-    zto <- changeresvec(z, resfac[3])
+      yto <- changeresvec(1:Dxy[2], resfac[2])
+    zto <- changeresvec(1:DD[signr], resfac[3])
     changeres <- TRUE
   } else 
     if (! is.null(xto) | ! is.null(yto) )
       changeres <- TRUE
 
-  if (changeres) {
-    var <- map(var, x = x, y = y, z = z, xto = xto, yto = yto, zto = zto)$var
-    sigma <- map(sigma, x = x, y = y, z = z, xto = xto, yto = yto, zto = zto)$var
+  if (changeres) { 
+    var <- map(var, x = 1:Dxy[1], y = 1:Dxy[2], z = 1:DD[signr], 
+               xto = xto, yto = yto, zto = zto, ...)$var
+    sigma <- map(sigma, x = 1:Dxy[1], y = 1:Dxy[2], z = 1:DD[signr], 
+               xto = xto, yto = yto, zto = zto, ...)$var
+    xy <- (1:3)[-signr]
+    x <- changeresvec(x, resfac[xy[1]])
+    y <- changeresvec(y, resfac[xy[2]])
+    
   }
+  DD <- dim(var)
+  Dxy <- DD[-signr]
 
   if (is.null(depth))
     depth <- seq(min(sigma, na.rm = TRUE), max(sigma, na.rm = TRUE), 
-                length.out = ifelse(is.null(numdepth), dim(sigma)[lenD], numdepth))
+                length.out = ifelse(is.null(numdepth), dim(sigma)[signr], numdepth))
 
-  Mnew <- array(dim = c( DD[1:2], length(depth)), data = NA)
   
-  for (i in 1:DD[1])
-    for (j in 1:DD[2]) {
-      if (any(! is.na(sigma[i,j,])))
-        Mnew[i,j,] <- Approx(x = sigma[i,j,], y = var[i,j,], xout = depth)$y 
-    }
-  list (var = Mnew, depth = depth)
+  if (signr == 3) {
+    Mnew <- array(dim = c( Dxy[1:2], length(depth)), data = NA)
+    for (i in 1:Dxy[1])
+      for (j in 1:Dxy[2]) {
+        if (any(! is.na(sigma[i,j,])))
+          Mnew[i,j,] <- Approx(x = sigma[i,j,], y = var[i,j,], xout = depth)$y 
+      }
+  } else if (signr == 2) {
+    Mnew <- array(dim = c(Dxy[1], length(depth), Dxy[2]), data = NA)
+    for (i in 1:Dxy[1])
+      for (j in 1:Dxy[2]) {
+        if (any(! is.na(sigma[i,,j])))
+          Mnew[i,,j] <- Approx(x = sigma[i,,j], y = var[i,,j], xout = depth)$y 
+      }
+  } else  if (signr == 1) {
+    Mnew <- array(dim = c( length(depth), Dxy[1:2]), data = NA)
+    for (i in 1:Dxy[1])
+      for (j in 1:Dxy[2]) {
+        if (any(! is.na(sigma[,i,j])))
+          Mnew[,i,j] <- Approx(x = sigma[,i,j], y = var[,i,j], xout = depth)$y 
+      }
+  }
+
+  list (var = Mnew, depth = depth, x = x, y = y)
 } 
 ## =============================================================================
 ## Transect in sigma coordinates

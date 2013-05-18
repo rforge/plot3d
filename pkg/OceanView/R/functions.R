@@ -179,22 +179,37 @@ setplotpar <- function(ldots, nv, ask) {
 
 splitpardots <- function(dots) {
 
+  clog <- dots$clog
+  if (is.null(clog)) { 
+    clog <- FALSE
+    if (! is.null(dots$log)) {
+      if (length(grep("c", dots[["log"]])) > 0) {
+        dots[["log"]] <- gsub("c", "", dots[["log"]])
+        if (dots[["log"]] == "")
+          dots[["log"]] <- NULL
+        clog <- TRUE
+      } 
+    } 
+  }
+
   nmdots <- names(dots)
 
   # plotting parameters : split in plot parameters and point parameters
-  plotnames <- c("xlab", "ylab", "zlab",
-                 "xlim", "ylim", "zlim", "main", "sub", "log", "asp",
+  plotnames <- c("xlab", "ylab", "zlab", "xlim", "ylim", "zlim", 
+                 "main", "sub", "log", "asp", "bty", 
                  "ann", "axes", "frame.plot", "panel.first", "panel.last",
-                 "cex.lab", "cex.axis", "cex.main", "col.lab", "col.axis", "col.main")
+                 "cex.lab", "col.lab", "font.lab",
+                 "cex.axis", "col.axis", "font.axis", 
+                 "cex.main", "col.main", "font.main")
 
   # plot.default parameters
   ii <- names(dots) %in% plotnames
   dotmain <- dots[ii]
 
   # point parameters
-  ip <- !names(dots) %in% c(plotnames, "add")
+  ip <- !names(dots) %in% c(plotnames, "add", "clog")
   dotpoints <- dots[ip]
-  list (points = dotpoints, main = dotmain, add = dots$add)
+  list (points = dotpoints, main = dotmain, add = dots$add, clog = clog)
 
 }
 

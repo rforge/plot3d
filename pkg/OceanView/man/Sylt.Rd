@@ -177,12 +177,13 @@ data(Sylt3D)
 
  visct <-  Sylttran$visc  [ix, ,]
  sig   <-  Sylttran$sigma [ix, ,]  
- 
- visc <- mapsigma(t(visct), x = Sylttran$time, 
-   sigma = t(sig), numdepth = 100, resfac = 5)
+
+# sigma coordinates are first dimension (signr)
+ visc <- mapsigma(visct, sigma = sig, signr = 1, 
+   x = Sylttran$time, numdepth = 100, resfac = 3)
  D    <- -visc$depth
 
- image2D(visc$var, x = visc$x, y = D, NAcol = "black", ylim = range(D),
+ image2D(t(visc$var), x = visc$x, y = D, NAcol = "black", ylim = range(D),
    main = "eddy viscosity", ylab = "m", xlab = "hour",     
    clab = "m2/s")
 

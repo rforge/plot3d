@@ -83,16 +83,16 @@ data(TrackProf)
  depth <- 0 : 809    
 
 # map from "sigma" to "depth" coordinates
- Temp_Depth <- mapsigma (TrackProf$temp, sigma = TrackProf$depth, #resfac = 2,
+ Temp_Depth <- mapsigma (TrackProf$temp, sigma = TrackProf$depth, 
    depth = depth)$var
 
 # image with depth increasing downward and increased resolution (resfac)  
  image2D(z = Temp_Depth, main = "Temperature-depth",
-       ylim = c(809, 0), y = depth, NAcol ="black", resfac = 2,
+       ylim = c(809, 0), y = depth, NAcol ="black", resfac = 2, 
        xlab = "station nr", ylab = "depth, m", clab = "dgC")
    
 ## =============================================================================    
-## scatterplot on ocean bathymetry
+## scatterplot of surface values on ocean bathymetry
 ## =============================================================================    
 
  par(mar = mar + c(0, 0, 0, 2))
@@ -116,11 +116,9 @@ data(TrackProf)
 \references{
   \url{http://www.nodc.noaa.gov/gtspp/}
 
-  U.S. National Oceanographic Data Center
-
-  Global Temperature and Salinity Profile Programme (GTSPP) Data.
-  project = Joint IODE/JCOMM Global Temperature-Salinity Profile Programme
-
+  U.S. National Oceanographic Data Center: Global Temperature-Salinity Profile Programme.
+  June 2006. U.S. Department of Commerce, National Oceanic and Atmosphere Administration,
+  National Oceanographic Data Center, Silver Spring, Maryland, 20910. Date of Access: 9/06/2012.
 }
 
 \seealso{
