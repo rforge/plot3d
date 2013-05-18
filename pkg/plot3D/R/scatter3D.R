@@ -44,11 +44,6 @@ scatter3D <- function(x, y, z, ..., colvar = z,
   if (length(z) != len)
     stop("'z' should have same length as 'x'")
 
- # confidence intervals
-  isCI <- is.list(CI)
-  if (isCI) 
-    CI <- check.CI(CI, len, 3)
-
  # colors   
   if (len > 1 & ispresent(colvar)) {
   
@@ -90,13 +85,58 @@ scatter3D <- function(x, y, z, ..., colvar = z,
              phi = phi, theta = theta, plot = plot, colkey = colkey, col = col), 
              dot$persp))
     plist <- getplist()
+  } 
+ # droplines, passed with a surface  
+  fit <- NULL
+  if (! is.null(surf)) {
+    if (! is.list(surf))
+      stop("'surf' should be a 'list' or 'NULL'")
+    fit <- surf$fit
+    surf$fit <- NULL    
   }  
+  if (! is.null(fit)){
+    if (! is.null(CI)) {
+      if (! is.null(CI$z))
+        stop("cannot combine a confidence interval (CI) on 'z' with 'fit' in 'surf'")
+    } else 
+      CI <- list()
+    if (length(fit) != length(z))
+      stop("'fit', argument of 'surf'  should be of equal size of 'z'")  
+    disttoz <- fit - z
+    CIz <- matrix(ncol = 2, data = c(-disttoz, disttoz))
+    CIz[CIz > 0] <- 0 
+    CI$z = CIz
+    CI$alen = 0
+    } 
+
+ # confidence intervals
+  isCI <- is.list(CI)
+  if (isCI) 
+    CI <- check.CI(CI, len, 3)
+   
+  if (is.null(CI) & any (Col == "transparent")){
+    ii <- Col != "transparent"
+    x <- x[ii]
+    y <- y[ii]
+    z <- z[ii]
+    Col <- Col[ii]
+    len <- length(x)
+  }
+  
   if (is.function(panel.first)) 
     panel.first(plist$mat)  
 
-  if (! is.null(surf))
+  if (! is.null(surf)) {
+    if (is.null(surf$col))
+      surf$col <- col
+    if (is.null(surf$clim))
+      if (! is.null(clim) & ! is.null(surf$z)) {
+        surf$clim <- clim
+        surf$z[surf$z < clim[1]]  <- NA
+        surf$z[surf$z > clim[2]]  <- NA
+      }  
     spoly <- do.call("addimg", c(alist(poly = NULL, plist = plist), surf))
-  else
+  } else
     spoly <- NULL
 
   sseg <- NULL  # for segments
@@ -232,13 +272,13 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     CIpt$dopoints <- TRUE
  
   } else if (dopoints) {
-   # points and confidence intervals
-    ii <- !is.na(x) *!is.na(y)*!is.na(z)
+   # points - remove NAs
+    ii <- which(!is.na(x) & !is.na(y) & !is.na(z))
     pt     <- list(x.mid = x[ii], y.mid = y[ii], z.mid = z[ii],
                    col = Col[ii],
-                   pch = rep(pch, length.out = sum(ii)),
-                   cex = rep(cex, length.out = sum(ii)),
-                   bg = rep(bg, length.out = sum(ii))
+                   pch = rep(pch, length.out = length(ii)),
+                   cex = rep(cex, length.out = length(ii)),
+                   bg = rep(bg, length.out = length(ii))
                    )
     
     class(pt) <- "pt"

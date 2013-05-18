@@ -147,17 +147,18 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
                     colkey = list(side = 4), 
                     clim = NULL, clab = NULL, add = FALSE)  {
 
-  dots <- splitpardots(list(...))
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
 
-  clog <- FALSE
-  if (! is.null(dots$log)) {
-    if (length(grep("c", dots[["log"]])) > 0) {
-      dots[["log"]] <- gsub("c", "", dots[["log"]])
-      if (dots[["log"]] == "")
-        dots[["log"]] <- NULL
-      clog <- TRUE
-    }
-  }
+  plist <- add2Dplist(plist, "polygon", x = x, y = y, colvar = colvar,
+                    col = col, NAcol = NAcol, border = border, facets = facets,
+                    colkey = colkey, clim = clim,
+                    clab = clab, ...)
+  setplist(plist)
+
+  dots <- splitpardots(list(...))
 
 # checks
   checkinput <- function (x) {
@@ -215,7 +216,7 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     
-    if (clog) {                       
+    if (dots$clog) {                       
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -245,7 +246,7 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
   do.call("polygon", c(alist(x, y, col = Col$facet, border = Col$border), dots$points))
 
   if (iscolkey) {
-    drawcolkey(colkey, col, clim, clab, clog)
+    drawcolkey(colkey, col, clim, clab, dots$clog)
     if (! add)
       par(plt = par.ori)
     par(mar = par("mar"))

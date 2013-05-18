@@ -5,7 +5,7 @@
 
 isosurf3D <- function(x, y, z, colvar, ..., 
                       phi = 40, theta = 40, 
-                      level = mean(colvar), isofunc = createisosurf,
+                      level = mean(colvar, na.rm = TRUE), isofunc = createisosurf,
                       col = "grey", border = NA, facets = TRUE, 
                       colkey = list(side = 4), panel.first = NULL,
                       clab = NULL, bty = "b", 

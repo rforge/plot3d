@@ -81,10 +81,12 @@ text2D (x, y, labels, ..., colvar = NULL,
   \item{CI }{A \code{list} with parameters and values for the confidence 
     intervals or \code{NULL}.
     If a list it should contain at least the item \code{x}, \code{y} or \code{z} 
-    (latter for \code{scatter3D}). Other parameters should be one of (with defaults):
+    (latter for \code{scatter3D}). These should be 2-columned matrices, defining the left/right intervals. 
+    Other parameters should be one of (with defaults):
     \code{alen = 0.01, lty = par("lty"), lwd = par("lwd"), col = NULL},
     to set the length of the arrow head, the line type and width, and the color.
     If \code{col} is \code{NULL}, then the colors as specified by \code{colvar} are used.
+    See examples.
     } 
   \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
     set up but before any plotting takes place. 
@@ -110,12 +112,15 @@ text2D (x, y, labels, ..., colvar = NULL,
   \item{labels }{The text to be written. A vector of length equal to length of
     x, y, z.
     }
-  \item{surf }{If not \code{NULL}, a list specifying a surface to be added on 
+  \item{surf }{If not \code{NULL}, a list specifying a (fitted) surface to be added on 
     the scatterplot. 
-    They should include at least \code{x}, \code{y}, \code{z}, equal sized
-    matrices, and optional: \code{colvar, col, NAcol, border, facets, 
-    lwd, resfac, clim, ltheta, lphi, shade, lighting}. Note that the default is 
-    that \code{colvar} is not specified.
+    The list should include at least \code{x}, \code{y}, \code{z}, defining the surface, 
+    and optional: \code{colvar, col, NAcol, border, facets, 
+    lwd, resfac, clim, ltheta, lphi, shade, lighting, fit}. Note that the default is 
+    that \code{colvar} is not specified which will set \code{colvar = z}.
+    The argument \code{fit} should give the fitted z-values, in the same order as the 
+    z-values of the scatter points, for instance produced by \code{predict}. 
+    When present, this will produce droplines from points to the fitted surface.
     }
   \item{add }{Logical. If \code{TRUE}, then the points will be added to the current plot.
     If \code{FALSE} a new plot is started. 
@@ -217,6 +222,50 @@ text2D (x, y, labels, ..., colvar = NULL,
  CI$alen <- 0.02            # increase arrow head
  scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
 
+## =======================================================================
+## Scatter on an image
+## =======================================================================
+ 
+ par(mfrow = c(1, 1))
+# image of oxygen saturation
+ oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
+ image2D(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+       contour = TRUE, 
+       xlab = "longitude", ylab = "latitude", 
+       main = "Oxygen saturation", zlim = oxlim, clab = "\%")
+
+# (imaginary) measurements at 5 sites
+ lon   <- c( 11.2,   6.0, 0.9,  -4, -8.8)
+ lat   <- c(-19.7,-14.45,-9.1,-3.8, -1.5)
+ O2sat <- c(   90,    95,  92,  85,  100)
+               
+# add to image; use same zrange; avoid adding  a color key
+ scatter2D(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
+         add = TRUE, cex = 2, colkey = FALSE)
+
+## =======================================================================
+## Scatter on a contourplot
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+
+# room for colorkey 
+ PM <- par(mar = par("mar") + c(0, 0, 0, 4))
+
+# contour plot of the ocean's bathymetry
+ Depth <- Hypsometry$z
+ Depth[Depth > 0] <- NA
+ contour2D(z = Depth, x = Hypsometry$x, y = Hypsometry$y, 
+       xlab = "longitude", ylab = "latitude", 
+       col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
+       main = "Oxygen saturation along ship track", colkey = FALSE)
+
+# add to image; with  a color key
+ scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
+         add = TRUE, cex = 2, colkey = TRUE, clab = "\%")
+         
+ par(mar = PM)
+ 
 ## =======================================================================
 ## A sphere 
 ## =======================================================================
@@ -348,20 +397,32 @@ text2D (x, y, labels, ..., colvar = NULL,
 ## droplines till the fitted surface
 ## =======================================================================
 
- disttoz <- sin(xs) + ys - zs
- CIz = matrix(nrow = length(xs), data = c(-disttoz, disttoz))
- CIz[CIz > 0] <- 0              
+ with (mtcars, {
 
-# no arrow head (alen=0)
- CI <- list(z = CIz, lwd = 2, alen = 0, col = "black") 
+  # linear regression
+   fit <- lm(mpg ~ wt + disp)
 
-# transparent surface; border colored according to z (default colvar)
- scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
-   xlim = c(0, 2*pi), ylim = c(0, 0.3), zlim = c(-1.7, 1.7), 
-   CI = CI, theta = 20, phi = 30, cex = 2, bty = "g",
-   surf = list(x = M$x, y = M$y, z = z, 
-       facets = NA, shade = 0.5)
-   )
+  # predict values on regular xy grid
+   wt.pred <- seq(1.5, 5.5, length.out = 30)
+   disp.pred <- seq(71, 472, length.out = 30)
+   xy <- expand.grid(wt = wt.pred, 
+                     disp = disp.pred)
+
+   mpg.pred <- matrix (nrow = 30, ncol = 30, 
+      data = predict(fit, newdata = data.frame(xy), 
+      interval = "prediction"))
+
+# fitted points for droplines to surface
+   fitpoints <- predict(fit) 
+
+   scatter3D(z = mpg, x = wt, y = disp, pch = 18, cex = 2, 
+      theta = 20, phi = 20, ticktype = "detailed",
+      xlab = "wt", ylab = "disp", zlab = "mpg",  
+      surf = list(x = wt.pred, y = disp.pred, z = mpg.pred, 
+                  facets = NA, fit = fitpoints),
+      main = "mtcars")
+  
+ })
 
 ## =======================================================================
 ## Two ways to make a scatter 3D of quakes data set
@@ -402,50 +463,6 @@ text2D (x, y, labels, ..., colvar = NULL,
       colkey = list(length = 0.5, width = 0.5, cex.clab = 0.75))
       )
 
-## =======================================================================
-## Scatter on an image
-## =======================================================================
- 
- par(mfrow = c(1, 1))
-# image of oxygen saturation
- oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
- image2D(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
-       contour = TRUE, 
-       xlab = "longitude", ylab = "latitude", 
-       main = "Oxygen saturation", zlim = oxlim, clab = "\%")
-
-# (imaginary) measurements at 5 sites
- lon   <- c( 11.2,   6.0, 0.9,  -4, -8.8)
- lat   <- c(-19.7,-14.45,-9.1,-3.8, -1.5)
- O2sat <- c(   90,    95,  92,  85,  100)
-               
-# add to image; use same zrange; avoid adding  a color key
- scatter2D(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
-         add = TRUE, cex = 2, colkey = FALSE)
-
-## =======================================================================
-## Scatter on a contourplot
-## =======================================================================
-
- par(mfrow = c(1, 1))
-
-# room for colorkey 
- PM <- par(mar = par("mar") + c(0, 0, 0, 4))
-
-# contour plot of the ocean's bathymetry
- Depth <- Hypsometry$z
- Depth[Depth > 0] <- NA
- contour2D(z = Depth, x = Hypsometry$x, y = Hypsometry$y, 
-       xlab = "longitude", ylab = "latitude", 
-       col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
-       main = "Oxygen saturation along ship track", colkey = FALSE)
-
-# add to image; with  a color key
- scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
-         add = TRUE, cex = 2, colkey = TRUE, clab = "\%")
-         
- par(mar = PM)
- 
 ## =======================================================================
 ## text3D and scatter3D
 ## =======================================================================

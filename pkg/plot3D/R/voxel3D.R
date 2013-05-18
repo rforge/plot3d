@@ -5,7 +5,7 @@
 
 voxel3D <- function(x, y, z, colvar, ..., 
                     phi = 40, theta = 40, 
-                    level = mean(colvar), eps = 0.01,
+                    level = mean(colvar, na.rm = TRUE), eps = 0.01,
                     operator = "=", col = jet.col(100), 
                     panel.first = NULL, bty = "b", 
                     add = FALSE, plot = TRUE) {
@@ -50,7 +50,7 @@ voxel3D <- function(x, y, z, colvar, ...,
 
 ## =============================================================================
 
-createvoxel <- function (x, y, z, colvar, level = mean(colvar), 
+createvoxel <- function (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), 
                          eps = 0.01, operator = "=") {
 
   if (! ispresent(colvar))

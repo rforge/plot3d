@@ -319,32 +319,32 @@ trans3D <- function(x, y, z, pmat) {
 ## =============================================================================
 ## =============================================================================
 
-changeres <- function(resfac, x, y, z, colvar = NULL) { 
+changeres <- function(resfac, x, y, z, colvar = NULL, na.rm = FALSE) { 
 
   resfac <- abs(rep(resfac, length.out = 2))
-  diffx <- c(diff(x), 0)
-  diffy <- c(diff(y), 0)
+  diffx <- diff(x)
+  diffy <- diff(y)
   XX <- x
   YY <- y 
   RX <- 1/resfac[1]
   RY <- 1/resfac[2]
   if (resfac[1] > 1)
-    for (i in 1: resfac[1])  
-      XX <- c(XX, x + diffx * i*RX)
+    for (i in 1: (resfac[1]-1))  
+      XX <- c(XX, x[-length(x)] + diffx * i*RX)
   else if (resfac[1] < 0.99) 
     XX <- x[as.integer(seq(1, nrow(z), length.out = nrow(z)*resfac[1]))]
   if (resfac[2] > 1)
-    for (i in 1: resfac[2])  
-      YY <- c(YY, y + diffy * i*RY)
+    for (i in 1: (resfac[2]-1))  
+      YY <- c(YY, y[-length(y)] + diffy * i*RY)
   else if (resfac[2] < 0.99) 
     YY <- y[as.integer(seq(1, ncol(z), length.out = ncol(z)*resfac[2]))]
 
   XX <- unique(sort(XX))
   YY <- unique(sort(YY))
-  z <- remapxy(z, x = x, y = y, xto = XX, yto = YY)
+  z <- remapxy(z, x = x, y = y, xto = XX, yto = YY, na.rm)
   
   if (! is.null(colvar))  
-    colvar <- remapxy(colvar, x = x, y = y, xto = XX, yto = YY)
+    colvar <- remapxy(colvar, x = x, y = y, xto = XX, yto = YY, na.rm)
   
   list(x = XX, y = YY, z = z, colvar = colvar)
 }
@@ -353,8 +353,10 @@ changeres <- function(resfac, x, y, z, colvar = NULL) {
 ## Maps a matrix 'z' from (x, y) to (xto, yto) by linear 2-D interpolation
 ## =============================================================================
 
-remapxy <- function(z, x, y, xto, yto) { 
+remapxy <- function(z, x, y, xto, yto, na.rm = FALSE) {    # cannot set na.rm yet-to be decided
 
+  if (na.rm & any(is.na(z)))
+    return(remapxyNA (z, x = x, y = y, xto = xto, yto = yto))
 # a simple function with linear interpolation - only for x and y a vector
   Nx <- length(x)
   Ny <- length(y)
@@ -388,6 +390,48 @@ remapxy <- function(z, x, y, xto, yto) {
           yfac*((1-xfac)*z[cbind(ix,iyp1)]+xfac*z[cbind(ixp1,iyp1)])
   
   return (matrix(nrow = length(xto), ncol = length(yto), data = M))
+}
+
+remapxyNA <- function(z, x, y, xto, yto) {
+    Nx <- length(x)
+    Ny <- length(y)
+    dx <- c(diff(x), 1)
+    dy <- c(diff(y), 1)
+    ix <- FindInterval(xto, x)
+    iy <- FindInterval(yto, y)
+    xfac <- (xto - x[ix])/dx[ix]
+    yfac <- (yto - y[iy])/dy[iy]
+    gg <- expand.grid(ix, iy)
+    ix <- gg[, 1]
+    iy <- gg[, 2]
+    ixp1 <- pmin(ix + 1, Nx)
+    iyp1 <- pmin(iy + 1, Ny)
+    gg <- expand.grid(xfac, yfac)
+    xfac <- gg[, 1]
+    yfac <- gg[, 2]
+
+    f <- zz <- matrix(nrow = length(xfac), ncol = 4)
+    zz[ , 1] <- z[cbind(ix, iy)]
+    f[ , 1] <- (1 - yfac) *(1 - xfac)
+
+    zz[,2]  <- z[cbind(ix, iyp1)]
+    f[,2] <- yfac * (1 - xfac)
+
+    f[,3] <- (1 - yfac) * xfac
+    zz[,3]  <- z[cbind(ixp1, iy)]
+ 
+    f[,4] <- yfac * xfac
+    zz[,4] <- z[cbind(ixp1, iyp1)]
+
+    naii <- is.na(zz)
+    f[naii] <- 0
+    zz[naii] <- 0
+     
+    rows <- rowSums(f)
+    f <- f/rowSums(f)
+    
+    M <- f[,1] * zz[,1] + f[,2] * zz[,2] + f[,3] * zz[,3] + f[,4] * zz[,4]
+    return(matrix(nrow = length(xto), ncol = length(yto), data = M))
 }
 
 ## =============================================================================
@@ -599,28 +643,32 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
 
   namespersp <- c("xlim", "ylim", "zlim", "xlab", "ylab", "zlab",
         "main", "sub", "r", "d", "scale", "expand","box", "axes", 
-        "nticks", "ticktype", "col.ticks", "lwd.ticks", 
-        "bty", "cex.axis", "col.axis", "font.axis", "col.panel", 
-        "lwd.panel", "col.grid", "lwd.grid")
-    
+        "nticks", "ticktype", "col.ticks", "lwd.ticks", "bty", 
+        "cex.axis", "col.axis", "font.axis", 
+        "col.panel", "lwd.panel", "col.grid", "lwd.grid",
+        "cex.lab", "col.lab", "font.lab",  # col is ignored...
+        "cex.main", "col.main", "font.main")
+            
   namesshade <- c("shade", "lphi", "ltheta")
 
   # log of color variable
-  clog <- FALSE 
-  if (! is.null(dots[["log"]])) {
-    if (length(grep("c", dots[["log"]])) > 0) {
-      dots[["log"]] <- gsub("c", "", dots[["log"]])
-      if (dots[["log"]] == "")
-        dots[["log"]] <- NULL
-      
-      clog <- TRUE
-    }
+  clog <- dots$clog
+  if (is.null(clog)) { 
+    clog <- FALSE
+    if (! is.null(dots[["log"]])) {
+      if (length(grep("c", dots[["log"]])) > 0) {
+        dots[["log"]] <- gsub("c", "", dots[["log"]])
+        if (dots[["log"]] == "")
+          dots[["log"]] <- NULL
+        clog <- TRUE
+      } 
+    } 
   }
   
  # labels        
   if (is.null(dots$xlab)) 
     dots$xlab <- "x"
-  if (is.null(dots$ylab)) 
+  if (is.null(dots$ylab))     
     dots$ylab <- "y"
   if (is.null(dots$zlab)) 
     dots$zlab <- "z"
@@ -646,10 +694,10 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
   shadedots <- dots[names(dots) %in% namesshade]
   shadedots <- check.shade(shadedots, lighting)
     
-  Persp <- c(dots[ names(dots) %in% namespersp], col = col)  
+  Persp <- c(dots[ names(dots) %in% namespersp], col = col, clog = clog)  
                 
   list(persp = Persp,
-       points = dots[!names(dots) %in% c(namespersp, namesshade)],
+       points = dots[!names(dots) %in% c(namespersp, namesshade, "clog")],
        shade = c(shadedots, xs = scalefac$x, ys = scalefac$y, zs = scalefac$z), clog = clog)
 }      
 
@@ -722,22 +770,37 @@ setplotpar <- function(ldots, nv, ask) {
 
 splitpardots <- function(dots) {
 
+  clog <- dots$clog
+  if (is.null(clog)) { 
+    clog <- FALSE
+    if (! is.null(dots$log)) {
+      if (length(grep("c", dots[["log"]])) > 0) {
+        dots[["log"]] <- gsub("c", "", dots[["log"]])
+        if (dots[["log"]] == "")
+          dots[["log"]] <- NULL
+        clog <- TRUE
+      } 
+    } 
+  }
+  
   nmdots <- names(dots)
 
   # plotting parameters : split in plot parameters and point parameters
-  plotnames <- c("xlab", "ylab", "zlab",
-                 "xlim", "ylim", "zlim", "main", "sub", "log", "asp",
+  plotnames <- c("xlab", "ylab", "zlab", "xlim", "ylim", "zlim", 
+                 "main", "sub", "log", "asp", "bty", 
                  "ann", "axes", "frame.plot", "panel.first", "panel.last",
-                 "cex.lab", "cex.axis", "cex.main", "col.lab", "col.axis", "col.main")
+                 "cex.lab", "col.lab", "font.lab",
+                 "cex.axis", "col.axis", "font.axis", 
+                 "cex.main", "col.main", "font.main")
 
   # plot.default parameters
   ii <- names(dots) %in% plotnames
   dotmain <- dots[ii]
 
   # point parameters
-  ip <- !names(dots) %in% c(plotnames, "add")
+  ip <- !names(dots) %in% c(plotnames, "add", "clog")
   dotpoints <- dots[ip]
-  list (points = dotpoints, main = dotmain, add = dots$add)
+  list (points = dotpoints, main = dotmain, add = dots$add, clog = clog)
 
 }
 

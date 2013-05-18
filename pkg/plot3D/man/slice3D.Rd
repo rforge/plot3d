@@ -43,7 +43,7 @@ slicecont3D (x, y, z, colvar, ..., phi = 40, theta = 40,
          dDepth = 0, add = FALSE, plot = TRUE) 
 
 isosurf3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
-         level = mean(colvar), isofunc = createisosurf,
+         level = mean(colvar, na.rm = TRUE), isofunc = createisosurf,
          col = "grey", border = NA, facets = TRUE, 
          colkey = list(side = 4), panel.first = NULL, 
          clab = NULL, bty = "b", 
@@ -51,7 +51,7 @@ isosurf3D (x, y, z, colvar, ..., phi = 40, theta = 40,
          lighting = FALSE, add = FALSE, plot = TRUE) 
 
 voxel3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
-         level = mean(colvar), eps = 0.01, operator = "=", 
+         level = mean(colvar, na.rm = TRUE), eps = 0.01, operator = "=", 
          col = jet.col(100), panel.first = NULL, 
          bty = "b", add = FALSE, plot = TRUE) 
 
@@ -62,9 +62,9 @@ triangle3D (tri, colvar = NULL, ..., phi = 40, theta = 40,
            lighting = FALSE, clim = NULL, clab = NULL,
            bty = "b", add = FALSE, plot = TRUE)  
 
-createisosurf (x, y, z, colvar, level = mean(colvar))
+createisosurf (x, y, z, colvar, level = mean(colvar, na.rm = TRUE))
 
-createvoxel (x, y, z, colvar, level = mean(colvar), eps = 0.01,
+createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
              operator = "=")
 }
 

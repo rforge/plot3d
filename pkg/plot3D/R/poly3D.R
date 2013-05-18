@@ -1,5 +1,5 @@
  # a function to create polygons
-  add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border, lwd = 1, lty = 1)  {
+  add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border, lwd = 1, lty = 1, ...)  {
 
     nr <- nrow(x) - 1
     nc <- ncol(x) - 1
@@ -75,7 +75,7 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
                      border = NA, facets = TRUE, lwd = 1, lty = 1,
                      resfac = 1, clim = NULL,   
                      ltheta = -135, lphi = 0, shade = NA, 
-                     lighting = FALSE)  {
+                     lighting = FALSE, ...)  {
 
   if (missing(poly) | is.null(poly)) 
     poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
@@ -205,7 +205,7 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
 
 addsegments <- function(segm, x0, x1, y0, y1, z0, z1, colvar = NULL, plist,
                      col = NULL, NAcol = "white", lwd = 1, lty = 1,
-                     clim = NULL) {
+                     clim = NULL, ...) {
   if (missing(segm) | is.null(segm)) 
     segm <- list(x.from = NULL, x.to = NULL, 
                  y.from = NULL, y.to = NULL,
@@ -287,7 +287,7 @@ addlines <- function(segm, x, y, z, plist,
                      col, NAcol = "white", 
                      lwd = 1, lty = 1, 
                      ltheta = -135, lphi = 0, shade = NA, 
-                     lighting = FALSE, ignorez = TRUE)
+                     lighting = FALSE, ignorez = TRUE, ...)
                       {
 
   if (missing(segm) | is.null(segm)) 

@@ -4,3 +4,10 @@ inst/doc/.*[.]png
 ^Rplots.pdf$
 work
 todo.txt
+.svn
+R/.svn
+data/.svn
+inst/.svn
+inst/doc/.svn
+man/.svn
+vignettes/.svn

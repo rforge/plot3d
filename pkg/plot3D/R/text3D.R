@@ -133,22 +133,12 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
 
   dots <- splitpardots(list(...))
 
-  clog <- FALSE
-  if (! is.null(dots$main$log)) {
-    if (length(grep("c", dots[["log"]])) > 0) {
-      dots[["log"]] <- gsub("c", "", dots[["log"]])
-      if (dots[["log"]] == "")
-        dots[["log"]] <- NULL
-      clog <- TRUE
-    }
-  }
-
  # colors
   if (! is.null(colvar)) {
     if (is.null(col))
       col <- jet.col(100)
 
-    if (clog) {
+    if (dots$clog) {
       colvar <- log(colvar)
       if (! is.null(clim)) clim <- log(clim)
     }
@@ -181,7 +171,7 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
   do.call("text", c(alist(x, y, labels = labels, col = Col), dots$points))
 
   if (iscolkey) {
-    drawcolkey(colkey, col, clim, clab, clog)
+    drawcolkey(colkey, col, clim, clab, dots$clog)
     if (! add)
       par(plt = par.ori)
     par(mar = par("mar"))

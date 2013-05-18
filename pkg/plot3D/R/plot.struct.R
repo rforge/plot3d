@@ -12,6 +12,11 @@ plotdev <- function(...)  {
 plot.plist <- function(x, ...)  {
   if (length(x) == 0)
     stop("nothing to draw")
+  if (x$type == "2D") {
+    x <- plot2Dplist(x, ...)
+    setplist(x)
+    return(invisible(x))
+  }
   dot <- list(...)
 
   if (length(dot) != 0) {
@@ -31,6 +36,12 @@ plot.plist <- function(x, ...)  {
   
   x$persp$box <- FALSE
   x <- plot.struct.3D (x, plot = TRUE)
+
+  if (x$type == "23D") {
+    x <- plot2Dplist(x, ...)
+    setplist(x)
+  }
+
   invisible(x)  
 }
 

@@ -17,9 +17,9 @@
 \author{
   Karline Soetaert
 }
-%\references{
-%% to be filled
-%}
+\references{
+dedicated to Carlo
+}
 \seealso{
 Functions that are based on the \link{persp} function:
  \itemize{

@@ -8,28 +8,29 @@ scatter2D <- function(x, y, ..., colvar = NULL,
                     colkey = list(side = 4), 
                     clim = NULL, clab = NULL, CI = NULL, add = FALSE) {
 
-  dots <- list(...)
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+  plist <- add2Dplist(plist, "scatter", x = x, y = y, colvar = colvar, 
+                    col = col, NAcol = NAcol, 
+                    colkey = colkey, 
+                    clim = clim, clab = clab, CI = CI, ...)
+  setplist(plist)
+  
+  dots <- splitpardots(list(...))
 
   isCI <- is.list(CI)
   if (isCI) 
     CI <- check.CI(CI, length(x), 2)
   
-  clog <- FALSE 
-  if (! is.null(dots$log)) {
-    if (length(grep("c", dots[["log"]])) > 0) {
-      dots[["log"]] <- gsub("c", "", dots[["log"]])
-      if (dots[["log"]] == "")
-        dots[["log"]] <- NULL
-      clog <- TRUE
-    }
-  }
-
  # colors
   if (! is.null(colvar)) {
     if (is.null(col))
       col <- jet.col(100)
 
-    if (clog) {
+    if (dots$clog) {
       colvar <- log(colvar)
       if (! is.null(clim)) clim <- log(clim) 
     }
@@ -58,51 +59,51 @@ scatter2D <- function(x, y, ..., colvar = NULL,
 
   useSegments <- FALSE
   
-  if (! is.null(dots$type))
-    if (dots$type %in% c("b", "l", "o"))
+  if (! is.null(dots$main$type))
+    if (dots$main$type %in% c("b", "l", "o"))
       if (length(Col) > 1  )
         useSegments <- TRUE
 
   if (useSegments) {
-    Type <- dots$type
+    Type <- dots$main$type
     len <- length(x)
     if (Type %in% c("b", "o"))   # no distinction is made..
-      dots$type <- "p" 
+      dots$main$type <- "p" 
     else     
-      dots$type <- "n" 
+      dots$main$type <- "n" 
 
    # mean of point colors for line colors
     LCol <- cbind(Col[-1], Col[-len])
     LCol <- apply(LCol, MARGIN = 1, FUN = MeanColors)
 
     if (! add) 
-      dots <- start2Dplot(dots, x, y)
+      dots$main <- start2Dplot(dots$main, x, y)
     add <- TRUE
     if (isCI) {plot.CI.2d(CI, x, y, Col) ; isCI <- FALSE}  # do this first
-    do.call("points", c(alist(x, y, col = Col), dots)) 
-    dots$type <- NULL
+    do.call("points", c(alist(x, y, col = Col), dots$points)) 
+    dots$main$type <- NULL
     do.call("segments", c(alist(x[-len], y[-len], x[-1], y[-1], 
-                  col = LCol), dots))
+                  col = LCol), dots$points))
   }
   
   else if (! add) {
-    dots <- start2Dplot(dots, x, y)
+    dots$main <- start2Dplot(dots$main, x, y)
     if (isCI) {
       plot.CI.2d(CI, x, y, Col)   
       isCI <- FALSE
     }
-    do.call("points", c(alist(x, y, col = Col), dots))
+    do.call("points", c(alist(x, y, col = Col), dots$points))
   }
   else  {
     if (isCI) {
       plot.CI.2d(CI, x, y, Col) 
       isCI <- FALSE
     }
-    do.call("points", c(alist(x, y, col = Col), dots))
+    do.call("points", c(alist(x, y, col = Col), dots$points))
   }
     
   if (iscolkey) {
-    drawcolkey(colkey, col, clim, clab, clog) 
+    drawcolkey(colkey, col, clim, clab, dots$clog) 
     if (! add)       
       par(plt = par.ori)  
     par(mar = par("mar"))

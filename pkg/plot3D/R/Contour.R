@@ -11,6 +11,19 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
  # The plotting arguments
   dots <- list(...)
 
+  add <- dots[["add"]]
+  if (is.null(add)) add <- FALSE
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+  plist <- add2Dplist(plist, "contour", z = z, x = x, y = y, 
+                    col = col, NAcol = NAcol, 
+                    colkey = colkey, resfac = resfac,
+                    clab = clab, ...)
+  setplist(plist)
+
  # log transformation of z-values (log = "c", or log = "z")
   zlog <- FALSE
   if (! is.null(dots$log)) {
@@ -65,8 +78,6 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
     zlim <- range(levels) + dz
   }
   
-  add <- dots[["add"]]
-  if (is.null(add)) add <- FALSE
 
   iscolkey <- is.colkey(colkey, col)     
 

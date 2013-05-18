@@ -27,6 +27,7 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
   plist$persp$box <- FALSE
   
   dot <- list(...)
+  dot$clog <- NULL
   plist$persp$expand <- ifelse (is.null(dot$expand), 1, dot$expand)
   
  # check inputs 

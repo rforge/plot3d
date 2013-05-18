@@ -19,7 +19,6 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    contour = FALSE, colkey = list(side = 4), resfac = 1, 
                    clab = NULL, theta = 0, rasterImage = FALSE) {
 
-
  if (is.character(z)) {
    ImageNULL (z = NULL, x = x, y = y, ..., col = z, NAcol = NAcol, 
               border = border, facets = facets,
@@ -39,6 +38,17 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   add <- dots[["add"]]
   if (is.null(add)) 
     add <- FALSE
+
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+  plist <- add2Dplist(plist, "image", z = z, x = x, y = y, 
+                    col = col, NAcol = NAcol, border = border, facets = facets,
+                    contour = contour, colkey = colkey, resfac = resfac,
+                    clab = clab, theta = theta, rasterImage = rasterImage, ...)
+  setplist(plist)
 
   iscolkey <- is.colkey(colkey, col)       
   if (iscolkey) {
@@ -88,6 +98,8 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
       stop ("cannot add contour if 'x' or 'y' is a matrix")
     contour$x <- x
     contour$y <- y
+    if (dots$clog)
+      contour$drawlabels = FALSE        # to avoid strange values
   }
  
  # rotate 
@@ -107,7 +119,7 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   }
 
   useimage <- TRUE     # default it to use the image function
-  if (is.matrix(x)) {  # ..but not if x and y are matrix!
+  if (is.matrix(x)) {  # ..but not if x and y are matrix 
     if (any (dim(x) - dim(y) != 0))
       stop("matrices 'x' and 'y' not of same dimension") 
     if (any (dim(x) - dim(z) != 0))                             
@@ -132,6 +144,8 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   
  # log transformation of z-values (can be specified with log = "c", or log = "z"
   zlog <- FALSE 
+  if (! is.null(dots$clog)) 
+    zlog <- dots$clog  
   if (! is.null(dotimage$log)) {
     if (length(grep("z", dotimage[["log"]])) > 0) {
       dotimage[["log"]] <- gsub("z", "", dotimage[["log"]])
@@ -273,11 +287,23 @@ addraster <- function (x, y, col, xlim, ylim, angle, dots) {
   
   if (is.matrix(x) | is.matrix(y))
     stop("'x' or 'y' cannot be a matrix if rasterImage is used")
-  dx <- range(diff(x))
-  if (abs(diff(dx)) > 1e-8)
-    stop("'x' should be equally spaced if  rasterImage is used")
-  dy <- range(diff(y))
-  if (abs(diff(dy)) > 1e-8)
+#  dx <- range(diff(x))
+#  if (abs(diff(dx)) > 1e-8)
+#    stop("'x' should be equally spaced if  rasterImage is used")
+#  dy <- range(diff(y))
+#  if (abs(diff(dy)) > 1e-8)
+#    stop("'y' should be equally spaced if  rasterImage is used")
+# check the x- and y-values, to be ~equally spaced and monotonously increasing/decreasing
+  dx <- diff(x)
+  if (any(dx == 0) | max(sign(dx)) != min(sign(dx)))
+    stop("'x'-values should be increasing or decreasing, not constant")
+    
+  if (max(dx)/min(dx) > 1.01)
+    stop("'x' should be quasi-equally spaced if  rasterImage is used")
+  dy <- diff(y)
+  if (any(dy == 0) | max(sign(dy)) != min(sign(dy)))
+    stop("'y'-values should be increasing or decreasing, not constant")
+  if (max(dy)/min(dy) > 1.01)
     stop("'y' should be equally spaced if  rasterImage is used")
 
   if (is.null(xlim)) xlim <- range(x)
