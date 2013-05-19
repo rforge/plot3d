@@ -119,9 +119,9 @@ Package \p contains:
      \item \code{ImageOcean}, for an image of the ocean's bathymetry.
    \end{itemize}
  \item Other functions
-  \item \link{scatter2D}: colored points, lines, ... in 2-D. 
-  \item \link{text2D}, \link{arrows2D}, \link{segments2D}, \link{rect2D}, 
-    \link{polygon2D} for other 2D functions that have a color key.
+  \item \code{scatter2D}: colored points, lines, ... in 2-D. 
+  \item \code{text2D}, \code{arrows2D}, \code{segments2D}, \code{rect2D}, 
+    \code{polygon2D} for other 2D functions that have a color key.
  \item Colors and colorkeys:
    \begin{itemize}
      \item \code{colkey}: color legendS.
