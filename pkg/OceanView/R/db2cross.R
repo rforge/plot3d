@@ -2,8 +2,34 @@
 ## From a table in "database format" (3-columns) to a "crosstab"
 ## =============================================================================
 
+# Creates factors for values that are at a distance of at most df
+createfactor <- function(var, df = 0) {
+  if (df == 0 | is.na(df)) {
+    var.unique <- sort(unique(var))
+    return(list(var = var.unique, factor = 1 : length(var.unique), mean = var.unique))
+  } else {  
+    var.unique <- sort(unique(var))
+    var.diff   <- c(df+1, diff(var.unique)) # df+1 to make sure first value is selected
+    var.min    <- var.unique[which(var.diff >= df)]
+    var.factor <- sapply(X = var.unique, 
+      FUN = function(x) which.min(abs(x-var.min)))
+    var.mean   <- sapply(X = 1:length(var.min), 
+      FUN = function(x) mean(var.unique[which(var.factor == x)]))
+    return(list(var = var.unique, factor = var.factor, mean = var.mean))
+  }
+}
+
+# Creates factors for values that are closest to out
+closestfactor <- function(var, out) {
+    var.unique <- sort(unique(var))
+    var.factor <- sapply(X = var.unique, 
+      FUN = function(x) which.min(abs(x-out)))
+    return(list(var = var.unique, factor = var.factor, mean = out))
+}
+
                                                
-db2cross <- function(input, row = 1, col = 2, value = 3) {
+db2cross <- function(input, row = 1, col = 2, value = 3, 
+  df.row = NA, df.col = NA, out.row = NA, out.col = NA) {
 
   if (is.character(value))
     value <- which(colnames(input) == value)
@@ -15,21 +41,71 @@ db2cross <- function(input, row = 1, col = 2, value = 3) {
   # Check if input has only 3 columns
   dim.input <- dim(IN <- cbind(as.double(input[, col]), 
                                as.double(input[, row]), 
-                               as.double(input[,value])))
+                               as.double(input[, value])))
   if (ncol(IN) != 3)
     stop ("'input' should have three columns")
 
-  cols <- sort(unique(input[,col]))
-  rows <- sort(unique(input[,row]))
+  if (! is.na(df.row))
+    if (df.row < 0) stop("df.row should be a positive value or 0")
 
-  nr <- length(rows)
-  nc <- length(cols)
-  out <- .Fortran("crosstab", t(IN), as.integer(nrow(input)),
+  if (! is.na(df.col))
+    if (df.col < 0) stop("df.col should be a positive value or 0")
+
+# which fortran function to use depends on df.row and df.col
+  use2 <- ifelse (!is.na(df.row) | !is.na(df.col) | 
+                  !is.na(out.row) | !is.na(out.col) , TRUE, FALSE)
+  
+  if (length(out.row) == 1 & is.na(out.row[1]))
+    rowfac <- createfactor(input[, row], df.row)
+  else
+    rowfac <- closestfactor(input[, row], out.row)  
+
+  if (length(out.col) == 1 & is.na(out.col[1]))
+    colfac <- createfactor(input[, col], df.col)
+  else
+    colfac <- closestfactor(input[, col], out.col)
+
+# values or names of rows and columns in crosstable
+  rows <- rowfac$mean
+  cols <- colfac$mean
+
+  nr <- as.integer(length(rows))
+  nc <- as.integer(length(cols))
+  
+  NAnum <- min(IN, na.rm = TRUE) - 100
+  
+  IN[is.na(IN)] <- NAnum
+  
+
+  if (! use2) {
+  
+    out <- .Fortran("crosstab", t(IN), as.integer(nrow(input)),
              as.integer(1), as.integer(2), as.integer(3),
-             as.double(cols), as.double(rows), nrow = nr, ncol = nc, 
-             cross = matrix(nrow = nr, ncol = nc, data = as.double(0.)),
-             package = "OceanView") 
+             as.double(cols), as.double(rows), nr = nr, nc = nc, 
+             cross = matrix(nrow = nr, ncol = nc, data = as.double(0)),
+             count = matrix(nrow = nr, ncol = nc, data = as.integer(0)),
+             NAnum = as.double(NAnum), package = "OceanView") 
+  } else {        # Need also index of each unique rowvalue/columnvalue to used row and column
+    indrow <- rowfac$factor
+    indcol <- colfac$factor
+    
+    nrow <- as.integer(length(indrow))
+    ncol <- as.integer(length(indcol))
+    out <- .Fortran("crosstab2", t(IN), as.integer(nrow(input)),
+             as.integer(1), as.integer(2), as.integer(3),
+             as.double(colfac$var), as.double(rowfac$var), 
+             nr = nr, nc = nc,
+             nrow = nrow, ncol = ncol, indrow = as.integer(indrow),
+             indcol = as.integer(indcol),  
+             cross = matrix(nrow = nr, ncol = nc, data = as.double(0)),
+             count = matrix(nrow = nr, ncol = nc, data = as.integer(0)),
+             NAnum = as.double(NAnum), package = "OceanView") 
+    
+  }
+  
   z <- out$cross
+  z[out$count == 0] <- NA
+  
   colnames(z) <- cols
   rownames(z) <- rows            
   list(x = rows, y = cols, z = z)             

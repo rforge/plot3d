@@ -100,7 +100,7 @@ remapxyNA <- function(z, x = x, y = y, xto = x, yto = y) {
     rows <- rowSums(f)
     f <- f/rowSums(f)
     
-    M <- colSums(f * zz)
+    M <- rowSums(f * zz)
     return(matrix(nrow = length(xto), ncol = length(yto), data = M))
 }
 

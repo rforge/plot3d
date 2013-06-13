@@ -8,7 +8,9 @@
 }
 
 \usage{
-db2cross (input, row = 1, col = 2, value = 3) }
+db2cross (input, row = 1, col = 2, value = 3,
+  df.row = NA, df.col = NA, out.row = NA, out.col = NA) 
+}
 
 \arguments{
   \item{input }{A \code{matrix} in \emph{database} format, (x,y,z) .
@@ -21,6 +23,17 @@ db2cross (input, row = 1, col = 2, value = 3) }
   }
   \item{value }{Number or name of the column in \code{input}, to be used as 
     values in the result.
+  }
+  \item{df.row, df.col }{Maximal distance in row and column values that should 
+    be considered the same. The default is to use each unique row or column 
+    value in \code{input} as a row or column value in the crosstable.
+    Overrruled when \code{out.row} or \code{out.col} are defined.
+  }
+  \item{out.row, out.col }{Values of rows and columns to be used in the cross table. 
+    The default is to use each unique row or column value in \code{input} as a 
+    row or column value in the crosstable. Each value in \code{input} is mapped to
+    \code{out.row} and \code{out.col} to which it is closest.
+    Overrrules \code{df.row} or \code{df.col}.
   }
 }
 \value{
@@ -44,6 +57,19 @@ db2cross (input, row = 1, col = 2, value = 3) }
                    score = rnorm(12))
  head(df3)
  db2cross(df3, val = 4)
+
+## =======================================================================
+## Defining the output rows
+## =======================================================================
+Samples <- data.frame(time = c(1, 1.1, 1.2, 2, 2.1, 2.2, 4, 4.1, 4.2),
+                      var = rep(c("O2", "NO3", "NH3"), 3), 
+                      val = 1:9)
+Samples
+
+db2cross(Samples)
+db2cross(Samples, df.row = 0.5)
+db2cross(Samples, out.row = c(1, 2, 4))
+db2cross(Samples, out.row = 1:4)
 
 ## =======================================================================
 ## A larger dataset; requires OceanView.Data
