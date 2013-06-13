@@ -215,6 +215,12 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
     do.call("axis", c(list(side = colkeypar$side, mgp = c(3, 1, 0), las = 1), 
          axispar))
   }
+  if (zlog) {
+    if (colkeypar$side %in% c(2, 4))  
+      par (ylog = FALSE)
+    else 
+      par (xlog = FALSE)      
+  }
   
   box(col = colkeypar$col.box) 
 

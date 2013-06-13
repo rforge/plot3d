@@ -364,8 +364,7 @@ text2D (x, y, labels, ..., colvar = NULL,
 # scatter + surface
  scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
    xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215), 
-   surf = list(x = M$x, y = M$y, z = volcano, shade = 0.5, 
-       col = jet.col(100)))
+   surf = list(x = M$x, y = M$y, z = volcano, shade = 0.5))
  
 ## =======================================================================
 ## A surface and CI
@@ -418,7 +417,7 @@ text2D (x, y, labels, ..., colvar = NULL,
    scatter3D(z = mpg, x = wt, y = disp, pch = 18, cex = 2, 
       theta = 20, phi = 20, ticktype = "detailed",
       xlab = "wt", ylab = "disp", zlab = "mpg",  
-      surf = list(x = wt.pred, y = disp.pred, z = mpg.pred, 
+      surf = list(x = wt.pred, y = disp.pred, z = mpg.pred,  
                   facets = NA, fit = fitpoints),
       main = "mtcars")
   

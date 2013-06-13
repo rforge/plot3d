@@ -101,7 +101,6 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (dots$clog)
       contour$drawlabels = FALSE        # to avoid strange values
   }
- 
  # rotate 
   rotate <- FALSE
   if (theta != 0 & ! rasterImage) {        
@@ -133,13 +132,17 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
        dotimage$xlim <- rev(range(x))
      x <- rev(x)
      z <- z[nrow(z):1, ]
-   }
+    if (iscontour)
+      contour$x <- x
+  }
   
    if (! is.matrix(y) & all(diff(y) < 0)) {    
      if (is.null(dotimage$ylim)) 
        dotimage$ylim <- rev(range(y))
      y <- rev(y)
      z <- z[, (ncol(z):1)]
+    if (iscontour)
+      contour$y <- y
    }
   
  # log transformation of z-values (can be specified with log = "c", or log = "z"

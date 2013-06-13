@@ -59,18 +59,18 @@ scatter2D <- function(x, y, ..., colvar = NULL,
 
   useSegments <- FALSE
   
-  if (! is.null(dots$main$type))
-    if (dots$main$type %in% c("b", "l", "o"))
+  if (! is.null(dots$points$type))
+    if (dots$points$type %in% c("b", "l", "o"))
       if (length(Col) > 1  )
         useSegments <- TRUE
 
   if (useSegments) {
-    Type <- dots$main$type
+    Type <- dots$points$type
     len <- length(x)
     if (Type %in% c("b", "o"))   # no distinction is made..
-      dots$main$type <- "p" 
+      dots$points$type <- "p" 
     else     
-      dots$main$type <- "n" 
+      dots$points$type <- "n" 
 
    # mean of point colors for line colors
     LCol <- cbind(Col[-1], Col[-len])
@@ -81,7 +81,7 @@ scatter2D <- function(x, y, ..., colvar = NULL,
     add <- TRUE
     if (isCI) {plot.CI.2d(CI, x, y, Col) ; isCI <- FALSE}  # do this first
     do.call("points", c(alist(x, y, col = Col), dots$points)) 
-    dots$main$type <- NULL
+    dots$points$type <- NULL
     do.call("segments", c(alist(x[-len], y[-len], x[-1], y[-1], 
                   col = LCol), dots$points))
   }

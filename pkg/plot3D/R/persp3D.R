@@ -72,17 +72,17 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
       if (is.null(dot$persp$xlim)) 
         dot$persp$xlim <- rev(range(x))
       x <- rev(x)
-      z <- z[nrow(z):1, ]
       if (ispresent(colvar)) 
         colvar <- colvar[nrow(colvar):1, ]
+      z <- z[nrow(z):1, ]
     }
     if (all(diff(y) < 0)) {     
       if (is.null(dot$persp$ylim)) 
         dot$persp$ylim <- rev(range(y))
       y <- rev(y)
-      z <- z[, (ncol(z):1)]
       if (ispresent(colvar)) 
         colvar <- colvar[, (ncol(colvar):1)]
+      z <- z[, (ncol(z):1)]
     }
   }
   image   <- check.args(image)

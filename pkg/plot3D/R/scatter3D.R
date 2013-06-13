@@ -127,14 +127,24 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     panel.first(plist$mat)  
 
   if (! is.null(surf)) {
-    if (is.null(surf$col))
+    
+    if (is.null(surf$colvar))
+      surf$colvar <- surf$z
+
+    if (is.null(surf[["col"]])) {
       surf$col <- col
-    if (is.null(surf$clim))
-      if (! is.null(clim) & ! is.null(surf$z)) {
+      if (is.null(surf$clim))  
         surf$clim <- clim
-        surf$z[surf$z < clim[1]]  <- NA
-        surf$z[surf$z > clim[2]]  <- NA
-      }  
+    }  
+      if (is.null(surf$clim))  
+        surf$clim <- range(surf$colvar)
+
+    surf$colvar[surf$colvar < surf$clim[1]]  <- NA
+    surf$colvar[surf$colvar > surf$clim[2]]  <- NA
+ 
+    surf$z[surf$z < dot$persp$zlim[1]]  <- NA
+    surf$z[surf$z > dot$persp$zlim[2]]  <- NA
+
     spoly <- do.call("addimg", c(alist(poly = NULL, plist = plist), surf))
   } else
     spoly <- NULL
