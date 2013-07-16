@@ -1,2 +1,2 @@
-export(plotrgl, cutrgl, uncutrgl, imagergl, contourrgl, 
+export(plotrgl, cutrgl, uncutrgl, croprgl, uncroprgl, imagergl, contourrgl, 
   scatterrgl, arrowsrgl)

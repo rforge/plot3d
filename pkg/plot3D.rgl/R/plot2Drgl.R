@@ -14,7 +14,7 @@ plot2Drgl <- function(func.name, x, y, colvar, col, NAcol, clim, add,
 # ------------------------------------------------------------------------------
   dots <- list(...)
 
-  dots$expand <- dots$ticktype <- dots$zlab <- NULL
+  dots$expand <- dots$ticktype <- dots$zlab <- dots$bty <- dots$add <- NULL
   dots$box <- TRUE
   namesscat <- c(namespersp, namesextra)
   dotpersp <- dots[names(dots) %in% namesscat]

@@ -9,6 +9,10 @@ par3dpars <- c("antialias","cex","family","font","useFreeType","fontname",
 plotrgl <- function(lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...) {
 
   plist <- getplist() 
+
+  if (sum(plist$setlim) > 0)
+    plist <- clipplist(plist$xlim, plist$ylim, plist$zlim)
+
   if (plist$type =="2D") {
     plotrgl2D(plist, new = new, add = add, smooth = smooth, plot = TRUE, ...)
     pp <- getplist()
@@ -26,6 +30,21 @@ plotrgl <- function(lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, .
     pan3d(3)           # from the help of rgl.setMouseCallbacks
 }
 
+clipplist <- function(xlim, ylim, zlim){  
+  SS <- function (x, y, z) {
+    val <- rep(TRUE, length(x))
+    if (! is.null(xlim)) 
+      val[x < min(xlim) | x > max(xlim)] <- FALSE
+    if (! is.null(ylim)) 
+      val[y < min(ylim) | y > max(ylim)] <- FALSE
+    if (! is.null(zlim)) 
+      val[z < min(zlim) | z > max(zlim)] <- FALSE
+    return(val)  
+  }
+  plist <- selectplist(getplist(), SS)
+  return(plist)
+}
+
 ## =============================================================================
 ## Plot all items of a plist
 ## =============================================================================
@@ -36,6 +55,9 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   if (add)
     new <- FALSE
   dots <- list(...)
+  if (is.null(dots$alpha))  
+    dots$alpha <- plist$alpha
+  
   materialnames <- names(formals(rgl.material))
   material <- dots[names(dots) %in% materialnames] 
   material$lit <- lighting
@@ -58,8 +80,10 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   # images
   Poly <- plist$poly
 
- # make col the correct size for persp3d
-  if (! is.null(plist$imgnr)) {
+  if (is.null(plist$imgnr)) 
+    plist$imgnr <- 0
+  if (plist$imgnr > 0) {
+   # make col the correct size for persp3d
     changedimg <- FALSE
     for (i in 1:plist$imgnr) {
       img <- plist$img[[i]]
@@ -71,25 +95,25 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
        } 
     }
     if (changedimg) setplist(plist)
-  }
-  
-  if (smooth & ! is.null(plist$imgnr)) {
-  
+    # plot the images
     for (i in 1:plist$imgnr) {
       img <- plist$img[[i]]
-       if (!all(is.na(img$col))) 
-        persp3d(img$x, img$y, img$z, col = img$col, add = TRUE, aspect = FALSE)
+      fb <- Createcolors(img$facets, img$border, img$col)
+      if (!all(is.na(fb$facets))) 
+          persp3d(img$x, img$y, img$z, col = fb$facets, add = TRUE, aspect = FALSE, 
+            front = "filled", back = "filled", smooth = smooth)
+      if (!all(is.na(fb$border))) 
+        persp3d(img$x, img$y, img$z, col = fb$border, add = TRUE, aspect = FALSE, 
+          front = "lines", back = "lines", smooth = smooth)
     }
     
-   # the borders?      
-    im <- which(Poly$isimg & ! is.na(Poly$border))
-    rglpoly(Poly, im, "line")
-
    # polygons that are not images
-    p <- !Poly$isimg
-    poly <- list(x = Poly$x[,p], y = Poly$y[,p], z = Poly$z[,p], 
+    if ( length(Poly) > 0) {
+      p <- !Poly$isimg
+      poly <- list(x = Poly$x[,p], y = Poly$y[,p], z = Poly$z[,p], 
         col = Poly$col[p], border = Poly$border[p],
         lwd = Poly$lwd[p], lty = Poly$lty[p])
+    } else poly <- NULL    
         
   } else poly <- Poly
   
@@ -100,7 +124,7 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
 
     ifill <- which(! is.na(poly$col))
     if (length(ifill) > 0)
-      rglpoly(poly, ifill, "fill")
+      rglpoly(poly, ifill, "filled")
     iline <- which(is.na(poly$col))
     if (length(iline) > 0)
       rglpoly(poly, iline, "line")
@@ -219,6 +243,45 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   invisible(pp)
 }
 
+
+## =============================================================================
+## function as from plot3D to see whether and which colors to use
+## =============================================================================
+Createcolors <- function(facets, border, Cols) {
+
+  isfacets <- facets
+  if (is.null(facets)) isfacets <- NA
+  if (is.null(border)) border <- NA
+  if (is.null(Cols)) Cols <- NA
+
+  isnaborder <- FALSE
+  if (length(border) > 0)
+    isnaborder <- is.na(border)
+
+  if (is.na(isfacets)) {
+    if (isnaborder)        
+      border <- Cols
+    Cols[] <- NA
+
+  } else if (isfacets) {    # facets added
+    if (isnaborder) {
+      border <- Cols
+      border[] <- NA 
+    }
+  } else {
+    if (is.na(border))      # no facets
+      border <- Cols
+    Cols[] <- "white"
+  }
+  if (length(border ) == 1) {
+    bb <- border
+    border <- Cols
+    border[] <- bb
+  }
+  
+  list(border = border, facets = Cols)
+}
+
 ## =============================================================================
 ## Plot polygons of a plist
 ## =============================================================================
@@ -236,7 +299,7 @@ rglpoly <- function(poly, il, front) {
 
     
   plotpoly <- function(ipol, func, ir) {
-    if (front == "fill")  {
+    if (front == "filled")  {
       it <- ipol[poly$col[ipol] != "transparent" ]
       func(x = poly$x[1:ir, it], y = poly$y[1:ir, it], z = poly$z[1:ir, it], 
         col = matrix (nrow = ir, byrow = TRUE, data = rep(poly$col[it], ir)), 
@@ -263,7 +326,6 @@ rglpoly <- function(poly, il, front) {
 ## =============================================================================
 ## An arrow function, 
 ## =============================================================================
-# TO BE IMPROVED...
   
 hypoth <- function(a, b) sqrt(a^2 + b^2)
 
@@ -272,7 +334,7 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
     sx, sy, sz)  # scales       
 {
 #  if (is.null(angle)) angle <- 30
-  length <- length/3
+  length <- length/2
   if (any(length < 0 | ! is.finite(length   )))
     stop ("invalid arrow head length")
 
@@ -297,7 +359,6 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
 ## ? something with scale???
   
   eps <- 1e-8
-  dd <- hypoth(x.from - x.to, y.from - y.to)
     
   arrhead <- function (code) {
   
@@ -354,7 +415,7 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
       x <- as.vector(outer (x1[is], 1:N, FUN = function (x,i)
              x + length[is] * sx * cos(rot[is] + angle[is]*cos(pseq[i]))*
                                    sin(rot2[is] + angle[is]*sin(pseq[i]))))
-      x <- rbind(x, rep(x.to[is], times = N), c(x[-(1:Nx)], x[1:Nx]))
+      x <- rbind(x, rep(x1[is], times = N), c(x[-(1:Nx)], x[1:Nx]))
 
       y <- as.vector(outer (y1[is], 1:N, FUN = function (y,i)
              y + length[is] * sy * sin(rot[is] + angle[is]*cos(pseq[i]))*
@@ -366,7 +427,7 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
       z <- rbind(z, rep(z1[is], times = N), c(z[-(1:Nx)], z[1:Nx]))
 
       triangles3d(x = x, y = y, z = z, col = col[1:3, is], lty = lty[is[1]], 
-           front = "fill", lwd = lwd[1])                    
+           front = "filled", lwd = lwd[1])                    
     }
     ii <- which (type != "cone") 
     if (length(ii) == 0) return()
@@ -381,14 +442,15 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
     if (length(is) > 0)  	        
      lines3d(x[,is], y[,is], z[,is], col = col[,is], lwd = lwd[1], lty = lty[is[1]])                    
 
-    is <- which (type == "triangle")
+    is <- which (type %in% c("triangle", "curved"))
     if (length(is) > 0)  	        
       triangles3d(x = x[1:3,is], y = y[1:3,is], z = z[1:3,is], col = col[1:3,is], lty = lty[is[1]], 
-        front = "fill", lwd = lwd[1])                    
+        front = "filled", lwd = lwd[1])                    
   }
   arrhead(1)
-  arrhead(2)
   arrhead(3)
+  Code[Code == 3] <- 2
+  arrhead(2)
 }
 
 
@@ -404,15 +466,19 @@ plotrgl2D <- function(plist, new, add, smooth, plot = FALSE, ...) {
         pdots$xlim <- dots$xlim
       if (! is.null(dots$ylim)) 
         pdots$ylim <- dots$ylim
+      if (is.null(pdots$alpha)) 
+        pdots$alpha <- dots$alpha
     }
-    pdots$colkey <- pdots$clab <- pdots$facets <- pdots$resfac <- pdots$theta <- NULL 
+    pdots$colkey <- pdots$clab <- pdots$facets <- pdots$resfac <- pdots$theta <- pdots$add <- NULL 
     pdots$rasterImage <- NULL 
     pdots$new <- new
     pdots
   }
   
-  img2Dnr <- cont2Dnr <- scat2Dnr <- arr2Dnr <- segm2Dnr <- rect2Dnr <- poly2Dnr <- 0
+  img2Dnr <- cont2Dnr <- scat2Dnr <- arr2Dnr <- segm2Dnr <- rect2Dnr <- poly2Dnr <- text2Dnr <- 0
   dots <- list(...)
+  if (is.null(dots$alpha))  
+    dots$alpha <- plist$alpha
 #  if (add)
 #    new <- FALSE
 #  if (new) 
@@ -435,7 +501,11 @@ plotrgl2D <- function(plist, new, add, smooth, plot = FALSE, ...) {
       scat2Dnr <- scat2Dnr + 1
       Dots <- checkdots(p$scat2D[[scat2Dnr]], dots, add)
       do.call ("scatterrgl", c(alist(add = add), Dots))
-    } else if (plt == "arrows") {
+    } else if (plt == "text") {
+      text2Dnr <- text2Dnr + 1
+      Dots <- checkdots(p$text2D[[text2Dnr]], dots, add)
+      do.call ("textrgl", c(alist(add = add), Dots))
+    } else if (plt %in% c("arrows", "ArrType")) {
       arr2Dnr <- arr2Dnr + 1
       Dots <- checkdots(p$arr2D[[arr2Dnr]], dots, add)
       do.call ("arrowsrgl", c(alist(add = add), Dots))
