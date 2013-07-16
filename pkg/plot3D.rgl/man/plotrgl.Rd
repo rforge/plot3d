@@ -187,11 +187,10 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
 ## =======================================================================
 
  AA <- Hypsometry$z
- lim <- c(-0.8, 0.8)
 
 # log transformation of color variable; full = TRUE to plot both halves
  spheresurf3D(AA, theta = 90, phi = 30, box = FALSE,
-    full = TRUE, xlim = lim, ylim = lim, zlim = lim)
+    full = TRUE, plot = FALSE) 
 
 # change the way the left mouse reacts
  plotrgl(mouseMode = c("zAxis", "zoom", "fov"))
