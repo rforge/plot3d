@@ -1,14 +1,14 @@
 \name{Quiver and flow paths}
-\alias{quiver}
-\alias{quiver.matrix}
-\alias{quiver.array}
+\alias{quiver2D}
+\alias{quiver2D.matrix}
+\alias{quiver2D.array}
 \alias{quiverrgl}
 \alias{flowpath}
 \title{
   Plots velocities as arrows or as trajectory plots.
 }
 \description{
-  Function \code{quiver} displays velocity vectors as arrows, using ordinary graphics.
+  Function \code{quiver2D} displays velocity vectors as arrows, using ordinary graphics.
 
   Function \code{quiverrgl} displays velocity vectors as arrows using rgl. 
     
@@ -17,9 +17,9 @@
   
 }
 \usage{
-quiver(u, ...)
+quiver2D(u, ...)
 
-\method{quiver}{matrix}(u, v, x = NULL, y = NULL, 
+\method{quiver2D}{matrix}(u, v, x = NULL, y = NULL, 
            colvar = NULL, ..., 
            scale = 1, arr.max = 0.2, arr.min = 0, by = NULL, 
            type = "triangle", col = NULL, NAcol = "white", 
@@ -28,7 +28,7 @@ quiver(u, ...)
            clim = NULL, clab = NULL, 
            add = FALSE, plot = TRUE) 
 
-\method{quiver}{array} (u, v, margin = c(1, 2), subset, ask = NULL, ...)
+\method{quiver2D}{array} (u, v, margin = c(1, 2), subset, ask = NULL, ...)
                     
 quiverrgl (u, v, x = NULL, y = NULL, colvar = NULL, ..., 
            scale = 1, arr.max = 0.2, arr.min = 0, 
@@ -43,15 +43,15 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 }
 
 \arguments{
-  \item{u }{A matrix (\code{quiver}) or array (\code{quiver.array})
+  \item{u }{A matrix (\code{quiver2D}) or array (\code{quiver2D.array})
     with velocities in x-direction. 
-    For \code{quiver} 
+    For \code{quiver2D} 
     the number of rows should be = Nx or Nx+1 (Nx = length(x), if x given),  
     the number of columns should be = Ny or Ny+1 (Ny = length(y), if y given). 
     }
-  \item{v }{A matrix (\code{quiver}) or array (\code{quiver.array})
+  \item{v }{A matrix (\code{quiver2D}) or array (\code{quiver2D.array})
     with velocities in y-direction. 
-    For \code{quiver} the number of rows should be = Nx or Nx+1,  
+    For \code{quiver2D} the number of rows should be = Nx or Nx+1,  
     the number of columns should be = Ny or Ny+1.  
     }
   \item{x }{Vector with x-coordinates of the velocities. 
@@ -173,7 +173,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
     }
 }
 \details{
-  S3 function \code{quiver} plots vectors specified by \code{u, v} at the coordinates
+  S3 function \code{quiver2D} plots vectors specified by \code{u, v} at the coordinates
   \code{x, y}.
   
   \code{flowpath} uses the velocities \code{u, v} at the coordinates
@@ -188,7 +188,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
   matrix with the x-y coordinates of the flow paths. 
   Separate flow paths are separated with \code{NA}.
 
-  \code{quiver} returns  (as \code{invisible}) a \code{list} containing the 
+  \code{quiver2D} returns  (as \code{invisible}) a \code{list} containing the 
   coordinates of the arrows (\code{x0}, \code{x1}, \code{y0}, \code{y1}), 
   the color of each arrow (\code{col}), and the length of the arrowhead
   (\code{length}). This can be used with function \link{arrows}.
@@ -198,7 +198,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
   
   \link{vectorplot} for plotting velocity vectors as spikes.
 
-  \link{Arrows} for the arrow function from package \code{shape} on which quiver is based.
+  \link{Arrows} for the arrow function from package \code{shape} on which quiver2D is based.
 }
 
 \examples{
@@ -215,15 +215,15 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  dy <- outer(x, y , function(x, y) x)
 
 # velocity plots
- quiver(u = dx, v = dy, x = x, y = y)
+ quiver2D(u = dx, v = dy, x = x, y = y)
 
 # different color for up/downward pointing arrows
- quiver(u = dx, v = dy, x = x, y = y, colvar = dx > 0, 
+ quiver2D(u = dx, v = dy, x = x, y = y, colvar = dx > 0, 
         col = c("red", "blue"), colkey = FALSE,
         arr.max = 0.4, arr.min = 0.1)
 
 # different scale
- quiver(u = dx, v = dy, x = x, y = y, by = 2, scale = 2)
+ quiver2D(u = dx, v = dy, x = x, y = y, by = 2, scale = 2)
 
 # three flow paths
  flowpath(u = dx, v = dy, x = x, y = y, startx = 0.1, starty = 0.1)
@@ -244,7 +244,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  dX <- outer(x, y, function(x,y) 3*x^2 - 3)
  dY <- outer(x, y, function(x,y) -4*y)
 
- quiver(u = dX, v = dY, x = x, y = y, scale = 1, add = TRUE, by = 1)
+ quiver2D(u = dX, v = dY, x = x, y = y, scale = 1, add = TRUE, by = 1)
  flowpath(u = dX, v = dY, x = x, y = y, startx = c(-2, 1.1), 
             starty = c(-1, -1), add = TRUE, arr.length = 0.5,
             col = "darkgreen", lwd = 3, numarr = 1)
@@ -257,7 +257,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  u <- outer (x, y, function (x, y) cos(2*pi*y/10))
  v <- outer (x, y, function (x, y) cos(2*pi*x/10))
 
- quiver(x = x, y = y, u = u, v = v, col = "grey")
+ quiver2D(x = x, y = y, u = u, v = v, col = "grey")
 
 # flowpaths using all combinations of x and y at edges
  flowpath(x = x, y = y, u = u, v = v, add = TRUE, 
@@ -277,18 +277,18 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  V <- array(dim = c(dim(v2), 2), data = c(v, v2), 
             dimnames = c("x", "y", "times"))
 
- quiver(u = U, v = V, x = x, y = y, main = c("time 1", "time 2"))
+ quiver2D(u = U, v = V, x = x, y = y, main = c("time 1", "time 2"))
 
 # quiver over x and time, for a subset of y-values:
- quiver(u = U, v = V, x = x, y = 1:2, 
+ quiver2D(u = U, v = V, x = x, y = 1:2, 
         margin = c(1, 3), main = paste("y ", y), 
         subset = y <= 4)
 
 \dontrun{
- quiver(u = U, v = V, x = x, y = y, ask = TRUE, 
+ quiver2D(u = U, v = V, x = x, y = y, ask = TRUE, 
         mfrow = c(1, 1))
 
- quiver(u = U, v = V, x = x, y = 1:2, ask = TRUE, 
+ quiver2D(u = U, v = V, x = x, y = 1:2, ask = TRUE, 
         margin = c(1, 3), main = paste("y ", y),
         mfrow = c(1, 1))
 
@@ -307,7 +307,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  v <-   (volcano[-1, ] - volcano[-nrow(volcano), ] )/dx
  u <- - (volcano[, -1] - volcano[ ,-ncol(volcano)] )/dy
 
- quiver(x = 1:nrow(u), y = 1:ncol(v), 
+ quiver2D(x = 1:nrow(u), y = 1:ncol(v), 
         u = u, v = v, add = TRUE, by = 3)
  
  flowpath(x = 1:nrow(u), y = 1:ncol(v), numarr = 10,
@@ -320,15 +320,15 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  par (mfrow = c(2, 2))
  
  mask <- volcano; mask[volcano < 120]  <- NA
- quiver(by = c(2, 1), u = u, v = v, mask = mask)
+ quiver2D(by = c(2, 1), u = u, v = v, mask = mask)
 
- quiver(by = c(2, 1), u = u, v = v,  
+ quiver2D(by = c(2, 1), u = u, v = v,  
         image = list(z = mask, NAcol = "black"))
 
- quiver(by = c(3, 2), u = u, v = v,
+ quiver2D(by = c(3, 2), u = u, v = v,
         contour = list(z = volcano, lwd = 2))
 
- quiver(by = c(3, 2), u = u, v = v, 
+ quiver2D(by = c(3, 2), u = u, v = v, 
         contour = list(z = volcano, col = "black"), 
         image = list(z = volcano, NAcol = "black"))
 
@@ -357,7 +357,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 
  par(mfrow = c(1, 1))
  with (Syltsurf,
-   quiver(x = x, y = y, u = u[ , ,2], v = v[ , ,2], 
+   quiver2D(x = x, y = y, u = u[ , ,2], v = v[ , ,2], 
      xlim = c(5, 20), ylim = c(10, 25), by = 2, 
      main = paste(formatC(time[1]), " hr"), scale = 1.5, 
      image = list(z = depth, x = x, y = y, NAcol = "black", colkey = TRUE), 
@@ -373,7 +373,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 # now for an array (first and l4th time point only)
  ii <- c(1, 4)
  with (Syltsurf,
-   quiver(x = x, y = y, u = u[ ,,ii], v = v[ ,,ii], 
+   quiver2D(x = x, y = y, u = u[ ,,ii], v = v[ ,,ii], 
      xlim = c(5, 20), ylim = c(10, 25), by = 3, 
      mask = list(z = depth, x = x, y = y, NAcol = "blue"),
      main = paste(formatC(time[ii]), " hr"), scale = 1.5,

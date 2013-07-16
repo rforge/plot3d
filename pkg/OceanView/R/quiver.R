@@ -90,11 +90,11 @@ checkinput <- function(u, v, x = NULL, y = NULL, scale = 1, by = 1,
     iy <- 1:ncol(u)
   }
   if (! is.null(xlim)) {
-    ii <- which (x < xlim[1] | x > xlim[2])
+    ii <- which (x < min(xlim) | x > max(xlim))
     u[ii] <- v[ii] <- 0
   }
   if (! is.null(ylim)) {
-    ii <- which (y < ylim[1] | y > ylim[2])
+    ii <- which (y < min(ylim) | y > max(ylim))
     u[ii] <- v[ii] <- 0
   }
   isna <- which (is.na(u))
@@ -122,10 +122,10 @@ checkinput <- function(u, v, x = NULL, y = NULL, scale = 1, by = 1,
 ## Actual quiver functions
 ## =============================================================================
 
-quiver <- function(u, ...) UseMethod ("quiver")
-quiver.default <- function (u, ...) quiver.matrix(u, ...)
+quiver2D <- function(u, ...) UseMethod ("quiver2D")
+quiver2D.default <- function (u, ...) quiver2D.matrix(u, ...)
 
-quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ..., 
+quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ..., 
                     scale = 1, arr.max = 0.2, arr.min = 0, 
                     by = NULL, type = "triangle", 
                     col = NULL, NAcol = "white", colkey = list(side = 4), 
@@ -224,19 +224,15 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
     }
 
     if (contour$add) {
-      if (image$add | ! is.null(mask)) 
-        contour$args$add <- TRUE
-      else
-        contour$args$add <- FALSE
-     if (contour$args$add) 
+     if (add) 
       contour$args$colkey <- FALSE
       if (is.null(contour$args$z))
         stop("contour$'z' should be specified if 'contour' is a list")
 
-      if (!contour$args$add) 
+      if (!add) 
         contour$args <- c(contour$args, dm)
 
-      do.call("contour2D", contour$args)
+      do.call("contour2D", c(alist(add = add), contour$args))
       add <- TRUE
     }
   } # plot
@@ -254,7 +250,8 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
   dp <- lapply(dp, FUN = function(x) 
                     if (is.matrix(x)) x[MM$ix, MM$iy] else x)
   
-  dp$arr.length <- MM$speed / MM$maxspeed * (arr.max - arr.min) + arr.min
+#  dp$arr.length <- MM$speed / MM$maxspeed * (arr.max - arr.min) + arr.min
+  dp$length <- MM$speed / MM$maxspeed * (arr.max - arr.min) + arr.min
 
   if (plot) {
     if (! add) {
@@ -263,15 +260,16 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
       if (is.null(dm$ylab)) 
         dm$ylab <- "y"
 
-      do.call("matplot", c(alist(rbind(x, xto), rbind(y, yto)), 
-                       type = "n", dm))
+#      do.call("matplot", c(alist(rbind(x, xto), rbind(y, yto)), 
+#                       type = "n", dm))
     }
   
     dp$arr.type <- NULL 
-    if (is.null(dp$arr.lwd))   
-      dp$arr.lwd <- 1
+    if (is.null(dp$lwd))   
+      dp$lwd <- 1
   
-    do.call("Arrows", c(alist(x, y, xto, yto, col = Col, arr.type = type),  dp))
+#    do.call("Arrows", c(alist(x, y, xto, yto, col = Col, arr.type = type),  dp))
+    do.call("arrows2D", c(alist(x, y, xto, yto, col = Col, type = type, add = add),  dm, dp))
   
     if (iscolkey) {
 #      drawcolkey(colkey, col, clim, clab, cex.clab, clog) 
@@ -282,12 +280,12 @@ quiver.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
       par(mar = par("mar"))
     }    
   } #plot
-  invisible(list(x0 = x, y0 = y, x1 = xto, y1 = yto, col = Col, length = dp$arr.length))
+  invisible(list(x0 = x, y0 = y, x1 = xto, y1 = yto, col = Col, length = dp$length))
 }
 
 ## =============================================================================
 
-quiver.array <- function (u, v, margin = c(1, 2), subset, ask = NULL, ...) {
+quiver2D.array <- function (u, v, margin = c(1, 2), subset, ask = NULL, ...) {
 
   DD <- dim(u)
   if (length(DD) != 3)
@@ -362,7 +360,7 @@ quiver.array <- function (u, v, margin = c(1, 2), subset, ask = NULL, ...) {
     }  
     LL$main <- title[i1]
     i1 <- i1 +1
-    do.call(quiver, LL)
+    do.call(quiver2D, LL)
     #quiver(u = uu, v = vv, ...) 
   }
   
@@ -516,7 +514,7 @@ quiverrgl <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
     y <- seq(0, 1, length.out = ncol(v))
   ylim <- range(y)
   
-  F <- quiver(u, v, x, y, colvar, scale = scale, 
+  F <- quiver2D(u, v, x, y, colvar, scale = scale, 
               arr.max = arr.max, arr.min = arr.min, 
               by = by, plot = FALSE, col = col, NAcol = NAcol, 
               clim = clim)

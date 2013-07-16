@@ -79,7 +79,7 @@ vectorplot(u, v, x = 0, y = 0, colvar = NULL, ...,
  none
 }
 \seealso{
- \link{quiver}, \link{flowpath}, for other functions to plot velocities.
+ \link{quiver2D}, \link{flowpath}, for other functions to plot velocities.
 }
 
 \examples{

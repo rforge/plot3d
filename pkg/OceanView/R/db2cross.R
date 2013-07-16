@@ -38,6 +38,16 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
   if (is.character(col))
     col <- which(colnames(input) == col)
 
+# Row can point to more than one column?
+  if (is.character(input[, col]))
+    input[, col] <- as.factor(input[, col])
+    
+  if (is.character(input[, row]))
+    input[, row] <- as.factor(input[, row])
+
+  if (is.character(input[, value]))
+    stop(" cannot expand input; value should point to a numeric column") 
+
   # Check if input has only 3 columns
   dim.input <- dim(IN <- cbind(as.double(input[, col]), 
                                as.double(input[, row]), 

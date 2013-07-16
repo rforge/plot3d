@@ -28,7 +28,7 @@
   \link{Mcommon}, \link{Mplot}, \link{Msplit},
     functions for plotting matrices.
 
-  \link{quiver}, velocities plotted as arrows. 
+  \link{quiver2D}, velocities plotted as arrows. 
 
   \link{vectorplot}, vector velocity plot.
 }

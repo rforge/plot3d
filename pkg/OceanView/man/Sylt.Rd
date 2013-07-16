@@ -102,11 +102,13 @@ data(Sylt3D)
 # perspective view
  par(mar = c(1, 1, 1, 2))
  persp3D(z = -depth, x = x, y = y, scale = FALSE, expand = 0.2, 
-   ticktype = "detailed", col = "grey", shade = 0.6, bty = "f")
+   ticktype = "detailed", col = "grey", shade = 0.6, bty = "f",
+   plot = FALSE)
 
 # add 3-D region; small amount added to z so that it is visible in rgl   
  persp3D(z = -Sylt3D$depth + 1e-3, x = Sylt3D$x, y = Sylt3D$y, 
-   col = alpha.col("red", alpha = 0.4), add = TRUE)
+   col = alpha.col("red", alpha = 0.4), add = TRUE,
+   plot = FALSE)
 
 # transect
  with (Sylttran, points3D(x = x, y = rep(y, length(x)), 
@@ -114,17 +116,17 @@ data(Sylt3D)
 
 \dontrun{
  plotrgl()
- plotrgl(lighting = TRUE, new = FALSE)
+ plotrgl(lighting = TRUE, new = FALSE, smooth = TRUE)
 }
 
 ## =============================================================================
 ## Data Syltsurf: Surface elevation
 ## =============================================================================  
 
- par(mfrow = c(3, 2), mar = c(0, 0, 1, 0))
+ par(mfrow = c(2, 2), mar = c(0, 0, 1, 0))
 
  clim <- range(Syltsurf$elev, na.rm = TRUE)
- for (i in 1:5) 
+ for (i in 1:3) 
    persp3D(z = -depth, colvar = Syltsurf$elev[,,i], x = x, y = y, 
      clim = clim, inttype = 2,  d = 2, 
      scale = FALSE, expand = 0.1, colkey = FALSE, shade = 0.5, 
@@ -140,7 +142,7 @@ data(Sylt3D)
  Speed <- sqrt(Syltsurf$u[,,2]^2 + Syltsurf$v[,,2]^2)
 
  with (Syltsurf,
-   quiver(x = x, y = y, u = u[,,2], v = v[,,2], col = gg.col(100),
+   quiver2D(x = x, y = y, u = u[,,2], v = v[,,2], col = gg.col(100),
      xlim = c(5, 20), ylim = c(10, 25), by = 2, 
      colvar = Speed, clab = c("speed", "m/s"), 
      main = paste(formatC(time[1]), " hr"), scale = 1.5, 
