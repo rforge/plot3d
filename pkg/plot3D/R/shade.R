@@ -28,7 +28,7 @@ normal.matrix <- function(x, y, z, Extend = TRUE) {  # the x- y- and z matrices
  # normals in x, y, and z direction are matrices
   N.x <- N.y <- N.z <- matrix(nrow = nrow(xx)-1, ncol = ncol(xx)-1, data = NA)
     
- # choose 3 points on each vertex
+ # choose points on each vertex
   for (i in ii) {
     ip1 <- cbind(i,     jj+1)
     ip2 <- cbind(i+1  , jj)
@@ -57,7 +57,25 @@ normal.matrix <- function(x, y, z, Extend = TRUE) {  # the x- y- and z matrices
 
 ## =============================================================================
 
-normal.points <- function(p1, p2, p3) {  #x, y, z of 3 pts
+normal.points <- function(p1, p2, p3, p4) {  #x, y, z of 4 pts
+   # two vectors to represent these points
+  V1 <- p2 - p1
+  V2 <- p3 - p4
+
+   # the (unnormalised) normals
+  N.x  <-  V1[2, ]*V2[3, ] - V1[3, ]*V2[2, ]
+  N.y  <- -V1[1, ]*V2[3, ] + V1[3, ]*V2[1, ]
+  N.z  <-  V1[1, ]*V2[2, ] - V1[2, ]*V2[1, ]
+
+  # normalise
+  Norm <- sqrt(N.x^2 + N.y^2 + N.z^2) # normalisation factor
+  Norm[Norm == 0] <-1
+  list (u = N.x/Norm, v = N.y/Norm, w = N.z/Norm)  
+}
+
+## =============================================================================
+
+normal.points.tri <- function(p1, p2, p3) {  #x, y, z of 3 pts
    # two vectors to represent these points
   V1 <- p2 - p1
   V2 <- p3 - p1
@@ -118,13 +136,9 @@ facetcols.tri <- function(tri, col, shade){
   A[2,,] <-  A[2,,] *shade$ys
   A[3,,] <-  A[3,,] *shade$zs
   light   <- setuplight(shade$lphi, shade$ltheta) [1:3]
-  Normals <- normal.points(A[,1,], A[,2,], A[,3,])
+  Normals <- normal.points.tri(A[,1,], A[,2,], A[,3,])
     
-  if (shade$type == "shade")
-    return(facetcols.shade(light, Normals, col, shade$shade))
-
-  else if (shade$type == "light")
-    return(facetcols.light(light, Normals, col, shade))
+  return(facetcols.shadelight(light, Normals, col, shade))
 }
 
 ## =============================================================================
@@ -143,10 +157,25 @@ facetcols <- function(x, y, z, col, shade, Extend = TRUE){
   light   <- setuplight(shade$lphi, shade$ltheta) [1:3]
   Normals <- normal.matrix(x * shade$xs, y * shade$ys, z * shade$zs, Extend)
     
+  return(facetcols.shadelight(light, Normals, col, shade))
+}
+
+## =============================================================================
+## facet colors with transparancy
+## =============================================================================
+
+facetcols.shadelight <- function(light, Normals, col, shade){
+  
   if (shade$type == "shade")
-    return(facetcols.shade(light, Normals, col, shade$shade))
-  else  if (shade$type == "light")
-    return(facetcols.light(light, Normals, col, shade))
+   Col <- facetcols.shade(light, Normals, col, shade$shade)
+
+  else if (shade$type == "light")
+   Col <- facetcols.light(light, Normals, col, shade)
+   
+  if (! is.null(shade$alpha))
+    Col <- setalpha(Col, shade$alpha)
+    
+  return(Col)  
 }
 
 ## =============================================================================

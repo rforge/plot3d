@@ -59,11 +59,13 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "black"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)
     iscolkey <- FALSE
   }
@@ -189,11 +191,13 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)
     iscolkey <- FALSE
   }
@@ -317,11 +321,13 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)
     iscolkey <- FALSE
   }

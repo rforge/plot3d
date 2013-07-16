@@ -54,11 +54,13 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim)
     
   } else {
     if (is.null(col))
       col <- "black"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = length(x))  
     iscolkey <- FALSE
   }
@@ -119,7 +121,19 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
 text2D <- function(x, y, labels, ..., colvar = NULL, 
                       col = NULL, NAcol = "white", 
                       colkey = list(side = 4), 
-                      clim = NULL, clab = NULL, add = FALSE) {
+                      clim = NULL, clab = NULL, add = FALSE, plot = TRUE) {
+
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+  plist <- add2Dplist(plist, "text", x = x, y = y, labels = labels,
+                    colvar = colvar, col = col, NAcol = NAcol, 
+                    colkey = colkey, 
+                    clim = clim, clab = clab, ...)
+  setplist(plist)
+  if (!plot) return()
 
  # checks
   x     <- as.vector(x)
@@ -157,11 +171,13 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
+    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim)
 
   } else  {  # no colvar
     Col <- col
     if (is.null(Col)) Col <- "black"
+    if (! is.null(dots$alpha)) Col <- setalpha(Col, dots$alpha)
     iscolkey <- FALSE
   }
 

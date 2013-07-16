@@ -74,7 +74,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     cv <- colvar
 
  # check colvar and colors
-  CC <- check.colvar.persp(colvar, z, col, 2, clim)
+  CC <- check.colvar.persp(colvar, z, col, 2, clim, dot$alpha)
   colvar <- CC$colvar; col <- CC$col
 
   if (ispresent(colvar)) {
@@ -217,17 +217,20 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   if (isshade) {
      if (facets) {
        RGB  <- t(col2rgb(COL)) * Shade / 255
-       COL  <- rgb(RGB)      
+       COL  <- rgb(RGB)
+       if (! is.null(dot$alpha)) COL <- setalpha(COL, dot$alpha)
+             
      }
      if (! is.na(border)){
        RGB  <- t(col2rgb(BORD)) * Shade / 255
-       BORD <- rgb(RGB)     
+       BORD <- rgb(RGB) 
+       if (! is.null(dot$alpha)) BORD <- setalpha(BORD, dot$alpha)
      } 
   } else if (islight) {
      if (facets) 
-       COL  <- facetcols.light (light, Normals, COL,  dot$shade)
+       COL  <- facetcols.shadelight (light, Normals, COL,  dot$shade)
      if (! is.na(border))
-       BORD <- facetcols.light (light, Normals, BORD, dot$shade)
+       BORD <- facetcols.shadelight (light, Normals, BORD, dot$shade)
   }
 
   PolyX <- rbind(PolyX, NA)   
@@ -248,11 +251,12 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                border = BORD,
                lwd    = rep(lwd , length.out = ncol(PolyX)),
                lty    = rep(lty , length.out = ncol(PolyX)),
+               isimg  = rep(0, length.out = ncol(PolyX)),
                proj   = Proj)
-  class(poly) <- "poly"
+  class(Poly) <- "poly"
 
   if (image$add) 
-    poly <- XYimage (poly, image, x, y, z, plist, col) 
+    Poly <- XYimage (Poly, image, x, y, z, plist, col) 
 
   if (contour$add) 
     segm <- contourfunc(contour, x, y, z, plist, cv, clim)

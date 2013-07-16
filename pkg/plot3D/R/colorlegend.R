@@ -172,8 +172,8 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
   cex.zlab <- colkeypar$cex.clab
   
   ix <- 1
-  minz <- zlim[1]
-  maxz <- zlim[2]
+  minz <- min(zlim)
+  maxz <- max(zlim)
   binwidth <- (maxz - minz)/64
   iy <- IY <- seq(minz + binwidth/2, maxz - binwidth/2, by = binwidth)
   if (zlog) {

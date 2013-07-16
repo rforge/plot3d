@@ -14,13 +14,6 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
                   lighting = FALSE, inttype = 1, 
                   curtain = FALSE, add = FALSE, plot = TRUE){
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
-      
-  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
-    
  # check dimensionality
   if (! is.vector(x) & length(dim(x)) == 1)
     x <- as.vector(x)
@@ -85,6 +78,28 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
       z <- z[, (ncol(z):1)]
     }
   }
+
+# check if col or colvar already have the colors to be used
+  if (is.character(colvar) & is.matrix(colvar)) {
+    col <- colvar
+    colvar <- NULL
+  }
+
+  if (is.null(colvar) & is.matrix(col)) {
+    pmat <- persp3Db(x = x, y = y, z = z, col = col, ..., 
+             phi = phi, theta = theta, NAcol = NAcol, border = border, 
+             facets = facets, panel.first = panel.first,
+             bty = bty, lighting = lighting, add = add, plot = plot)
+    return(invisible(pmat))
+  }
+    
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+      
+  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
+    
   image   <- check.args(image)
   contour <- check.args(contour)
   if (image$add & is.matrix(x))  
@@ -96,7 +111,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     cv <- colvar
       
  # check colvar and colors
-  CC <- check.colvar.persp(colvar, z, col, inttype, clim)
+  CC <- check.colvar.persp(colvar, z, col, inttype, clim, dot$alpha)
   colvar <- CC$colvar; col <- CC$col
   Extend <- inttype == 2
   
@@ -115,10 +130,6 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
 
   } else 
     iscolkey <- FALSE
-
-  is.facets <- facets
-  if (is.na(facets)) 
-    is.facets <- TRUE
 
   if (is.null(plist)) {
     do.call("perspbox", c(alist(x, y, z,  
@@ -142,11 +153,12 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   lty <- ifelse (is.null (dot$points$lty), 1, dot$points$lty)
 
   Poly <- paintit (colvar, X, Y, z, plist, col, NAcol, clim, 
-           border, facets, lwd, lty, dot$shade, Extend)
+           border, facets, lwd, lty, dot$shade, Extend, plot = plot)
 
   if (curtain) {
     P <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
-               lwd = NULL, lty = NULL, proj = NULL, img = list(), isimg = NULL)                    
+               lwd = NULL, lty = NULL, proj = NULL, img = list(), 
+               isimg = NULL)                    
  
     zmin <- plist$zlim[1]
     Nx <- length(x)
@@ -190,7 +202,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
            img     = Poly$img
            )
   class(Poly) <- "poly"
-           
+       
 
   }
    

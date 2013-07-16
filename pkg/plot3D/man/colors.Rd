@@ -59,7 +59,9 @@ The gg-plot type of colors \code{gg.plot} is a color-blind friendly palette from
 }
 \details{
 In addition to the color functions described here, colors 
-can also be adapted by shading and lighting. Shading will overrule lighting.
+can also be adapted by shading and lighting, or made transparent. Shading will overrule lighting.
+
+To make colors transparent, use argument \code{alpha}, with a value inbetween 0 and 1.
 
 To switch on shading, the argument \code{shade} should be given a value inbetween 0 and 1.
 
@@ -95,7 +97,7 @@ not be optimal for lighting.
 
  par(mfrow = c(3, 3))
  for (alph in c(0.25, 0.75))
-   image2D(volcano, col = jet.col(100, alpha = alph), 
+   image2D(volcano, alpha = alph, 
          main = paste("jet.col, alpha = ", alph))  
  image2D(volcano, main = "jet.col")
  image2D(volcano, col = jet2.col(100), main = "jet2.col")
@@ -178,6 +180,12 @@ not be optimal for lighting.
    col = alpha.col(c("red", "lightblue", "yellow", "green", "black"), 
                   alpha = 0.4))
 
+# the same, now passing alpha as an argument to polygon3D:
+\dontrun{
+ polygon3D(x, y, z, border = "black", lwd = 2, 
+   col = c("red", "lightblue", "yellow", "green", "black"), 
+                  alpha = 0.4)
+}
 # reset plotting parameters
  par(mfrow = pm)
  par(mar = pmar)

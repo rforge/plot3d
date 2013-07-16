@@ -6,11 +6,13 @@ plot2Dplist <- function (plist, ...) {
         pdots$xlim <- dots$xlim
       if (! is.null(dots$ylim)) 
         pdots$ylim <- dots$ylim
+      if (! is.null(dots$alpha)) 
+        pdots$alpha <- dots$alpha
     }
     pdots
   }
   
-  img2Dnr <- cont2Dnr <- scat2Dnr <- arr2Dnr <- segm2Dnr <- rect2Dnr <- poly2Dnr <- 0
+  img2Dnr <- cont2Dnr <- scat2Dnr <- arr2Dnr <- segm2Dnr <- rect2Dnr <- poly2Dnr <- text2Dnr <- 0
   add <- FALSE
   dots <- list(...)
   p <- plist$twoD
@@ -28,7 +30,7 @@ plot2Dplist <- function (plist, ...) {
       scat2Dnr <- scat2Dnr + 1
       Dots <- checkdots(p$scat2D[[scat2Dnr]], dots, add)
       do.call ("scatter2D", c(alist(add = add), Dots))
-    } else if (plt == "arrows") {
+    } else if (plt %in% c("arrows", "ArrType")) {
       arr2Dnr <- arr2Dnr + 1
       Dots <- checkdots(p$arr2D[[arr2Dnr]], dots, add)
       do.call ("arrows2D", c(alist(add = add), Dots))
@@ -44,15 +46,26 @@ plot2Dplist <- function (plist, ...) {
       poly2Dnr <- poly2Dnr + 1
       Dots <- checkdots(p$poly2D[[poly2Dnr]], dots, add)
       do.call ("polygon2D", c(alist(add = add), Dots))
-    }
+    } else if (plt  == "text") {
+      text2Dnr <- text2Dnr + 1
+      Dots <- checkdots(p$text2D[[text2Dnr]], dots, add)
+      do.call ("text2D", c(alist(add = add), Dots))
+    } 
     add <- TRUE
   }
   invisible(plist)
 }
 
 add2Dplist <- function(plist, method, ...) {
-  if (is.null(plist))
-    plist <- list(type = "2D", twoD = list(order = NULL))
+  dots <- list(...)
+  
+  if (is.null(plist) | length(plist) == 0) {
+    setlim <- c(!is.null(dots$xlim), !is.null(dots$ylim), !is.null(dots$zlim))
+    plist <- list(type = "2D", 
+      xlim = dots$xlim, ylim = dots$ylim, zlim = dots$zlim, setlim = setlim,
+      twoD = list(order = NULL))
+  }
+  
   if (plist$type == "3D")
     plist$type <- "23D" 
 #    stop ("cannot merge 2D and 3D plotting functions")
@@ -65,7 +78,7 @@ add2Dplist <- function(plist, method, ...) {
         p$img2D <- list()
     } 
     p$img2Dnr <- p$img2Dnr + 1
-    p$img2D[[p$img2Dnr]] <- list(...)
+    p$img2D[[p$img2Dnr]] <- dots
   }
     
   else if (method == "contour") {
@@ -74,7 +87,7 @@ add2Dplist <- function(plist, method, ...) {
         p$cont2D <- list()
     } 
     p$cont2Dnr <- p$cont2Dnr + 1
-    p$cont2D[[p$cont2Dnr]] <- list(...)
+    p$cont2D[[p$cont2Dnr]] <- dots
   }
 
   else if (method == "scatter") {
@@ -83,16 +96,16 @@ add2Dplist <- function(plist, method, ...) {
         p$scat2D <- list()
     } 
     p$scat2Dnr <- p$scat2Dnr + 1
-    p$scat2D[[p$scat2Dnr]] <- list(...)
+    p$scat2D[[p$scat2Dnr]] <- dots
   }
     
-  else if (method == "arrows") {
+  else if (method %in% c("arrows", "ArrType")) {
     if (is.null(p$arr2Dnr)) {
         p$arr2Dnr <- 0
         p$arr2D <- list()
     } 
     p$arr2Dnr <- p$arr2Dnr + 1
-    p$arr2D[[p$arr2Dnr]] <- list(...)
+    p$arr2D[[p$arr2Dnr]] <- dots
   }
     
   else if (method == "segments") {
@@ -101,7 +114,7 @@ add2Dplist <- function(plist, method, ...) {
         p$segm2D <- list()
     } 
     p$segm2Dnr <- p$segm2Dnr + 1
-    p$segm2D[[p$segm2Dnr]] <- list(...)
+    p$segm2D[[p$segm2Dnr]] <- dots
   }
 
   else if (method == "rect") {
@@ -110,7 +123,7 @@ add2Dplist <- function(plist, method, ...) {
         p$rect2D <- list()
     } 
     p$rect2Dnr <- p$rect2Dnr + 1
-    p$rect2D[[p$rect2Dnr]] <- list(...)
+    p$rect2D[[p$rect2Dnr]] <- dots
   }
   else if (method == "polygon") {
     if (is.null(p$poly2Dnr)) {
@@ -118,8 +131,17 @@ add2Dplist <- function(plist, method, ...) {
         p$poly2D <- list()
     } 
     p$poly2Dnr <- p$poly2Dnr + 1
-    p$poly2D[[p$poly2Dnr]] <- list(...)
+    p$poly2D[[p$poly2Dnr]] <- dots
   }
+  else if (method == "text") {
+    if (is.null(p$text2Dnr)) {
+        p$text2Dnr <- 0
+        p$text2D <- list()
+    } 
+    p$text2Dnr <- p$text2Dnr + 1
+    p$text2D[[p$text2Dnr]] <- dots
+  }
+
   plist$twoD <- p
   class(plist) <- c("plist","list")
   plist
@@ -135,7 +157,7 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
                     colkey = list(side = 4),
                     clim = NULL, clab = NULL, add = FALSE,
-                    method = "arrows") {
+                    plot = TRUE, method = "arrows") {
 
   if (add) 
     plist <- getplist()
@@ -147,6 +169,7 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
     clab = clab, ...)
   setplist(plist)
 
+  if (!plot) return()
   dots <- splitpardots(list(...))
 
  # colors
@@ -173,11 +196,13 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
+    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim)
 
   } else  {  # no colvar
     Col <- col
     if (is.null(Col)) Col <- "black"
+    if (! is.null(dots$alpha)) Col <- setalpha(Col, dots$alpha)
     iscolkey <- FALSE
   }
 
@@ -195,33 +220,34 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
 
 }
 
-arrows2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
-                    col = NULL, NAcol = "white",
+arrows2D <- function(x0, y0, x1 = x0, y1 = y0,..., colvar = NULL,
+                    col = NULL, NAcol = "white", 
                     colkey = list(side = 4),
-                    clim = NULL, clab = NULL, add = FALSE)  
+                    clim = NULL, clab = NULL, 
+                    type = "triangle", add = FALSE, plot = TRUE)  
   plot2D (x0, y0, x1, y1, ..., colvar = colvar,
                     col = col, NAcol = NAcol,
-                    colkey = colkey,
+                    colkey = colkey, type = type,
                     clim = clim, clab = clab, add = add,
-                    method = "arrows")
+                    plot = plot, method = "ArrType")
 
 segments2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
                     colkey = list(side = 4),
-                    clim = NULL, clab = NULL, add = FALSE) 
+                    clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
   plot2D (x0, y0, x1, y1, ..., colvar = colvar,
                     col = col, NAcol = NAcol,
                     colkey = colkey,
                     clim = clim, clab = clab, add = add,
-                    method = "segments")
+                    plot = plot, method = "segments")
 
 rect2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
                     colkey = list(side = 4),
-                    clim = NULL, clab = NULL, add = FALSE) 
+                    clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
   plot2D (x0, y0, x1, y1, ..., colvar = colvar,
                     col = col, NAcol = NAcol,
                     colkey = colkey,
                     clim = clim, clab = clab, add = add,
-                    method = "rect")
+                    plot = plot, method = "rect")
 

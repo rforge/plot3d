@@ -52,13 +52,13 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
     clim <- log(clim)
   }
 
+  CC <- check.colvar.persp(colvar, z, col, inttype, clim, dot$alpha)
+  col <- CC$col ; colvar <- CC$colvar
+  
   iscolkey <- is.colkey(colkey, col)
   if (iscolkey) 
     colkey <- check.colkey(colkey)
 
-  CC <- check.colvar.persp(colvar, z, col, inttype, clim)
-  col <- CC$col ; colvar <- CC$colvar
-  
   Extend <- inttype == 2
 
   if (is.null(plist)) {

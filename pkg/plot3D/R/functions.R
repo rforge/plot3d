@@ -132,9 +132,9 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
   for (side in contour$side) {  
   
     if (side == "zmin")
-      zz <- plist$zlim[1]
+      zz <- min(plist$zlim)
     else if (side == "zmax")
-      zz <- plist$zlim[2]
+      zz <- max(plist$zlim)
     else if (side == "z")
       zz <- NULL
     else if (!is.numeric(as.numeric(side)))
@@ -448,8 +448,8 @@ variablecol <- function(colvar, col, NAcol, clim) {
  
   ncol <- length(col)
   
-  colvar[colvar < clim[1]] <- NA
-  colvar[colvar > clim[2]] <- NA
+  colvar[colvar < min(clim)] <- NA
+  colvar[colvar > max(clim)] <- NA
   rn <- clim[2] - clim[1]
   ifelse (rn != 0, Col <- col[1 + trunc((colvar - clim[1])/rn * 
     (ncol - 1))], Col <- rep(col[1], ncol))
@@ -463,8 +463,8 @@ variablecol <- function(colvar, col, NAcol, clim) {
 
 checkcolors <- function(colvar, col, NAcol, lim) {
   
-  colvar[colvar < lim[1]] <- NA
-  colvar[colvar > lim[2]] <- NA
+  colvar[colvar < min(lim)] <- NA
+  colvar[colvar > max(lim)] <- NA
 
   if (length(col) == 1) 
     col <- c(col, col)
@@ -518,7 +518,7 @@ createcolors <- function(isfacets, border, Cols) {
 ## check dimensionality of colvar and colors
 ## =============================================================================
 
-check.colvar.persp <- function(colvar, z, col, inttype, clim) {
+check.colvar.persp <- function(colvar, z, col, inttype, clim, alpha) {
   
   iscolvar <- ispresent(colvar)
 
@@ -553,14 +553,16 @@ check.colvar.persp <- function(colvar, z, col, inttype, clim) {
       col <- c(col, col)
     }  
 
-  } else {
-    if (is.null(col))
+  } else { 
+     if (is.null(col))
       col <- rep("grey", 2)
     else
       col <- rep(col[1], 2)  # take first color
   }
+  if (! is.null(alpha))
+     col <- setalpha(col, alpha)
   
-  list(colvar = colvar, col = col)    # Should be extend = extend
+  list(colvar = colvar, col = col)     
 }
 
 ## =============================================================================
@@ -647,9 +649,10 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
         "cex.axis", "col.axis", "font.axis", 
         "col.panel", "lwd.panel", "col.grid", "lwd.grid",
         "cex.lab", "col.lab", "font.lab",  # col is ignored...
-        "cex.main", "col.main", "font.main")
+        "cex.main", "col.main", "font.main", "alpha")
             
   namesshade <- c("shade", "lphi", "ltheta")
+  setlim <- c(!is.null(dots$xlim), !is.null(dots$ylim), ! is.null(dots$zlim))
 
   # log of color variable
   clog <- dots$clog
@@ -673,11 +676,11 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
   if (is.null(dots$zlab)) 
     dots$zlab <- "z"
 
- # ranges
+ # ranges  
   if (! is.null(plist)) {
       dots$xlim <- plist$xlim
       dots$ylim <- plist$ylim
-      dots$zlim <- plist$zlim
+      dots$zlim <- plist$zlim                    
       scalefac <- plist$scalefac
   } else if (! is.null(x)) {
     if (is.null(dots$xlim)) 
@@ -694,11 +697,20 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
   shadedots <- dots[names(dots) %in% namesshade]
   shadedots <- check.shade(shadedots, lighting)
     
-  Persp <- c(dots[ names(dots) %in% namespersp], col = col, clog = clog)  
-                
+  Persp <- c(dots[ names(dots) %in% namespersp], clog = clog, setlim = setlim)  
+  if (! is.null(dots$alpha)) {
+    if (! is.numeric(dots$alpha))
+      stop("'alpha' should be numeric") 
+    if (length(dots$alpha) > 1)
+      stop("'alpha' should be one number") 
+    if (dots$alpha < 0 | dots$alpha > 1)
+      stop("'alpha' should be a number inbetween 0 and 1") 
+  }  
   list(persp = Persp,
-       points = dots[!names(dots) %in% c(namespersp, namesshade, "clog")],
-       shade = c(shadedots, xs = scalefac$x, ys = scalefac$y, zs = scalefac$z), clog = clog)
+       points = dots[!names(dots) %in% c(namespersp, namesshade, "clog", "alpha")],
+       shade = c(shadedots, xs = scalefac$x, ys = scalefac$y, zs = scalefac$z,
+         alpha = dots$alpha), 
+       clog = clog, alpha = dots$alpha)
 }      
 
 ## =============================================================================
@@ -798,9 +810,20 @@ splitpardots <- function(dots) {
   dotmain <- dots[ii]
 
   # point parameters
-  ip <- !names(dots) %in% c(plotnames, "add", "clog")
+  ip <- !names(dots) %in% c(plotnames, "add", "clog", "alpha")
   dotpoints <- dots[ip]
-  list (points = dotpoints, main = dotmain, add = dots$add, clog = clog)
+  # alpha
+  if (! is.null(dots$alpha)) {
+    if (! is.numeric(dots$alpha))
+      stop("'alpha' should be numeric") 
+    if (length(dots$alpha) > 1)
+      stop("'alpha' should be one number") 
+    if (dots$alpha < 0 | dots$alpha > 1)
+      stop("'alpha' should be a number inbetween 0 and 1") 
+  }  
+  
+  list (points = dotpoints, main = dotmain, add = dots$add, 
+    clog = clog, alpha = dots$alpha)
 
 }
 

@@ -28,7 +28,7 @@ arrows3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, ...,
          colvar = NULL, phi = 40, theta = 40,
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), panel.first = NULL,
-         clim = NULL, clab = NULL, bty = "b", type = "simple", 
+         clim = NULL, clab = NULL, bty = "b", type = "triangle", 
          add = FALSE, plot = TRUE)
 
 segments3D (x0, y0, z0, x1 = x0, y1 = y0, z1 = z0, ..., 
@@ -69,23 +69,24 @@ polygon3D (x, y, z, ...,
 arrows2D (x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
          col = NULL, NAcol = "white",
          colkey = list(side = 4),
-         clim = NULL, clab = NULL, add = FALSE)  
+         clim = NULL, clab = NULL, type = "triangle", 
+         add = FALSE, plot = TRUE)  
 
 segments2D (x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
          col = NULL, NAcol = "white",
          colkey = list(side = 4),
-         clim = NULL, clab = NULL, add = FALSE) 
+         clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
 
 rect2D (x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
          col = NULL, NAcol = "white",
          colkey = list(side = 4),
-         clim = NULL, clab = NULL, add = FALSE) 
+         clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
          
 polygon2D (x, y, ..., colvar = NULL, 
          col = NULL, NAcol = "white", 
          border = NA, facets = TRUE,
          colkey = list(side = 4), 
-         clim = NULL, clab = NULL, add = FALSE)
+         clim = NULL, clab = NULL, add = FALSE, plot = TRUE)
 }
 
 \arguments{
@@ -157,7 +158,7 @@ polygon2D (x, y, ..., colvar = NULL,
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     }
   \item{type }{The type of the arrow head, one of \code{"simple"} 
-    (the default, which uses R-function \link{arrows}) or \code{"triangle"} and \code{"cone"}.
+    (which uses R-function \link{arrows}), \code{"curved"} or \code{"triangle"} and \code{"cone"}.
     The latter two are the same in \code{plot3D} (but differ in package \code{plot3D.rgl}).
     }
   \item{add }{Logical. If \code{TRUE}, then the arrows, segments, ... will be added to the current plot.
@@ -167,9 +168,18 @@ polygon2D (x, y, ..., colvar = NULL,
     otherwise the viewing transformation matrix is returned (as invisible). 
     } 
   \item{\dots}{additional arguments passed to the plotting methods. 
+
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.
+    The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes for 3D plots.
+    All objects will be plotted, including those that fall out of these ranges.
+    To select objects only within the axis limits, use \link{plotdev}.
+    
+    \code{shade} and \code{lighting} parameters will have no effect.
+    
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
+         
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
@@ -212,11 +222,11 @@ polygon2D (x, y, ..., colvar = NULL,
 
  M <- mesh(xx, yy, zz)
  x0 <- M$x; y0 <- M$y; z0 <- M$z
- x1 <- x0 + 0.05
+ x1 <- x0 + 0.1
 
  Col <- c("red", "blue", "green") 
- arrows3D(x0, y0, z0, x1 = x1, colvar = z0, lwd = 2, type = "triangle",
-          d = 2, length = 0.05, clab = "z-value", col = Col,
+ arrows3D(x0, y0, z0, x1 = x1, colvar = z0, lwd = 2, 
+          d = 2, clab = "z-value", col = Col, length = 0.1,
           xlim = c(-0.8, 0.8), ylim = c(-0.8, 0.8),
           main = "arrows3D, points3D, segments3D, border3D")
 
@@ -272,7 +282,7 @@ polygon2D (x, y, ..., colvar = NULL,
 # use alpha.col to set the transparency of a vector of colors
  box3D(x0 = runif(3), y0 = runif(3), z0 = runif(3),
        x1 = runif(3), y1 = runif(3), z1 = runif(3),
-       col = alpha.col(c("red", "lightblue", "orange"), alpha = 0.5),
+       col = c("red", "lightblue", "orange"), alpha = 0.5,
        border = "black", lwd = 2)
 
 ## ========================================================================
@@ -318,8 +328,8 @@ polygon2D (x, y, ..., colvar = NULL,
  Y1 <- Y0 + 1
  Z1 <- Z0 + 10
 
- arrows3D(X0, Y0, Z0, X1, Y1, Z1, length = 0.05, lwd = 2, 
-         add = TRUE, col = "red")
+ arrows3D(X0, Y0, Z0, X1, Y1, Z1, lwd = 2, 
+         add = TRUE, type = "curved", col = "red")
 
  segments3D(X0, Y0, Z0, X0, Y0, rep(0, length(X0)), lwd = 2, 
          add = TRUE, col = "green")
@@ -358,9 +368,10 @@ segments2D(x0 = runif(10), y0 = runif(10),
          x1 = runif(10), y1 = runif(10), colvar = 1:10, 
          lwd = 2, add = TRUE, colkey = FALSE) 
 
+# transparency
 rect2D(x0 = runif(10), y0 = runif(10), 
        x1 = runif(10), y1 = runif(10), colvar = 1:10, 
-       col = jet.col(alpha = 0.4), lwd = 2, main = "rect2D") 
+       alpha = 0.4, lwd = 2, main = "rect2D") 
 
 ## ========================================================================
 ## polygon2D 
@@ -381,7 +392,7 @@ rect2D(x0 = runif(10), y0 = runif(10),
 # transparent colors (alpha)
  polygon2D(x, y, border = "black", lwd = 3,
    colvar = 1:(length(ii) + 1), 
-   col = gg.col(alpha = 0.8), 
+   col = gg.col(), alpha = 0.2, 
    main = "polygon2D")
 
 # restore plotting parameters

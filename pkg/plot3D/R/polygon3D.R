@@ -88,11 +88,13 @@ polygon3D  <- function(x, y, z,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   
@@ -120,7 +122,8 @@ polygon3D  <- function(x, y, z,
                col    = Col$facet,
                border = Col$border,
                lwd    = rep(lwd , length.out = len),
-               lty    = rep(lty , length.out = len))
+               lty    = rep(lty , length.out = len),
+               isimg  = rep(0, length.out = len))
 
   Poly$proj   <- project(colMeans(xx, na.rm = TRUE), colMeans(yy, na.rm = TRUE), 
     colMeans(zz, na.rm = TRUE), plist)
@@ -145,7 +148,7 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
                     col = NULL, NAcol = "white", 
                     border = NA, facets = TRUE,
                     colkey = list(side = 4), 
-                    clim = NULL, clab = NULL, add = FALSE)  {
+                    clim = NULL, clab = NULL, add = FALSE, plot = TRUE)  {
 
   if (add) 
     plist <- getplist()
@@ -157,7 +160,8 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
                     colkey = colkey, clim = clim,
                     clab = clab, ...)
   setplist(plist)
-
+  if (! plot) return()
+  
   dots <- splitpardots(list(...))
 
 # checks
@@ -228,11 +232,13 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
         par.ori <- par(plt = colkey$parplt)
     }
      
+    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
+    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   

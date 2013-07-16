@@ -86,7 +86,7 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
   if (contour$add) 
     cv <- colvar
 
-  CC <- check.colvar.persp(colvar, z, col, 2, clim)
+  CC <- check.colvar.persp(colvar, z, col, 2, clim, dot$alpha)
   colvar <- CC$colvar; col <- CC$col
 
   if (ispresent(colvar)) {

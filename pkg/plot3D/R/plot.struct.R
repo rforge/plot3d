@@ -10,13 +10,23 @@ plotdev <- function(...)  {
 ## =============================================================================
 
 plot.plist <- function(x, ...)  {
+
   if (length(x) == 0)
     stop("nothing to draw")
+
+  dot <- list(...)
+
   if (x$type == "2D") {
     x <- plot2Dplist(x, ...)
     setplist(x)
     return(invisible(x))
   }
+  
+  if (length(x$img) > 0) { 
+    x <- mapimg(x)
+    setplist(x)
+  }
+  
   dot <- list(...)
 
   if (length(dot) != 0) {
@@ -61,7 +71,8 @@ plot.struct.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
       plist <- plotbox(plist)
   }
   
-  plist <- update.3D(plist, pt, CIpt, poly, segm, labels, arr, other)
+  plist <- update.3D(plist, pt, CIpt, poly, segm, labels, arr, other, 
+    expand = plot)
 
   if (plot) {
     plotlist3D(plist)
@@ -83,31 +94,20 @@ alpha3D <- function(plist, alpha) { # makes colors transparant
   if (alpha == 1 | alpha == 0) 
     return (plist)
   
-  setalpha <- function(Col) {
-    if (is.null(Col))
-      return(Col)
-    ii <- which (! is.na(Col))
-    if (length(ii) > 0) {   
-      pcol <- alpha.col (Col, alpha)
-      Col[ii] <- pcol[ii] 
-    }    
-    Col
-  }
-
-  plist$poly$col       <- setalpha(plist$poly$col)
-  plist$poly$border    <- setalpha(plist$poly$border)
-  plist$pt$col         <- setalpha(plist$pt$col)
-  plist$pt$bg          <- setalpha(plist$pt$bg)
-  plist$CIpt$col       <- setalpha(plist$CIpt$col)
-  plist$CIpt$bg        <- setalpha(plist$CIpt$bg)
-  plist$CIpt$CIpar$col <- setalpha(plist$CIpt$CIpar$col)
-  plist$labels$col     <- setalpha(plist$labels$col)
-  plist$segm$col       <- setalpha(plist$segm$col)
-  plist$arr$col        <- setalpha(plist$arr$col)
+  plist$poly$col       <- setalpha(plist$poly$col, alpha)
+  plist$poly$border    <- setalpha(plist$poly$border, alpha)
+  plist$pt$col         <- setalpha(plist$pt$col, alpha)
+  plist$pt$bg          <- setalpha(plist$pt$bg, alpha)
+  plist$CIpt$col       <- setalpha(plist$CIpt$col, alpha)
+  plist$CIpt$bg        <- setalpha(plist$CIpt$bg, alpha)
+  plist$CIpt$CIpar$col <- setalpha(plist$CIpt$CIpar$col, alpha)
+  plist$labels$col     <- setalpha(plist$labels$col, alpha)
+  plist$segm$col       <- setalpha(plist$segm$col, alpha)
+  plist$arr$col        <- setalpha(plist$arr$col, alpha)
   
   if (! is.null(plist$numkeys))
     for (i in 1:plist$numkeys)
-      plist$colkey[[i]]$col  <- setalpha(plist$colkey[[i]]$col)
+      plist$colkey[[i]]$col  <- setalpha(plist$colkey[[i]]$col, alpha)
       
   return(plist)
 }
@@ -124,25 +124,53 @@ color3D <- function(poly, scalefac, shade, lighting) {  # lighting and shading
   px <- poly$x * scalefac$x
   py <- poly$y * scalefac$y
   pz <- poly$z * scalefac$z
-  Normals <- normal.points(rbind(px[1,], py[1,], pz[1,]) , 
-                           rbind(px[2,], py[2,], pz[2,]) , 
-                           rbind(px[3,], py[3,], pz[3,]) )
+  isthree <- which(is.na(px[4,]))
+    
+  if (length(isthree) == ncol(px))
+    Normals <- normal.points.tri(rbind(px[1,], py[1,], pz[1,]) , 
+                             rbind(px[2,], py[2,], pz[2,]) , 
+                             rbind(px[3,], py[3,], pz[3,]) 
+                           )
+  
+  else if (length(isthree) == 0)
+    Normals <- normal.points(rbind(px[1,], py[1,], pz[1,]) , 
+                             rbind(px[3,], py[3,], pz[3,]) , 
+                             rbind(px[4,], py[4,], pz[4,]) ,
+                             rbind(px[2,], py[2,], pz[2,]) 
+                             )
+  else {
+    Normals <- list(u = rep(0, ncol(px)), 
+                    v = rep(0, ncol(px)), w = rep(0, ncol(px)))
+ 
+    NN <- normal.points.tri(rbind(px[1,isthree], py[1,isthree], pz[1,isthree]) , 
+                             rbind(px[2,isthree], py[2,isthree], pz[2,isthree]) , 
+                             rbind(px[3,isthree], py[3,isthree], pz[3,isthree]) 
+                       )
+    Normals$u[isthree] <- NN$u
+    Normals$v[isthree] <- NN$v
+    Normals$w[isthree] <- NN$w
+    isfour <- which(!is.na(px[4,]))
+        
+    NN <- normal.points(rbind(px[1,isfour], py[1,isfour], pz[1,isfour]) , 
+                             rbind(px[3,isfour], py[3,isfour], pz[3,isfour]) , 
+                             rbind(px[4,isfour], py[4,isfour], pz[4,isfour]) ,
+                             rbind(px[2,isfour], py[2,isfour], pz[2,isfour]) 
+                             )
+    Normals$u[isfour] <- NN$u
+    Normals$v[isfour] <- NN$v
+    Normals$w[isfour] <- NN$w
+  
+  }                           
     
   ii <- which (! is.na(poly$col) & poly$col != "transparent" )
   if (length(ii) > 0) {   
-    if (shade$type == "shade") 
-      pcol <- facetcols.shade(light, Normals, poly$col, shade$shade)
-    else if (shade$type == "light") 
-      pcol <-  facetcols.light(light, Normals, poly$col, shade)
+    pcol <- facetcols.shadelight(light, Normals, poly$col, shade)
     poly$col[ii] <- pcol[ii] 
   }    
 
   ii <- which (! is.na(poly$border))
   if (length(ii) > 0) {   
-    if (shade$type == "shade") 
-      pcol <- facetcols.shade(light, Normals, poly$border, shade$shade)
-    else if (shade$type == "light") 
-      pcol <-  facetcols.light(light, Normals, poly$border, shade)
+    pcol <-  facetcols.shadelight(light, Normals, poly$border, shade)
     poly$border[ii] <- pcol[ii] 
   }    
   
@@ -159,6 +187,21 @@ proj3D <- function(plist, dot) {
   if (!is.null(dot$phi))
     plist$persp$phi <- dot$phi
 
+  lims <- c(!is.null(dot$xlim), !is.null(dot$ylim), !is.null(dot$zlim))
+  if (sum(lims) > 0) {
+    SS <- function(x, y, z) {
+     sel <- rep(TRUE, length.out = length(x))
+     if (lims[1])
+       sel[x < min(dot$xlim) | x > max(dot$xlim)] <- FALSE
+     if (lims[2])
+       sel[y < min(dot$ylim) | y > max(dot$ylim)] <- FALSE
+     if (lims[3])
+       sel[z < min(dot$zlim) | z > max(dot$zlim)] <- FALSE
+     return(sel)
+    } 
+    plist <- selectplist(plist, SS)
+  } 
+      
   if (!is.null(dot$xlim))
     plist$xlim <- dot$xlim
 
@@ -220,11 +263,15 @@ proj3D <- function(plist, dot) {
 ## =============================================================================
 
 update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL, 
-       segm = NULL, labels = NULL, arr = NULL, other = NULL) {       
+       segm = NULL, labels = NULL, arr = NULL, other = NULL, expand = TRUE) {       
 # ------------------------------------------------------------------------------
 # update plist with new elements     
 # ------------------------------------------------------------------------------
-
+  if (any(plist$setlim)) {
+    PL <- list(pt = pt, CIpt = CIpt, poly = poly, segm = segm, labels = labels,
+    arr = arr, imgnr = plist$imgnr)
+  }
+  
   if (is.null(plist$pt))
     plist$pt <- pt
 
@@ -282,46 +329,34 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
   }
     
   if (! is.null(poly)) {
-    if (is.null(plist$poly)) {
-      plist$poly <- poly      
-      plist$poly$img <- NULL
-    } else {
-      nR1 <- nrow(poly$x) 
-      nR2 <- nrow(plist$poly$x)
-      if (nR1 > nR2) {
-        nR <- matrix(nrow = nR1 - nR2, ncol = ncol(plist$poly$x), data = NA)
-        plist$poly$x <- rbind(plist$poly$x, nR)
-        plist$poly$y <- rbind(plist$poly$y, nR)
-        plist$poly$z <- rbind(plist$poly$z, nR)
-      } else if (nR2 > nR1) {
-        nR <- matrix(nrow = nR2 - nR1, ncol = ncol(poly$x), data = NA)
-        poly$x <- rbind(poly$x, nR)
-        poly$y <- rbind(poly$y, nR)
-        poly$z <- rbind(poly$z, nR)
-      }
 
-      plist$poly$x      <- cbind(plist$poly$x,  poly$x)
-      plist$poly$y      <- cbind(plist$poly$y,  poly$y)
-      plist$poly$z      <- cbind(plist$poly$z,  poly$z)
-      plist$poly$proj   <- c(plist$poly$proj,   poly$proj)
-      plist$poly$lwd    <- c(plist$poly$lwd,    poly$lwd)
-      plist$poly$lty    <- c(plist$poly$lty,    poly$lty)
-      plist$poly$border <- c(plist$poly$border, poly$border)
-      plist$poly$col    <- c(plist$poly$col,    poly$col)
-      plist$poly$isimg  <- c(plist$poly$isimg,  poly$isimg)
-    }
-    if (! is.null(poly$img)) {        # If polygons form an image - for use with rgl
       if (is.null(plist$imgnr)) {
         plist$imgnr <- 0
         plist$img <- list()
-      } 
-      for (ii in 1: length(poly$img)) {
-        plist$imgnr <- plist$imgnr + 1
-        plist$img[[plist$imgnr]] <- poly$img[[ii]]
       }
-    }
+      if (length(poly$img) > 0) {
+        Img <- poly$img  
+        for (ii in 1: length(Img)) {
+          img <- Img[[ii]]
+          plist$imgnr <- plist$imgnr + 1
+          if (expand) {
+            if (is.null(img$mapped)) 
+              img$mapped <- TRUE
+            if (!img$mapped) {
+              Poly <- with (img, polyfill(x, y, z, col[sl$list], NAcol,        
+                facets, border, sl, lwd, lty, sl$Proj[sl$list]))
+              poly <- addPoly(poly, Poly)
+            }
+          }
+          plist$img[[plist$imgnr]] <- img
+        }
+      }
+#    if (expand) 
+      plist$poly <- addPoly(plist$poly, poly)
   }
-  
+  if (expand & length(plist$img) >0 )  
+    plist <- mapimg(plist)
+
   if (is.null(plist$segm))
     plist$segm <- segm
   else if (! is.null(segm)) {
@@ -410,9 +445,10 @@ plotlist3D <- function(plist) {
       numStruct <- numStruct + 1
     }    
 
-    sortlist <- sort.int(c(pt$proj, CIpt$proj, poly$proj, segm$proj, 
-                           labels$proj, arr$proj, other$proj), 
-                         index.return = TRUE)$ix
+    List <- c(pt$proj, CIpt$proj, poly$proj, segm$proj, 
+                           labels$proj, arr$proj, other$proj)
+    if (length(List) == 0) return()
+    sortlist <- sort.int(List, index.return = TRUE)$ix
 
 # ------------------------------------------------------------------------------
 # check if there is only one types and plot if true
@@ -553,15 +589,6 @@ plotlist3D <- function(plist) {
 
     } else if (type[ii] == 5) {
        io <- i - LCPSL
-       arrows(arr.from$x[io], arr.from$y[io],  
-              arr.to$x[io], arr.to$y[io], 
-              length = arr$length[io], 
-              angle = arr$angle[io], 
-              code = arr$code[io], 
-              col = arr$col[io], 
-              lwd = arr$lwd[io], 
-              lty = arr$lty[io])
-              
        if (arr$type[io] == "simple")
          arrows(arr.from$x[io], arr.from$y[io],  
               arr.to$x[io], arr.to$y[io], 
@@ -646,3 +673,226 @@ arrtria <- function (x.from, y.from, x.to, y.to, code,
   arrhead(3)
 }
 
+
+selectplist <- function (plist, SS) {
+ #
+ 
+  if (! is.null(plist$pt)) {
+    pt  <- plist$pt                  
+    ipt <- with (pt, SS(x.mid, y.mid, z.mid))
+    if (sum(ipt) > 0)
+      plist$pt <- with(pt, list(x.mid = x.mid[ipt], y.mid = y.mid[ipt],
+        z.mid = z.mid[ipt], col = col[ipt], pch = pch[ipt],
+        cex = cex[ipt], bg = bg[ipt], proj = proj[ipt]))
+    else
+      plist$pt <- NULL
+  }
+ #
+  if (!is.null(plist$CIpt)) {
+    CIpt <- plist$CIpt
+    ipt <- with (CIpt, SS(x.mid, y.mid, z.mid))
+    if (sum(ipt) > 0)
+      plist$CIpt <- with (CIpt, list(x.to = x.to[ipt,], y.to = y.to[ipt,],
+       z.to = z.to[ipt,], x.from = x.from [ipt,], y.from = y.from[ipt,],
+       z.from = z.from[ipt,], nCI = nCI[ipt], x.mid = x.mid[ipt],
+       y.mid = y.mid[ipt], z.mid = z.mid[ipt], length = CIpt$length[ipt],
+       col= col[ipt], pch = pch[ipt],
+       bg = bg[ipt], cex = cex[ipt], proj = proj[ipt],
+       CIpar = list (col = CIpar$col[ipt], lwd = CIpar$lwd[ipt],
+        lty = CIpar$lty[ipt], alen = CIpar$alen[ipt])))
+    else
+      plist$CIpt <- NULL
+  }
+
+ # polygons
+  if (length(plist$poly$x) > 0) {
+    xm <- colMeans(plist$poly$x, na.rm = TRUE)
+    ym <- colMeans(plist$poly$y, na.rm = TRUE)
+    zm <- colMeans(plist$poly$z, na.rm = TRUE)
+    remove <- NULL
+    if (any(is.nan(xm)))
+      remove <- c(remove, which(is.nan(xm)))
+    if (any(is.nan(ym)))
+      remove <- c(remove, which(is.nan(ym)))
+    if (any(is.nan(zm)))
+      remove <- c(remove, which(is.nan(zm)))
+    if (! is.null(remove)) {
+      remove <- unique(remove)
+      xm[is.nan(xm)] <- 0
+      ym[is.nan(ym)] <- 0
+      zm[is.nan(zm)] <- 0
+    }      
+    ip <- SS(xm, ym, zm)
+    if (! is.null(remove)) 
+      ip[remove] <- FALSE
+
+    if (sum(ip) > 0)
+      plist$poly <- with (plist$poly, list(x = as.matrix(x[,ip]), 
+         y = as.matrix(y[,ip]), z = as.matrix(z[,ip]),
+        col = col[ip], border = border[ip], lwd = lwd[ip], lty = lty[ip], 
+        isimg = isimg[ip], proj = proj[ip]))
+    else
+      plist$poly <- NULL
+  } else
+      plist$poly <- NULL
+
+ # images
+  imgxrange <- NULL
+  imgyrange <- NULL
+  imgzrange <- NULL
+  
+  if (length(plist$img)> 0 ) {
+    for (i in plist$imgnr:1) {
+      img <- plist$img[[i]]
+      
+     # because col has one row and column less than x, y, z 
+      Col <- img$col
+      if (nrow(Col) != nrow(img$z))
+        Col <- rbind(Col, Col[nrow(Col),])
+      if (ncol(Col) != ncol(img$z))
+        Col <- cbind(Col, Col[,ncol(Col)])
+      
+      # expand all values of x and y
+      if (is.vector(img$x)) {
+        XY <- mesh(img$x, img$y)
+        img$x <- XY$x; img$y <- XY$y
+      }
+      Nx <- nrow(img$z)
+      Ny <- ncol(img$z)
+
+      remove <- NULL
+      if (any(is.na(img$x)))
+        remove <- c(remove, which(is.na(img$x)))
+      if (any(is.na(img$y)))
+        remove <- c(remove, which(is.na(img$y)))
+      if (any(is.na(img$z)))
+        remove <- c(remove, which(is.na(img$z)))
+      if (! is.null(remove)) {
+        remove <- unique(remove)
+        img$x[is.na(img$x)] <- 0
+        img$y[is.na(img$y)] <- 0
+        img$z[is.na(img$z)] <- 0
+      }      
+
+      ipt <- SS(img$x, img$y, img$z)
+      if (! is.null(remove))  {
+        ipt[remove] <- FALSE
+        img$x[remove] <- NA
+        img$y[remove] <- NA
+        img$z[remove] <- NA
+      }
+
+      if (sum(ipt) > 0) {
+        zset <- min(img$z[ipt], na.rm = TRUE)
+        Select <- img$z; Select[] <- ipt
+        Noselect <- which(!ipt)
+        Col[Noselect] <- "transparent"
+        img$z[Noselect] <- zset
+        arrsel <- which (Select == 1, arr.ind = TRUE)
+        xr <- range(arrsel[,1])
+        yr <- range(arrsel[,2])
+  
+        xsel <- xr[1] : xr[2]
+        ysel <- yr[1] : yr[2]
+        if (is.vector(plist$img[[i]]$x)) 
+          plist$img[[i]]$x <- plist$img[[i]]$x[xsel]
+        else
+          plist$img[[i]]$x <- img$x[xsel, ysel]
+
+        if (is.vector(plist$img[[i]]$x)) 
+          plist$img[[i]]$y <- plist$img[[i]]$y[ysel]
+        else
+          plist$img[[i]]$y <- img$y[xsel, ysel]
+        
+        plist$img[[i]]$z <- img$z[xsel, ysel]
+        plist$img[[i]]$col <- Col[xsel, ysel]
+        imgxrange <- range( c(imgxrange, plist$img[[i]]$x), na.rm = TRUE) 
+        imgyrange <- range( c(imgyrange, plist$img[[i]]$y), na.rm = TRUE) 
+        imgzrange <- range( c(imgzrange, plist$img[[i]]$z), na.rm = TRUE) 
+
+        if (! is.null(remove))  {
+          plist$img[[i]]$x[is.na(plist$img[[i]]$x)] <- imgxrange[1]
+          plist$img[[i]]$y[is.na(plist$img[[i]]$y)] <- imgyrange[1]
+          plist$img[[i]]$z[is.na(plist$img[[i]]$z)] <- imgzrange[1]
+        }
+
+      } else {
+        plist$img[[i]] <- NULL    
+        plist$imgnr <- plist$imgnr - 1
+      }  
+    }
+  }
+  
+  if (!is.null(plist$labels)) {
+    labels <- plist$labels
+    il <- with (labels, SS(x, y, z))
+    if (sum(il) > 0)
+      plist$labels <- with (labels, list(x = x[il], y = y[il], z = z[il],
+      labels = labels[il], adj = adj[il], cex = cex[il],
+      col = col[il], font = font[il], proj = proj[il]))
+    else
+      plist$labels <- NULL
+  }
+
+  if (!is.null(plist$segm)) {
+    segm <- plist$segm
+    is <- with (segm, SS(colMeans(rbind(as.vector(x.from), as.vector(x.to))),
+      colMeans(rbind(as.vector(y.from), as.vector(y.to))), colMeans(rbind(as.vector(z.from), as.vector(z.to)))))
+    if (sum(is) > 0)
+      plist$segm <- with (segm, list(x.from = as.vector(x.from)[is], 
+        y.from = as.vector(y.from)[is], z.from = as.vector(z.from)[is], 
+        x.to = as.vector(x.to)[is], y.to = as.vector(y.to)[is], 
+        z.to = as.vector(z.to)[is],
+        proj = proj[is], lwd  = lwd[is], lty  = lty[is], col  = col[is]))
+    else
+      plist$segm <- NULL
+  }
+
+  if (!is.null(plist$arr)) {
+    arr <- plist$arr
+    is <- with (arr, SS(colMeans(rbind(as.vector(x.from), as.vector(x.to))),
+      colMeans(rbind(as.vector(y.from), as.vector(y.to))), colMeans(rbind(as.vector(z.from), as.vector(z.to)))))
+    if (sum(is) > 0)
+      plist$arr <- with (arr, list(x.from = as.vector(x.from)[is], 
+        y.from = as.vector(y.from)[is], z.from = as.vector(z.from)[is], 
+        x.to = as.vector(x.to)[is], y.to = as.vector(y.to)[is], 
+        z.to = as.vector(z.to)[is],
+        proj = proj[is], lwd  = lwd[is], lty  = lty[is], col  = col[is],
+        code = code[is], angle = angle[is], length = length[is], type = type[is]))
+    else
+      plist$arr <- NULL
+  }
+
+  # new ranges 
+   xs <- c(plist$pt$x.mid, plist$CIpt$x.to, plist$CIpt$x.from,
+      plist$poly$x, plist$labels$x, plist$segm$x.from, plist$segm$x.to,
+      plist$arr$x.from, plist$arr$x.to, imgxrange)
+   if (length(xs) > 0)
+     plist$xlim <- newlim(xs)
+
+   ys <- c(plist$pt$y.mid, plist$CIpt$y.to, plist$CIpt$y.from,
+      plist$poly$y, plist$labels$y, plist$segm$y.from, plist$segm$y.to,
+      plist$arr$y.from, plist$arr$y.to, imgyrange)   
+   if (length(ys) > 0)
+     plist$ylim <- newlim(ys)
+
+   zs <- c(plist$pt$z.mid, plist$CIpt$z.to, plist$CIpt$z.from,
+      plist$poly$z, plist$labels$z, plist$segm$z.from, plist$segm$z.to,
+      plist$arr$z.from, plist$arr$z.to, imgzrange)
+   if (length(zs) > 0)
+     plist$zlim <- newlim(zs)
+
+  return (plist)
+}
+
+newlim <- function(xx) {
+
+  lim <- range(xx, na.rm = TRUE)
+
+  if (any(is.infinite(lim))) return(c(-0.1,0.1))
+  if (diff(lim) == 0)
+    lim <- lim * c(0.8, 1.2)
+  if (diff(lim) == 0)
+    lim <- lim + c(-0.1, 0.1)
+  return(lim)
+}

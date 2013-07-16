@@ -43,7 +43,7 @@ voxel3D <- function(x, y, z, colvar, ...,
     colvar <- vox$cv    
   
   do.call("scatter3D", c(alist(x = vox$x, y = vox$y, z = vox$z, 
-          add = TRUE, col = col, colkey = FALSE, plot = plot), dot$points))
+          add = TRUE, col = col, colkey = FALSE, plot = plot, alpha = dot$alpha), dot$points))
   plist <- getplist()
   invisible(plist$mat)
 }

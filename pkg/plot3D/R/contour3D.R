@@ -25,6 +25,11 @@ contour3D <- function(x = NULL, y = NULL,
   if (is.null(y))
     y <- seq(0, 1, length.out = ncol(colvar))
 
+  if (is.array(x) & length(dim(x)) == 1)
+    x <- as.vector(x)
+  if (is.array(y) & length(dim(y)) == 1)
+    y <- as.vector(y)
+
   if (! is.vector(x))
     stop("'x' should be a vector")
     
@@ -56,6 +61,8 @@ contour3D <- function(x = NULL, y = NULL,
   
   if (is.null(col))
     col <- jet.col(100)
+  if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    
   contour$args$col <- col
     
  # swap if decreasing

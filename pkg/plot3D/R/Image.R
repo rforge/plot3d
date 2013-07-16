@@ -17,12 +17,29 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    col = jet.col(100), NAcol = "white", 
                    border = NA, facets = TRUE, 
                    contour = FALSE, colkey = list(side = 4), resfac = 1, 
-                   clab = NULL, theta = 0, rasterImage = FALSE) {
+                   clab = NULL, theta = 0, rasterImage = FALSE,
+                   add = FALSE, plot = TRUE) {
 
+  if (is.null(add)) 
+    add <- FALSE
+
+ 
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+  plist <- add2Dplist(plist, "image", z = z, x = x, y = y, 
+                    col = col, NAcol = NAcol, border = border, facets = facets,
+                    contour = contour, colkey = colkey, resfac = resfac,
+                    clab = clab, theta = theta, rasterImage = rasterImage, ...)
+  setplist(plist)
+  if (!plot) return()
+  
  if (is.character(z)) {
    ImageNULL (z = NULL, x = x, y = y, ..., col = z, NAcol = NAcol, 
               border = border, facets = facets,
-              rasterImage = rasterImage, angle = theta)   
+              rasterImage = rasterImage, angle = theta, add = add)   
    return(invisible())
  } 
  # check colors  
@@ -34,21 +51,6 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   dots <- splitpardots(list(...))
   dotimage <- dots$main
   dotother <- dots$points
-
-  add <- dots[["add"]]
-  if (is.null(add)) 
-    add <- FALSE
-
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
-
-  plist <- add2Dplist(plist, "image", z = z, x = x, y = y, 
-                    col = col, NAcol = NAcol, border = border, facets = facets,
-                    contour = contour, colkey = colkey, resfac = resfac,
-                    clab = clab, theta = theta, rasterImage = rasterImage, ...)
-  setplist(plist)
 
   iscolkey <- is.colkey(colkey, col)       
   if (iscolkey) {
@@ -189,6 +191,7 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (zlog) 
       zlim  <- log(zlim )
                                 
+  if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
   colkeyZlim <- zlim
   colkeyCol  <- col
   
@@ -255,7 +258,7 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     do.call("abline", c(alist(h = 0.5*(y[-1]+y[-length(y)]), col = border), dotother))
     do.call("abline", c(alist(v = 0.5*(x[-1]+x[-length(x)]), col = border), dotother))
   }
-  if (is.null(dots$add)) 
+  if (!add) 
     box()
   
   # contours
@@ -263,7 +266,9 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (zlog) 
       if (!is.null(contour$levels)) 
         contour$levels <- log(contour$levels)
-      
+    if (! is.null(contour$col) &! is.null(contour$alpha)) 
+      contour$col <- setalpha(contour$col, contour$alpha)
+  
     if (! rotate)
       do.call("contour", c(list(z = z, add = TRUE), contour))
     else {    # first calculate contours on unrotated values, then transform
@@ -341,7 +346,7 @@ ImageNULL <- function(z = NULL,
                        y = seq(0, 1, length.out = ncol(col)), ...,
                        col, NAcol = "white",
                        border = NA, facets = TRUE,
-                       rasterImage = FALSE, angle) {
+                       rasterImage = FALSE, angle, add) {
 
   # check colors
   if (! is.character(col) | ! is.matrix(col))
@@ -351,10 +356,6 @@ ImageNULL <- function(z = NULL,
   dots <- splitpardots(list(...))
   dotimage <- dots$main
   dotother <- dots$points
-
-  add <- dots[["add"]]
-  if (is.null(add))
-    add <- FALSE
 
  # x- and y-values
   if (length(dim(x)) > 2 | length(dim(y)) > 2)
@@ -413,7 +414,7 @@ ImageNULL <- function(z = NULL,
     addraster (x, y, col, dotimage[["xlim"]], dotimage[["ylim"]], 
       angle, dotother)
 
-  if (is.null(dots$add))
+  if (!add)
     box()
 
 }

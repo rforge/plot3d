@@ -17,4 +17,4 @@ export(arrows3D, polygon3D, segments3D, rect3D, box3D, border3D)
 export(text3D, voxel3D, isosurf3D, createvoxel, createisosurf)
 export(arrows2D, segments2D, rect2D, polygon2D)
 
-export(getplist, setplist, plotdev)
+export(getplist, setplist, plotdev, selectplist)

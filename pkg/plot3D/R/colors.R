@@ -1,3 +1,15 @@
+setalpha <- function(Col, alpha) {
+  if (is.null(Col))
+    return(Col)
+  ii <- which (! is.na(Col))
+  if (length(ii) > 0) {   
+    pcol <- alpha.col (Col, alpha)
+    Col[ii] <- pcol[ii] 
+  }    
+  Col
+}
+
+
 ## =============================================================================
 ## Suitable colors
 ## =============================================================================
@@ -44,7 +56,6 @@ alpha.col <- function (col = "grey", alpha = 0.5) {
   return( rgb(t(RGBini), 
           maxColorValue = 255, alpha = alpha*255))
 }
-
 
 ramp.col <- function (col = c("grey", "black"), 
                       n = 100, alpha = 1) {

@@ -3,9 +3,10 @@
 \alias{plotdev}
 \alias{setplist}
 \alias{getplist}
+\alias{selectplist}
 
 \title{
-  Hnadling and plotting plotting lists.
+  Handling and plotting plotting lists.
 }
 \description{
   S3 method \code{plot.plist} and function \code{plotdev} plot the plotting list 
@@ -14,17 +15,25 @@
   or to make colors transparent.
 
   \code{getplist} and \code{setplist} retrieve and store information in the plotting list.
+  
+  \code{selectplist} selects parts from the plotting list, based on a user-defined function.
 }
 \usage{
 getplist()
 setplist(plist)
 plotdev(...)
 \method{plot}{plist} (x, ...) 
+selectplist(plist, SS)
 }
 
 \arguments{
   \item{x, plist }{The plotting \code{list} as generated (invisibly) 
     by any of the 3D plotting functions.
+    }
+  \item{SS }{Function which tests points for inclusion in the plotting list.
+    It should take as argument three vectors (x, y, z) and return a vector of 
+    equal length that is either \code{TRUE} or \code{FALSE}, denoting whether
+    the point should be selected or not.
     }
   \item{... }{Additional arguments to change the view or coloration. 
     Supported arguments to change the view are :
@@ -85,10 +94,7 @@ plotdev(...)
     (note in R-function \link{polygon}, passing a vector of line widths is not implemented;
     therefore, only the first value of \code{lwd} will be used for all polygons).
   
-  \item \code{proj}: the viewing depth of each polygon; polygons that are further away will
-    be drawn first (the painters algorithm).
-  
-    When \code{plot.plist} is called, the projection depth is used to sort the
+    When \code{plot.plist} is called, the projection depth is calculated and used to sort the
     facets and function \code{polygon} used to draw them.
   }
 }
@@ -267,6 +273,37 @@ plotdev(...)
 # plot updated list
  plotdev()
  
+
+## ========================================================================
+## Using selectplist
+## ========================================================================
+
+ polygon3D(runif(10), runif(10), runif(10), col = "red", 
+   alpha = 0.2, plot = FALSE, ticktype = "detailed", 
+   xlim = c(0,1), ylim = c(0, 1), zlim = c(0, 1))
+ polygon3D(runif(10)*0.5, runif(10), runif(10), col = "yellow", 
+   alpha = 0.2, plot = FALSE, add = TRUE)
+ polygon3D(runif(10)*0.5+0.5, runif(10), runif(10), col = "green", 
+   alpha = 0.2, plot = FALSE, add = TRUE)
+ points3D(runif(10), runif(10), runif(10), col = "blue", 
+   add = TRUE, plot = FALSE)
+ segments3D(x0 = runif(10), y0 = runif(10), z0 = runif(10), 
+   x1 = runif(10), y1 = runif(10), z1 = runif(10), 
+   colvar = 1:10, add = TRUE, lwd = 3)
+
+# retrieve plotting list
+ plist <- getplist()
+
+# selection function 
+ SS <- function (x, y, z)  {
+   sel <- rep(TRUE, length.out = length(x))
+   sel[x < 0.5] <- FALSE
+   return(sel)
+ } 
+# The whole polygon will be removed or kept.  
+ plot(x = selectplist(plist, SS), 
+   xlim = c(0, 1), ylim = c(0, 1), zlim = c(0, 1))
+
 # restore plotting parameters
  par(mfrow = pm)
  par(mar = pmar)

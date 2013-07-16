@@ -42,12 +42,12 @@ lines3D (x, y, z, ...)
 
 scatter2D (x, y, ..., colvar = NULL, col = NULL, NAcol = "white", 
          colkey = list(side = 4), clim = NULL, clab = NULL, 
-         CI = NULL, add = FALSE)
+         CI = NULL, add = FALSE, plot = TRUE)
 
 text2D (x, y, labels, ..., colvar = NULL, 
          col = NULL, NAcol = "white", 
          colkey = list(side = 4), 
-         clim = NULL, clab = NULL, add = FALSE) 
+         clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
 }
 
 \arguments{
@@ -126,16 +126,25 @@ text2D (x, y, labels, ..., colvar = NULL,
     If \code{FALSE} a new plot is started. 
     } 
   \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
-    otherwise the viewing transformation matrix is returned (as invisible). 
+    otherwise (for 3D plots) the viewing transformation matrix is returned (as invisible). 
     } 
   \item{\dots}{additional arguments passed to the plotting methods. 
+
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
     scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes for 3D plots.
+    All objects will be plotted, including those that fall out of these ranges.
+    To select objects only within the axis limits, use \link{plotdev}.
+
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
 
+    \code{shade} and \code{lighting} parameters will have no effect.
+    
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
+         
     For all functions, the arguments \code{lty, lwd} can be specified; \code{type}
     can be specified for all except \code{text3D}.
     
@@ -181,9 +190,11 @@ text2D (x, y, labels, ..., colvar = NULL,
 
  scatter2D(x, sin(x), colvar = cos(x), pch = 16, 
          ylab = "sin", clab = "cos", cex = 1.5)
+# other box types:
  scatter2D(x, sin(x), colvar = cos(x), type = "l", lwd = 4, bty = "g")
  scatter2D(x, sin(x), colvar = cos(x), type = "b", lwd = 2, bty = "b2")
- scatter2D(x, sin(x), colvar = cos(x), type = "h", lwd = 4)
+# transparent colors and spikes
+ scatter2D(x, sin(x), colvar = cos(x), type = "h", lwd = 4, alpha = 0.5)
   
 ## =======================================================================
 ## mesh examples and scatter2D
@@ -363,8 +374,9 @@ text2D (x, y, labels, ..., colvar = NULL,
   
 # scatter + surface
  scatter3D(xs, ys, zs, ticktype = "detailed", pch = 16, 
-   xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215), 
-   surf = list(x = M$x, y = M$y, z = volcano, shade = 0.5))
+   bty = "f", xlim = c(1, 87), ylim = c(1,61), zlim = c(94, 215), 
+   surf = list(x = M$x, y = M$y, z = volcano,  
+               NAcol = "grey", shade = 0.1))
  
 ## =======================================================================
 ## A surface and CI

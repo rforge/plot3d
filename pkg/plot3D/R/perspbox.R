@@ -21,13 +21,19 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
                      phi = 40, theta = 40, col = NULL,
                      colkey = list(side = 4), plot = TRUE){
 
-  plist <- list(type = "3D", plt = NULL, persp = NULL)
+  dot <- list(...)
+  plist <- list(type = "3D", plt = NULL, persp = NULL, alpha = dot$alpha)
+  dot$alpha <- NULL
+  dot$clog <- NULL
+ 
+ # which ranges are imposed...
+  plist$setlim <- c(dot$setlim1, dot$setlim2, dot$setlim3)
+  dot$setlim1 <- dot$setlim2 <- dot$setlim3 <- NULL 
+  
   if (plot) 
     plist$plt$ori   <- par("plt")
   plist$persp$box <- FALSE
   
-  dot <- list(...)
-  dot$clog <- NULL
   plist$persp$expand <- ifelse (is.null(dot$expand), 1, dot$expand)
   
  # check inputs 

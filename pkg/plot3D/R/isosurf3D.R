@@ -43,6 +43,7 @@ isosurf3D <- function(x, y, z, colvar, ...,
   } else if (length(col) != nlevel)
     stop ("number of colors in 'col' must equal number of levels")
   
+  if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
   iscolkey <- is.colkey(colkey, col)    
   if (iscolkey) 
     colkey <- check.colkey(colkey)
@@ -165,11 +166,13 @@ triangle3D  <- function(tri, colvar = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   

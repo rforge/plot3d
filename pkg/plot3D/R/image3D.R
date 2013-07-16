@@ -10,6 +10,11 @@ createsurfs <- function (x, y, z, colvar, names = c("x", "y", "z")) {
 
   if (is.null (x))
     x <- seq(0, 1, length.out = nrow(colvar))
+  if (is.array(x))
+    if (length(dim(x)) == 1)
+      x <- as.vector(x)
+    else if (length(dim(x)) == 2)
+      x <- as.matrix(x)
   if (! is.null(colvar)) {
     if (is.vector(x) & length(x) != nrow(colvar))
       stop (names[1], " should be a vector of length = nrow(colvar) or be NULL")
@@ -17,11 +22,17 @@ createsurfs <- function (x, y, z, colvar, names = c("x", "y", "z")) {
       if (any(dim(x) - dim(colvar) != 0)) 
         stop(names[1], " not compatible with 'colvar'")
   }
+      
   if (! is.matrix(x) & ! is.vector(x))
     stop(names[1], "should be a vector, a matrix or one value")
               
   if (is.null (y))
     y <- seq(0, 1, length.out = ncol(colvar))
+  if (is.array(y))
+    if (length(dim(y)) == 1)
+      y <- as.vector(y)
+    else if (length(dim(y)) == 2)
+      y <- as.matrix(y)
   if (! is.null(colvar)) {
     if (is.vector(y) & length(y) != ncol(colvar))
       stop (names[2], " should be a vector of length = ncol(colvar) or be NULL")

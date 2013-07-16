@@ -81,13 +81,22 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
     otherwise the viewing transformation matrix is returned (as invisible). 
     } 
   \item{\dots}{additional arguments passed to the plotting methods. 
+
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
     scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
+    All objects will be plotted, including those that fall out of these ranges.
+    To select objects only within the axis limits, use \link{plotdev}.
+
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
+    The parameters \code{shade} or \code{lighting} can be used for illuminating.
+    
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
+         
     Also the arguments \code{lty, lwd} can be specified (when \code{border} is not \code{NA}).
     
     The arguments after \dots must be matched exactly.
@@ -122,7 +131,7 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
  image3D(y = seq(0, 1, 0.1), z = seq(0, 1, 0.1), x = 0.5, 
    col = "blue", xlim = c(0,1))
  image3D(x = seq(0, 1, 0.1), z = seq(0, 1, 0.1), y = 0.5, 
-   add = TRUE, col = "red")
+   add = TRUE, col = "red", alpha = 0.2)   # alpha makes it transparent
  image3D(x = seq(0, 1, 0.1), y = seq(0, 1, 0.1), z = 0.5, 
    add = TRUE, col = "green")
  colkey(col = c("green", "red", "blue"), clim = c(0.5, 3.5), 
@@ -143,6 +152,7 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
    y = seq(0, 1, length.out = ncol(volcano)), 
    xlim = c(0, 2), ylim = c(0, 2), zlim = c(0, 2))
  image3D(y = 2, colvar = volcano, add = TRUE, 
+    shade = 0.2,
     x = seq(0, 1, length.out = nrow(volcano)),
     z = seq(1, 2, length.out = ncol(volcano)))
  image3D(x = 2, colvar = NULL, col = "orange", add = TRUE, 

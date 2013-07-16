@@ -13,13 +13,6 @@ surf3D <- function(x, y, z, ...,
                    lighting = FALSE, inttype = 1, 
                    add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
-
-  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
-  
  # check validity, class and dimensionality
   if (! is.matrix(x))
     stop("'x' should be a matrix")
@@ -37,6 +30,28 @@ surf3D <- function(x, y, z, ...,
   if (any (DD != dim(z)) )
     stop("dimension of 'x' not equal to dimension of 'z'")
 
+
+# check if col or colvar already have the colors to be used
+  if (is.character(colvar) & is.matrix(colvar)) {
+    col <- colvar
+    colvar <- NULL
+  }
+
+  if (is.null(colvar) & is.matrix(col)) {
+    pmat <- persp3Db(x = x, y = y, z = z, col = col, ..., 
+             phi = phi, theta = theta, NAcol = NAcol, border = border, 
+             facets = facets, panel.first = panel.first,
+             bty = bty, lighting = lighting, add = add, plot = plot)
+    return(invisible(pmat))
+  }
+
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+
+  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
+  
   if (ispresent(colvar)) {
 
     if (is.null(clim)) 
@@ -54,7 +69,7 @@ surf3D <- function(x, y, z, ...,
   } else 
     iscolkey <- FALSE
 
-  CC <- check.colvar.persp (colvar, z, col, inttype, clim)
+  CC <- check.colvar.persp (colvar, z, col, inttype, clim, dot$alpha)
   col <- CC$col
   colvar <- CC$colvar
   

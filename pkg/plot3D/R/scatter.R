@@ -6,7 +6,8 @@
 scatter2D <- function(x, y, ..., colvar = NULL, 
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4), 
-                    clim = NULL, clab = NULL, CI = NULL, add = FALSE) {
+                    clim = NULL, clab = NULL, CI = NULL, 
+                    add = FALSE, plot = TRUE) {
 
   if (add) 
     plist <- getplist()
@@ -18,7 +19,8 @@ scatter2D <- function(x, y, ..., colvar = NULL,
                     colkey = colkey, 
                     clim = clim, clab = clab, CI = CI, ...)
   setplist(plist)
-  
+  if (!plot) return()
+    
   dots <- splitpardots(list(...))
 
   isCI <- is.list(CI)
@@ -49,11 +51,13 @@ scatter2D <- function(x, y, ..., colvar = NULL,
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     
+    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else  {  # no colvar
     Col <- col
     if (is.null(Col)) Col <- "black"
+    if (! is.null(dots$alpha)) Col <- setalpha(Col, dots$alpha)
     iscolkey <- FALSE
   }   
 
@@ -75,6 +79,8 @@ scatter2D <- function(x, y, ..., colvar = NULL,
    # mean of point colors for line colors
     LCol <- cbind(Col[-1], Col[-len])
     LCol <- apply(LCol, MARGIN = 1, FUN = MeanColors)
+    if (! is.null(dots$alpha)) LCol <- setalpha(LCol, dots$alpha)
+    
 
     if (! add) 
       dots$main <- start2Dplot(dots$main, x, y)

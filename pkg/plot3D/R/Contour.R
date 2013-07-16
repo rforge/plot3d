@@ -2,7 +2,7 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    y = seq(0, 1, length.out = ncol(z)), ...,
                    col = NULL, NAcol = NULL, 
                    colkey = list(side = 4), resfac = 1,
-                   clab = NULL) {
+                   clab = NULL, add = FALSE, plot = TRUE) {
 
   # check colors
   if (length(col) == 1)
@@ -11,18 +11,11 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
  # The plotting arguments
   dots <- list(...)
 
-  add <- dots[["add"]]
   if (is.null(add)) add <- FALSE
   if (add) 
     plist <- getplist()
   else
     plist <- NULL
-
-  plist <- add2Dplist(plist, "contour", z = z, x = x, y = y, 
-                    col = col, NAcol = NAcol, 
-                    colkey = colkey, resfac = resfac,
-                    clab = clab, ...)
-  setplist(plist)
 
  # log transformation of z-values (log = "c", or log = "z")
   zlog <- FALSE
@@ -71,13 +64,15 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
 
   if (is.null(col))
     col <- jet.col(nlevs)
+  if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+  dots$alpha <- NULL
+  
     
   if (nlevs > 1) {
    # for colors: 
     dz <- c(-diff(levels[1:2]), diff(levels[(nlevs-1):nlevs])) * 0.5
     zlim <- range(levels) + dz
   }
-  
 
   iscolkey <- is.colkey(colkey, col)     
 
@@ -140,15 +135,21 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (!is.null(dots$levels))
       dots$levels <- log(dots$levels)
 
-  add <- dots$add
   if (is.null(add))
     add <- FALSE
-  dots$add <- NULL
+
   if (any (is.na(z)) & !is.null(NAcol)) {
     do.call("image2D", c(list(z = z, x = x, y = y, col = "transparent", 
-      NAcol = NAcol, add = add, colkey = FALSE), dots))
+      NAcol = NAcol, add = add, colkey = FALSE, plot = plot), dots))
     add <- TRUE
   }
+  plist <- add2Dplist(plist, "contour", z = z, x = x, y = y, 
+                    col = col, NAcol = NAcol, 
+                    colkey = colkey, resfac = resfac,
+                    clab = clab, ...)
+  setplist(plist)
+  if (!plot) return()
+  
   do.call("contour", c(list(z = z, x = x, y = y, col = col, 
     levels = levels, add = add), dots))
 

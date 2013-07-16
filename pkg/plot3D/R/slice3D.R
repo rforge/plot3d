@@ -7,9 +7,8 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
                      ys = NULL, zs = NULL, plist,
                      col = NULL, NAcol = "white",
                      border = NA, facets = TRUE, lwd = 1, clim = NULL,
-                     ltheta = -135, lphi = 0, shade = NA,
-                     lighting = FALSE)  {
-
+                     shadedot = NULL,
+                     lighting = FALSE, alpha = NULL)  {
 
   if (! ispresent(colvar))
     stop("'colvar' has to be defined and be an array of dimension 3")
@@ -58,8 +57,8 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
     poly <<- addimg(poly, xs, ys, zs, colvar = cv, plist = plist, 
         col = col, NAcol = NAcol, border = border, 
         facets = facets, resfac = 1, clim = clim, lwd = lwd, 
-        ltheta = ltheta, lphi = lphi, 
-        shade = shade, lighting = lighting)
+        ltheta = shadedot$ltheta, lphi = shadedot$lphi, 
+        shade = shadedot$shade, lighting = lighting, alpha = alpha)
     
   } # end function imageplane
 
@@ -97,7 +96,6 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
       for (z.s in zs[!is.na(zs)]) 
         add.plane(x, y, z.s, 3)
   }
-  
   return(poly)
 }                     
 
@@ -127,6 +125,8 @@ slice3D <- function(x, y, z, colvar, ...,
   if (iscolkey) 
     colkey <- check.colkey(colkey)
 
+  if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+
   if (is.null(clim))
     clim <- range(colvar, na.rm = TRUE)     
 
@@ -150,9 +150,8 @@ slice3D <- function(x, y, z, colvar, ...,
 
   Poly <- addslice(NULL, x, y, z, colvar, xs = xs, ys = ys, zs = zs, plist = plist,
                    col = col, NAcol = NAcol, border = border, facets = facets,
-                   clim = clim, ltheta = dot$shade$ltheta, lwd = lwd,
-                   lphi = dot$shade$lphi, shade = dot$shade$shade, 
-                   lighting = lighting)
+                   clim = clim, shadedot = dot$shade, lwd = lwd,
+                   lighting = lighting, alpha = dot$alpha)
    
   if (iscolkey)  
     plist <- plistcolkey(plist, colkey, col, clim, clab, 

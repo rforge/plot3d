@@ -67,6 +67,7 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim)
     if (length(Col) == 1)
       Col <- rep(Col, length.out = len)
@@ -75,6 +76,7 @@ scatter3D <- function(x, y, z, ..., colvar = z,
   } else {
     if (is.null(col))
       col <- "black"
+    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }
@@ -139,8 +141,8 @@ scatter3D <- function(x, y, z, ..., colvar = z,
       if (is.null(surf$clim))  
         surf$clim <- range(surf$colvar)
 
-    surf$colvar[surf$colvar < surf$clim[1]]  <- NA
-    surf$colvar[surf$colvar > surf$clim[2]]  <- NA
+    surf$colvar[surf$colvar < min(surf$clim)]  <- NA
+    surf$colvar[surf$colvar > max(surf$clim)]  <- NA
  
     surf$z[surf$z < dot$persp$zlim[1]]  <- NA
     surf$z[surf$z > dot$persp$zlim[2]]  <- NA

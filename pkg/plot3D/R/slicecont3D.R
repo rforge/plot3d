@@ -47,6 +47,8 @@ slicecont3D <- function(x, y, z, colvar, ...,
     
   if (is.null(col)) 
     col <- jet.col(100)
+
+  if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
   
   iscolkey <- is.colkey(colkey, col)    
   if (iscolkey) 

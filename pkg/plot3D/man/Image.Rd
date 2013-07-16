@@ -18,14 +18,15 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
          y = seq(0, 1, length.out = ncol(z)), ...,
          col = NULL, NAcol = NULL, 
          colkey = list(side = 4), resfac = 1,
-         clab = NULL)
+         clab = NULL, add = FALSE, plot = TRUE)
 
 \method{image2D}{matrix}(z, x = seq(0, 1, length.out = nrow(z)), 
                y = seq(0, 1, length.out = ncol(z)), ...,
                col = jet.col(100), NAcol = "white", 
                border = NA, facets = TRUE, contour = FALSE, 
                colkey = list(side = 4), resfac = 1, 
-               clab = NULL, theta = 0, rasterImage = FALSE) 
+               clab = NULL, theta = 0, rasterImage = FALSE,
+               add = FALSE, plot = TRUE) 
 
 \method{image2D}{array}(z, margin = c(1, 2), subset, ask = NULL, ...) 
 \method{image2D}{list}(z, ...) 
@@ -92,6 +93,12 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
     Note that by default, \link{rasterImage} linearly interpolates the image,
     so it will appear smoother.
     }
+  \item{add }{Logical. If \code{TRUE}, then the points will be added to the current plot.
+    If \code{FALSE} a new plot is started. 
+    } 
+  \item{plot }{Logical. If \code{TRUE} (default), a plot is created, 
+    otherwise (for 3D plots) the viewing transformation matrix is returned (as invisible).
+    }   
   \item{margin }{A vector giving the subscripts which the \code{image} 
     function will be applied over. 
     The image function will loop over the index that is not in \code{margin}.
@@ -111,6 +118,11 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
     }
   \item{\dots}{additional arguments passed to the plotting methods \link{image},
     \link{rasterImage}, \link{polygon} and  \link{contour}. 
+
+    \code{shade} and \code{lighting} parameters will have no effect, but will generate a warning.
+    
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
+    
     The arguments after \dots must be matched exactly.
     }
 }
@@ -312,12 +324,18 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
      main = "NAs and log = 'z'")
 
 ## =======================================================================
-## Image with contour specification
+## Image with contour specification (alpha sets the transparency)
 ## =======================================================================
 
  par(mfrow = c(1, 1))
- image2D(volcano, contour = list(col = "white", labcex = 0.8))
-
+ image2D(volcano, 
+   contour = list(col = "white", labcex = 0.8, lwd = 3, alpha = 0.5))
+# same:
+\dontrun{
+ image2D(z = volcano)
+ contour2D(z = volcano, col = "white", labcex = 0.8, 
+   lwd = 3, alpha = 0.5, add = TRUE)
+}
 # reset plotting parameters
  par(mfrow = pm)
 }

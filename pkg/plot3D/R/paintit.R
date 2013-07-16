@@ -1,11 +1,11 @@
 
 ## =============================================================================
-## Add image polygons, sorted, inputs are all matrices
+## Add image polygons, inputs are all matrices
 ## =============================================================================
 
 paintit  <- function (colvar, x, y, z, plist, col, NAcol, clim,
                      border, facets, lwd, lty, dotshade, 
-                     Extend = FALSE, Polar = FALSE) {        
+                     Extend = FALSE, Polar = FALSE, plot = TRUE) {        
 
  # Check the plotting arguments x and y
   if (! is.matrix(x))
@@ -26,36 +26,97 @@ paintit  <- function (colvar, x, y, z, plist, col, NAcol, clim,
 
   } else if (any (is.na(colvar)) & ! is.null(NAcol) ) {
     CC <- checkcolors(colvar, col, NAcol, clim)
-    col <- CC$col; colvar <- CC$colvar; clim <- CC$lim  
+    col <- CC$col
+    colvar <- CC$colvar
+    clim <- CC$lim  
   }
 
   cmin   <- clim[1]
   crange <- diff(clim)
   N      <- length(col) -1
 
-  sl <- Sortlist(x, y, z, plist, Extend, Polar)
-
-  # the colors, 1.0000 1 to avoid that trunc(1) = 0  
+  # the colors, 1.000..1 to avoid that trunc(1) = 0  
   if (ispresent(colvar)) 
     Col <- col[1 + trunc((colvar - cmin)/crange*1.00000000001*N)]
   
-  if (dotshade$type != "none") 
-    Col <- facetcols (x, y, z, Col, dotshade, Extend)
-
- # Draw colored polygons           
-  poly <- polyfill(x, y, z, Col[sl$list], NAcol, facets, border, sl$ix, sl$iy,        
-            lwd, lty, Extend, sl$Proj[sl$list])                                   
-  nr <- nrow(x)
-  nc <- ncol(x)
-  if (! Extend)
-    imgcol <- matrix(nrow = nr-1, ncol = nc-1, data = Col)
-  else {
-    imgcol <- matrix(nrow = nr, ncol = nc, data = Col)
-    x <- extend(x); y <- extend(y); z <- extend(z)
+  if (Extend) {
+    x <- extend(x)
+    y <- extend(y)
+    z <- extend(z)
   }
-  if (!ispresent(facets)) imgcol[] <- NA
-  poly$img <- list(list(x = x, y = y, z = z, col = imgcol))  #first item in list
+  
+  sl <- Sortlist(x, y, z, plist, Polar)
+
+  if (dotshade$type != "none") 
+    Col <- facetcols (x, y, z, Col, dotshade, Extend = FALSE)
+
+   imgcol <- matrix(nrow = nrow(x) - 1, ncol = ncol(x) -1, data = Col)
+
+#  if (!ispresent(facets)) imgcol[] <- NA
+  img <- list(list(x = x, y = y, z = z, col = imgcol, NAcol = NAcol, 
+    sl = sl, facets = facets, border = border, lwd = lwd, lty = lty,
+    mapped = FALSE))  
+
+  poly <- list(img = img)
+  class(poly) <- "poly"
   invisible(poly)
+}
+
+## =============================================================================
+
+mapimg <- function (plist) {
+  img <- plist$img
+  if (length(img) > 0) { 
+    poly <- plist$poly
+    for (i in 1:length(img)) {
+ 
+      if (is.null(img[[i]]$mapped)) 
+        img[[i]]$mapped <- TRUE
+      if (!img[[i]]$mapped) {
+        Poly <- with (img[[i]], polyfill(x, y, z, col[sl$list], NAcol, facets, border, sl,        
+            lwd, lty, sl$Proj[sl$list]))
+        poly <- addPoly(poly, Poly)
+        img[[i]]$mapped <- TRUE       
+      }
+    }
+    plist$img <- img
+    plist$poly <- poly
+  }
+  return(plist)
+}
+
+addPoly <- function (poly, Poly) {
+  if (is.null(poly) | is.null(poly$x)) {
+    poly <- Poly      
+  } else if (! is.null(Poly)){
+    if (!is.null(Poly$x)) {
+      nR1 <- nrow(Poly$x) 
+      nR2 <- nrow(poly$x)
+      if (nR1 > nR2) {
+        nR <- matrix(nrow = nR1 - nR2, ncol = ncol(poly$x), data = NA)
+        poly$x <- rbind(poly$x, nR)
+        poly$y <- rbind(poly$y, nR)
+        poly$z <- rbind(poly$z, nR)
+      } else if (nR2 > nR1) {
+        nR <- matrix(nrow = nR2 - nR1, ncol = ncol(Poly$x), data = NA)
+        Poly$x <- rbind(Poly$x, nR)
+        Poly$y <- rbind(Poly$y, nR)
+        Poly$z <- rbind(Poly$z, nR)
+      }
+
+      poly$x      <- cbind(poly$x,  Poly$x)
+      poly$y      <- cbind(poly$y,  Poly$y)
+      poly$z      <- cbind(poly$z,  Poly$z)
+      poly$proj   <- c(poly$proj,   Poly$proj)
+      poly$lwd    <- c(poly$lwd,    Poly$lwd)
+      poly$lty    <- c(poly$lty,    Poly$lty)
+      poly$border <- c(poly$border, Poly$border)
+      poly$col    <- c(poly$col,    Poly$col)
+      poly$isimg  <- c(poly$isimg,  Poly$isimg)
+    }
+  }
+  poly$img <- NULL
+  return(poly)
 }
 
 ## =============================================================================
@@ -69,29 +130,18 @@ sortlistvec <- function (x, y, z, plist, ignorez = TRUE) {
   list(list = sortlist, Proj = Proj)
 }
 
-Sortlist <- function (x, y, z, plist, Extend, Polar = FALSE) {
+Sortlist <- function (x, y, z, plist, Polar = FALSE) {
 
-  if (Polar & Extend)
-    zz <- z
-  else if (Polar & !Extend)
+  if (Polar)
     zz <- meangrid(z)
   else 
     zz <- 0
 
-  if (Extend) {
-    xx <- x
-    yy <- y
+  xx <- meangrid(x)
+  yy <- meangrid(y)
 
-  } else  {    # map to centre of grid
-    xx <- meangrid(x)
-    yy <- meangrid(y)
-  }  
   sl <- sortlistvec(as.vector(xx), as.vector(yy), as.vector(zz), plist, !Polar)
-
-  if (Extend)
-    ind <- expand.sort(sl$list, dim(x)) # now pointing to row/col
-  else
-    ind <- expand.sort(sl$list, dim(x)-1) 
+  ind <- expand.sort(sl$list, dim(x)-1) 
 
   ix <- ind$x; iy <- ind$y
 
@@ -145,11 +195,10 @@ createpoly <- function (x, y, z, ix, iy, Extend = TRUE) {
 ## Draw polygons
 ## =============================================================================
 
-polyfill <- function(x, y, z, Col, NAcol, facets, border, ix, iy, 
-                     lwd, lty, Extend = FALSE, proj = NULL) {
+polyfill <- function(x, y, z, Col, NAcol, facets, border, sl,
+                     lwd, lty, proj = NULL) {
 
-  Poly <- createpoly(x, y, z, ix, iy, Extend) 
-  
+  Poly <- createpoly(x, y, z, sl$ix, sl$iy, Extend = FALSE) 
   
   if (any (is.na(x) | is.na(y) | is.na(z))) {
     i1 <- which(is.na(Poly$X[-5, ]))
@@ -189,7 +238,7 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, ix, iy,
 
     
 # The colors
-  Col <- createcolors(facets, border, Col)  
+  Col <- createcolors(facets, border, Col[])  
 
   if (is.null(lwd))
     lwd <- 1

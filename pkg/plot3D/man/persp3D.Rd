@@ -151,11 +151,19 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}. 
+    The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
+    All objects will be plotted, including those that fall out of these ranges.
+    To select objects only within the axis limits, use \link{plotdev}.
+         
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
+    The parameters \code{shade} or \code{lighting} can be used for illuminating.
+
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
+
     For all functions, the arguments \code{lty, lwd} can be specified; this is only
     effective is \code{border} is not \code{NA}.
     
@@ -388,13 +396,14 @@ The New S Language. Wadsworth & Brooks/Cole.
 
  par(mfrow = c(1, 1))
  clim <- range(volcano)
- persp3D(z = volcano, zlim = c(100, 600), clim = clim, box = FALSE)
+ persp3D(z = volcano, zlim = c(100, 600), clim = clim, 
+   box = FALSE, plot = FALSE)
   
  persp3D(z = volcano + 200, clim = clim, colvar = volcano, 
-       add = TRUE, colkey = FALSE)
+       add = TRUE, colkey = FALSE, plot = FALSE)
 
  persp3D(z = volcano + 400, clim = clim, colvar = volcano, 
-       add = TRUE, colkey = FALSE)
+       add = TRUE, colkey = FALSE)    # plot = TRUE by default
 
 ## =======================================================================
 ## hist3D

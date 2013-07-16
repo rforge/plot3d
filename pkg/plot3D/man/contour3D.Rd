@@ -90,15 +90,24 @@ contour3D (x = NULL, y = NULL, z,
     otherwise the viewing transformation matrix is returned (as invisible). 
     } 
   \item{\dots}{additional arguments passed to the plotting methods. 
+
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
     scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
+    All objects will be plotted, including those that fall out of these ranges.
+    To select objects only within the axis limits, use \link{plotdev}.
+
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
-    For all functions, the arguments \code{lty, lwd} can be specified.
+    The arguments \code{lty, lwd} can also be specified.
     
+    \code{shade} and \code{lighting} parameters will have no effect.
+    
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
+         
     The arguments after \dots must be matched exactly.
     }
 }

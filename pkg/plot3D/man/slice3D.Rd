@@ -186,12 +186,22 @@ createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
      otherwise the viewing transformation matrix is returned (as invisible). 
     } 
   \item{\dots}{additional arguments passed to the plotting methods. 
+
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.      
+    The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
+    All objects will be plotted, including those that fall out of these ranges.
+    To select objects only within the axis limits, use \link{plotdev}.
+
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
+
+    The parameters \code{shade} or \code{lighting} can be used for illuminating 
+    in \code{slice3D} and \code{isosurf3D}.
+
+    \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
 
     For all functions, the arguments \code{lty, lwd} can be specified.
     
@@ -312,12 +322,18 @@ createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
  isosurf3D(x, y, z, F, level = 2, lighting = TRUE,
            lphi = 0, ltheta = 0, col = "blue", shade = NA)  
  
-# three levels, transparency must be added afterwards with plotdev 
+# three levels, transparency added
+ isosurf3D(x, y, z, F, level = seq(0, 4, by = 2), 
+   col = c("red", "blue", "yellow"), 
+   clab = "F", alpha = 0.2, theta = 0, lighting = TRUE)  
+
+# transparency can also be added afterwards with plotdev()
+\dontrun{
  isosurf3D(x, y, z, F, level = seq(0, 4, by = 2), 
    col = c("red", "blue", "yellow"), 
    shade = NA, plot = FALSE, clab = "F")  
  plotdev(lighting = TRUE, alpha = 0.2, theta = 0)
-
+}
 # use of creatisosurf
  iso <- createisosurf(x, y, z, F, level = 2)
  head(iso)

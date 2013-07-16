@@ -66,9 +66,13 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
     otherwise the viewing transformation matrix is returned (as invisible). 
     } 
   \item{\dots}{additional arguments passed to \link{persp}. 
+
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.      
+
+    Arguments \code{scale} and \code{expand} affect the size of the axes.
+    
     The arguments after \dots must be matched exactly.
     }
 }
@@ -88,6 +92,10 @@ perspbox (x = seq(0, 1, length.out = nrow(z)),
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
 
 \details{
+  The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
+  All objects will be plotted, including those that fall out of these ranges.
+  To select objects only within the axis limits, use \link{plotdev}.
+
   The predefined box types \code{bty} are defined as follows:
 
   ``f'': all panels are shown and transparent, also the \link{persp} default.

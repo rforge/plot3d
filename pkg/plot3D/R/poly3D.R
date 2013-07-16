@@ -59,7 +59,7 @@
            border  = c(poly$border, Col$border),
            lty     = c(poly$lty, Lty),
            lwd     = c(poly$lwd, Lwd),
-           isimg   = c(poly$isimg, rep(1, length.out = length(cv))),
+           isimg   = c(poly$isimg, rep(0, length.out = length(cv))),
            img     = poly$img
           )
 
@@ -75,9 +75,9 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
                      border = NA, facets = TRUE, lwd = 1, lty = 1,
                      resfac = 1, clim = NULL,   
                      ltheta = -135, lphi = 0, shade = NA, 
-                     lighting = FALSE, ...)  {
+                     lighting = FALSE, alpha = NULL, ...)  {
 
-  if (missing(poly) | is.null(poly)) 
+  if (missing(poly) | is.null(poly) | length(poly) == 0) 
     poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
                  lwd = NULL, lty = NULL, proj = NULL, isimg = NULL,
                  img = list())                    
@@ -150,7 +150,6 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
   Proj   <- project(colMeans(Poly$X, na.rm = TRUE), 
                     colMeans(Poly$Y, na.rm = TRUE), 
                     colMeans(Poly$Z, na.rm = TRUE), plist)
-    
 
  # colvar is converted to colors.
   if (! is.null(colvar)) {
@@ -173,8 +172,10 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
   if (! dot$shade$type == "none") 
     Col <- facetcols (x, y, z, Col, dot$shade)
 
+  if (! is.null(alpha)) Col <- setalpha(Col, alpha)
+
  # border and colors 
-  Col <- createcolors(facets, border, Col)
+  imgCol <- createcolors(facets, border, Col)
   
  # update polygons.
   numimg <- length(poly$img)    
@@ -182,8 +183,8 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
     list(x      = cbind(poly$x, Poly$X),
          y      = cbind(poly$y, Poly$Y),               
          z      = cbind(poly$z, Poly$Z),               
-         col    = c(poly$col, Col$facet),
-         border = c(poly$border, Col$border),
+         col    = c(poly$col, imgCol$facet),
+         border = c(poly$border, imgCol$border),
          lwd    = c(poly$lwd, rep(lwd , length.out = length(x))),
          lty    = c(poly$lty, rep(lty , length.out = length(x))),
          proj   = c(poly$proj, Proj),
@@ -191,8 +192,12 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
          img    = poly$img)
   if (numimg == 0)
     poly$img <- list()
+  sl <- list (ix = ix, iy = iy, Proj = Proj, list = 1:length(ix))
   poly$img[[numimg+1]] <- list(x = X, y = Y, z = z, 
-               col = matrix(nrow = nrow(colvar), ncol = ncol(colvar), data = Col$facet))
+               col = matrix(nrow = nrow(colvar), 
+               ncol = ncol(colvar), data = Col), NAcol = NAcol, sl = sl, 
+               facets = facets, border = border, lwd = lwd, lty = lty,
+               mapped = TRUE)      
 
   class(poly) <- "poly"
   
