@@ -17,7 +17,6 @@ points3D <- function(x, y, z,  ...) {
 ## =============================================================================
 ## scatterplot in 3D
 ## =============================================================================
-# x, y, z, colvar: same length
     
 scatter3D <- function(x, y, z, ..., colvar = z, 
                       phi = 40, theta = 40,
@@ -27,24 +26,20 @@ scatter3D <- function(x, y, z, ..., colvar = z,
                       bty = "b", CI = NULL, surf = NULL, 
                       add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   dot <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist)
 
- # checks
-  x      <- as.vector(x)
-  y      <- as.vector(y)
-  z      <- as.vector(z)
+  x <- as.vector(x)
+  y <- as.vector(y)
+  z <- as.vector(z)
   len <- length(x)
+
   if (length(y) != len)
     stop("'y' should have same length as 'x'")
   if (length(z) != len)
     stop("'z' should have same length as 'x'")
 
- # colors   
   if (len > 1 & ispresent(colvar)) {
   
     if (length(colvar) != len)
@@ -67,16 +62,18 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
+    
     Col <- variablecol(colvar, col, NAcol, clim)
     if (length(Col) == 1)
       Col <- rep(Col, length.out = len)
-    
-    
+
   } else {
     if (is.null(col))
       col <- "black"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }
@@ -88,7 +85,8 @@ scatter3D <- function(x, y, z, ..., colvar = z,
              dot$persp))
     plist <- getplist()
   } 
- # droplines, passed with a surface  
+
+ # droplines with a fitted surface  
   fit <- NULL
   if (! is.null(surf)) {
     if (! is.list(surf))
@@ -96,12 +94,14 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     fit <- surf$fit
     surf$fit <- NULL    
   }  
+  
   if (! is.null(fit)){
     if (! is.null(CI)) {
       if (! is.null(CI$z))
         stop("cannot combine a confidence interval (CI) on 'z' with 'fit' in 'surf'")
     } else 
       CI <- list()
+    
     if (length(fit) != length(z))
       stop("'fit', argument of 'surf'  should be of equal size of 'z'")  
     disttoz <- fit - z
@@ -109,7 +109,7 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     CIz[CIz > 0] <- 0 
     CI$z = CIz
     CI$alen = 0
-    } 
+  } 
 
  # confidence intervals
   isCI <- is.list(CI)
@@ -138,8 +138,8 @@ scatter3D <- function(x, y, z, ..., colvar = z,
       if (is.null(surf$clim))  
         surf$clim <- clim
     }  
-      if (is.null(surf$clim))  
-        surf$clim <- range(surf$colvar)
+    if (is.null(surf$clim))  
+      surf$clim <- range(surf$colvar)
 
     surf$colvar[surf$colvar < min(surf$clim)]  <- NA
     surf$colvar[surf$colvar > max(surf$clim)]  <- NA
@@ -148,16 +148,19 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     surf$z[surf$z > dot$persp$zlim[2]]  <- NA
 
     spoly <- do.call("addimg", c(alist(poly = NULL, plist = plist), surf))
+  
   } else
     spoly <- NULL
 
-  sseg <- NULL  # for segments
+  sseg <- NULL  # segments
           
   dtype <- dot$points$type
   dot$points$type <- NULL
 
   lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
   lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   if (is.null(dtype))
     dtype <- "p"
@@ -176,6 +179,7 @@ scatter3D <- function(x, y, z, ..., colvar = z,
                  col    = Col,
                  lwd    = rep(lwd , length.out = len),
                  lty    = rep(lty , length.out = len),
+                 alpha  = alpha,
                  proj   = Proj)
   
     class(sseg) <- "segments"
@@ -187,6 +191,9 @@ scatter3D <- function(x, y, z, ..., colvar = z,
     if (length(LCol) > 1) {
       LCol <- cbind(Col[-1], Col[-len])
       LCol <- apply(LCol, MARGIN = 1, FUN = MeanColors)
+      if (! is.null(dot$alpha)) 
+        LCol <- setalpha(LCol, dot$alpha)
+      
     }
 
     Proj   <- project(0.5*(x[-len]+x[-1]), 0.5*(y[-len]+y[-1]), 
@@ -200,13 +207,20 @@ scatter3D <- function(x, y, z, ..., colvar = z,
                  col    = c(sseg$col, LCol),
                  lwd    = c(sseg$lwd, rep(lwd , length.out = len-1)),
                  lty    = c(sseg$lty, rep(lty , length.out = len-1)),
+                 alpha  = c(sseg$alpha, alpha),
                  proj   = c(sseg$proj, Proj))
     class(sseg) <- "segments"
   }
   
-  pch <- dot$points$pch ;  if (is.null(pch)) pch <- 1
-  bg  <- dot$points$bg  ;  if (is.null(bg)) bg <- 1
-  cex <- dot$points$cex ;  if (is.null(cex)) cex <- 1
+  pch <- dot$points$pch 
+  if (is.null(pch)) 
+    pch <- 1
+  bg  <- dot$points$bg  
+  if (is.null(bg)) 
+    bg <- 1
+  cex <- dot$points$cex 
+  if (is.null(cex)) 
+    cex <- 1
 
   if (dtype == "l") 
     dopoints <- FALSE
@@ -218,14 +232,21 @@ scatter3D <- function(x, y, z, ..., colvar = z,
 
   if (! is.null(CI)) {
  # points and confidence intervals
-    CIpt     <- list(x.from = NULL, y.from = NULL, z.from = NULL,
-                   x.to = NULL, y.to = NULL, z.to = NULL,
-                   x.mid = x, y.mid = y, z.mid = z,
-                   col = Col,
-                   pch = rep(pch, length.out = len),
-                   cex = rep(cex, length.out = len),
-                   bg  = rep(bg, length.out = len)
-                   )
+    CIpt <- list(x.from = NULL, 
+                 y.from = NULL, 
+                 z.from = NULL,
+                 x.to = NULL, 
+                 y.to = NULL, 
+                 z.to = NULL,
+                 x.mid = x, 
+                 y.mid = y, 
+                 z.mid = z,
+                 col = Col,
+                 pch = rep(pch, length.out = len),
+                 cex = rep(cex, length.out = len),
+                 bg  = rep(bg, length.out = len),
+                 alpha  = alpha
+                 )
     class(CIpt) <- "CIpt"
 
     CIpt$CIpar <- CI   #[c("lty", "lwd", "col")]
@@ -286,12 +307,15 @@ scatter3D <- function(x, y, z, ..., colvar = z,
   } else if (dopoints) {
    # points - remove NAs
     ii <- which(!is.na(x) & !is.na(y) & !is.na(z))
-    pt     <- list(x.mid = x[ii], y.mid = y[ii], z.mid = z[ii],
-                   col = Col[ii],
-                   pch = rep(pch, length.out = length(ii)),
-                   cex = rep(cex, length.out = length(ii)),
-                   bg = rep(bg, length.out = length(ii))
-                   )
+    pt <- list(x.mid = x[ii], 
+               y.mid = y[ii], 
+               z.mid = z[ii],
+               col = Col[ii],
+               pch = rep(pch, length.out = length(ii)),
+               cex = rep(cex, length.out = length(ii)),
+               bg = rep(bg, length.out = length(ii)),
+               alpha = alpha
+               )
     
     class(pt) <- "pt"
   }
@@ -308,12 +332,11 @@ scatter3D <- function(x, y, z, ..., colvar = z,
 
  # plot it
   plist <- plot.struct.3D(plist, pt = pt, CIpt = CIpt, 
-           poly = spoly, segm = sseg, plot = plot)  
+               poly = spoly, segm = sseg, plot = plot)  
   
   setplist(plist)
   invisible(plist$mat)
-
 }
 
-# check.CI is in file scatter.R
+# Note: check.CI is in file scatter.R
 

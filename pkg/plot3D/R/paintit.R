@@ -4,9 +4,20 @@
 ## =============================================================================
 
 paintit  <- function (colvar, x, y, z, plist, col, NAcol, clim,
-                     border, facets, lwd, lty, dotshade, 
-                     Extend = FALSE, Polar = FALSE, plot = TRUE) {        
+                     border, facets, lwd, lty, dot, 
+                     Extend = FALSE, Polar = FALSE, 
+                     cv = NULL, cvlim = NULL) {        
 
+  dotshade <- dot$shade  
+  if (! is.null(clim)) {
+    if (length(clim) != 2)
+        stop("'clim' should be a two-valued vector with the ranges of 'colvar'")
+    colvar[colvar < min(clim)] <- NA
+    colvar[colvar > max(clim)] <- NA
+  }  
+            
+  cv <- cvlim <- NULL # copy of colvar and range
+  
  # Check the plotting arguments x and y
   if (! is.matrix(x))
     stop("'x' should be a matrix")
@@ -30,7 +41,7 @@ paintit  <- function (colvar, x, y, z, plist, col, NAcol, clim,
     colvar <- CC$colvar
     clim <- CC$lim  
   }
-
+                             
   cmin   <- clim[1]
   crange <- diff(clim)
   N      <- length(col) -1
@@ -50,12 +61,22 @@ paintit  <- function (colvar, x, y, z, plist, col, NAcol, clim,
   if (dotshade$type != "none") 
     Col <- facetcols (x, y, z, Col, dotshade, Extend = FALSE)
 
-   imgcol <- matrix(nrow = nrow(x) - 1, ncol = ncol(x) -1, data = Col)
+  imgcol <- matrix(nrow = nrow(x) - 1, ncol = ncol(x) -1, data = Col)
+  
+  col.full <- NULL
+  if (! is.null(cv)) {
+    if (is.null(cvlim)) 
+      cvlim <- range(cv)
+    cvmin <- cvlim[1]
+    cvrange <- diff(cvlim)
+    col.full <- col[1 + trunc((cv - cvmin)/cvrange*1.00000000001*N)]
+    col.full <- matrix(nrow = nrow(x), ncol = ncol(x), data = col.full)
+  }
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
 
-#  if (!ispresent(facets)) imgcol[] <- NA
-  img <- list(list(x = x, y = y, z = z, col = imgcol, NAcol = NAcol, 
-    sl = sl, facets = facets, border = border, lwd = lwd, lty = lty,
-    mapped = FALSE))  
+  img <- list(list(x = x, y = y, z = z, col = imgcol, col.full = col.full,
+    NAcol = NAcol, sl = sl, facets = facets, border = border, 
+    lwd = lwd, lty = lty, alpha = alpha, mapped = FALSE))  
 
   poly <- list(img = img)
   class(poly) <- "poly"
@@ -74,7 +95,7 @@ mapimg <- function (plist) {
         img[[i]]$mapped <- TRUE
       if (!img[[i]]$mapped) {
         Poly <- with (img[[i]], polyfill(x, y, z, col[sl$list], NAcol, facets, border, sl,        
-            lwd, lty, sl$Proj[sl$list]))
+            lwd, lty, sl$Proj[sl$list], alpha = alpha))
         poly <- addPoly(poly, Poly)
         img[[i]]$mapped <- TRUE       
       }
@@ -112,6 +133,7 @@ addPoly <- function (poly, Poly) {
       poly$lty    <- c(poly$lty,    Poly$lty)
       poly$border <- c(poly$border, Poly$border)
       poly$col    <- c(poly$col,    Poly$col)
+      poly$alpha  <- c(poly$alpha,  Poly$alpha)
       poly$isimg  <- c(poly$isimg,  Poly$isimg)
     }
   }
@@ -196,7 +218,7 @@ createpoly <- function (x, y, z, ix, iy, Extend = TRUE) {
 ## =============================================================================
 
 polyfill <- function(x, y, z, Col, NAcol, facets, border, sl,
-                     lwd, lty, proj = NULL) {
+                     lwd, lty, proj = NULL, alpha = NA) {
 
   Poly <- createpoly(x, y, z, sl$ix, sl$iy, Extend = FALSE) 
   
@@ -244,7 +266,9 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, sl,
     lwd <- 1
   if (is.null(lty))
     lty <- 1
-  
+  if (is.null(alpha)) 
+    alpha <- NA
+    
  # update and return polygons.
   poly <- list(
        x      = Poly$X,
@@ -255,6 +279,7 @@ polyfill <- function(x, y, z, Col, NAcol, facets, border, sl,
        lwd    = rep(lwd, length.out = ncol(Poly$X)),
        lty    = rep(lty, length.out = ncol(Poly$X)),
        isimg  = rep(1, length.out = ncol(Poly$X)), 
+       alpha  = rep(alpha, length.out = ncol(Poly$X)), 
        proj   = proj)
   class(poly) <- "poly"
   return(poly)

@@ -1,32 +1,29 @@
 ## =============================================================================
-## 3-d representation using contours in x, y or z
+## 3-D visualisation of volumetric data using isosurfaces
 ## =============================================================================
 # x, y, z vectors or arrays, colvar: array
 
 isosurf3D <- function(x, y, z, colvar, ..., 
                       phi = 40, theta = 40, 
                       level = mean(colvar, na.rm = TRUE), isofunc = createisosurf,
-                      col = "grey", border = NA, facets = TRUE, 
+                      col = NULL, border = NA, facets = TRUE, 
                       colkey = list(side = 4), panel.first = NULL,
                       clab = NULL, bty = "b", 
-                      ltheta = -135, lphi = 0, shade = 0.5,
-                      lighting = FALSE, add = FALSE, plot = TRUE) {
+                      lighting = FALSE, shade = 0.5, ltheta = -135, lphi = 0, 
+                      add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
-  dot <- splitdotpersp(c(list(...), ltheta = ltheta, lphi = lphi, shade = shade), 
-    bty, lighting, x, y, z, plist = plist)
+  dot <- splitdotpersp(list(...), bty, lighting, 
+    shade = shade, ltheta = ltheta, lphi = lphi, x, y, z, plist = plist)
 
   if (! ispresent(colvar))
     stop("'colvar' has to be defined and be an array of dimension 3")
 
- # check dimensionality 
   DD <- dim(colvar)
   if (length(DD) != 3)
     stop("'colvar' has to be an array of dimension 3")
+
   cr <- range(colvar, na.rm = TRUE)
   na <- level[level > cr[2] | level < cr[1]]
   if (length(na) > 0) 
@@ -65,24 +62,25 @@ isosurf3D <- function(x, y, z, colvar, ...,
     Tri <- isofunc (x, y, z, colvar, level[i])
    
     Col <- rep(col[i], length.out = nrow(Tri)/3)
-    lwd <- dot$points$lwd; if (is.null(lwd)) lwd <- 1
-    lty <- dot$points$lty; if (is.null(lty)) lty <- 1
+    lwd <- dot$points$lwd
+    if (is.null(lwd)) 
+      lwd <- 1
+    
+    lty <- dot$points$lty
+    if (is.null(lty)) 
+      lty <- 1
 
     X <- matrix(nrow = 3, data = Tri[ ,1])
     Y <- matrix(nrow = 3, data = Tri[ ,2])
     Z <- matrix(nrow = 3, data = Tri[ ,3])
 
-
- # depth view of the facets
     proj   <- project(colMeans(X), colMeans(Y), colMeans(Z), plist)
 
-    Col <- rep(Col, length.out = ncol(X))
-  
     if (! dot$shade$type == "none") 
       Col <- facetcols.tri (Tri, Col, dot$shade)
    
- # border and colors
     Col <- createcolors(facets, border, Col)
+    alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
 
     Poly <- list(
        x      = cbind(Poly$x, rbind(X, NA)),
@@ -93,6 +91,7 @@ isosurf3D <- function(x, y, z, colvar, ...,
        lwd    = c(Poly$lwd, rep(lwd, length.out = ncol(X))),
        lty    = c(Poly$lty, rep(lty, length.out = ncol(X))),
        isimg  = c(Poly$isimg, rep(0, length.out = ncol(X))),
+       alpha  = c(Poly$alpha, rep(alpha, length.out = ncol(X))),
        img    = Poly$img,
        proj   = c(Poly$proj, proj))
   }
@@ -120,7 +119,8 @@ triangle3D  <- function(tri, colvar = NULL,
                     col = NULL, NAcol = "white", 
                     border = NA, facets = TRUE,
                     colkey = list(side = 4), panel.first = NULL,
-                    lighting = FALSE, clim = NULL, clab = NULL,
+                    lighting = FALSE, shade = 0.5, ltheta = -135, lphi = 0,
+                    clim = NULL, clab = NULL,
                     bty = "b", add = FALSE, plot = TRUE)  {
 
   if (add) 
@@ -141,7 +141,7 @@ triangle3D  <- function(tri, colvar = NULL,
   z <- matrix(nrow = 3, data = tri[, 3])
   len <- ncol(x) # number of triangles
   
-  dot  <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
+  dot  <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist, shade, lphi, ltheta)
 
   # colors
   if (ispresent(colvar)) { 
@@ -166,13 +166,15 @@ triangle3D  <- function(tri, colvar = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   
@@ -188,15 +190,20 @@ triangle3D  <- function(tri, colvar = NULL,
   if (is.function(panel.first)) 
     panel.first(plist$mat)
   
-  lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
-  lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+  lwd <- dot$points$lwd 
+  if (is.null(lwd)) 
+    lwd <- 1
+  lty <- dot$points$lty
+  if (is.null(lty)) 
+    lty <- 1
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   proj   <- project(colMeans(x), colMeans(y), colMeans(z), plist)
 
   if (! dot$shade$type == "none") 
     Col <- facetcols.tri (tri, Col, dot$shade)
    
- # border and colors
   Col <- createcolors(facets, border, Col)
 
   Poly <- list(x = rbind(x, NA),
@@ -206,6 +213,9 @@ triangle3D  <- function(tri, colvar = NULL,
                border = Col$border,
                lwd    = rep(lwd , length.out = len),
                lty    = rep(lty , length.out = len),
+               isimg = rep(0, length.out = len),
+               img = NULL,
+               alpha = alpha,
                proj = proj)
 
   class(Poly) <- "poly"

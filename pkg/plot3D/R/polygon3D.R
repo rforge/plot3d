@@ -10,14 +10,10 @@ polygon3D  <- function(x, y, z,
                     clim = NULL, clab = NULL, bty = "b", 
                     add = FALSE, plot = TRUE)  {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   dot  <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist)
 
-# checks
   checkinput <- function (x) {
     if (is.matrix(x)) {
      x <- as.vector(x)
@@ -65,7 +61,7 @@ polygon3D  <- function(x, y, z,
     yy <- matrix(ncol = 1, data = c(y, NA)) 
     zz <- matrix(ncol = 1, data = c(z, NA)) 
   }
-  # colors
+
   if (ispresent(colvar)) { 
     if (length(colvar) != len)
       stop("'colvar' should have same length as number of polygons (= 1+ number of NAs in 'x', 'y' and 'z')")
@@ -88,13 +84,15 @@ polygon3D  <- function(x, y, z,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   
@@ -113,8 +111,14 @@ polygon3D  <- function(x, y, z,
   if (is.function(panel.first)) 
     panel.first(plist$mat)
   
-  lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
-  lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+  lwd <- dot$points$lwd 
+  if (is.null(lwd)) 
+    lwd <- 1
+  lty <- dot$points$lty 
+  if (is.null(lty)) 
+    lty <- 1
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   Poly <- list(x = xx, 
                y = yy, 
@@ -123,6 +127,7 @@ polygon3D  <- function(x, y, z,
                border = Col$border,
                lwd    = rep(lwd , length.out = len),
                lty    = rep(lty , length.out = len),
+               alpha  = alpha, 
                isimg  = rep(0, length.out = len))
 
   Poly$proj   <- project(colMeans(xx, na.rm = TRUE), colMeans(yy, na.rm = TRUE), 
@@ -131,14 +136,14 @@ polygon3D  <- function(x, y, z,
   class(Poly) <- "poly"
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "polygon3D") 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, 
+      type = "polygon3D") 
 
   plist <- plot.struct.3D(plist, poly = Poly, plot = plot)  
 
   setplist(plist)   
   invisible(plist$mat)
 }
-
 
 ## =============================================================================
 ## 2-D polygon and triangle function
@@ -150,10 +155,7 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
                     colkey = list(side = 4), 
                     clim = NULL, clab = NULL, add = FALSE, plot = TRUE)  {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   plist <- add2Dplist(plist, "polygon", x = x, y = y, colvar = colvar,
                     col = col, NAcol = NAcol, border = border, facets = facets,
@@ -164,7 +166,6 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
   
   dots <- splitpardots(list(...))
 
-# checks
   checkinput <- function (x) {
     if (is.matrix(x)) {
      x <- as.vector(x)
@@ -206,7 +207,7 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
     xx <- matrix(ncol = 1, data = c(x, NA)) 
     yy <- matrix(ncol = 1, data = c(y, NA)) 
   }
-  # colors
+
   if (ispresent(colvar)) { 
     if (length(colvar) != len)
       stop("'colvar' should have same length as number of polygons (= 1+ number of NAs in 'x', 'y' and 'z')")
@@ -232,13 +233,15 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
         par.ori <- par(plt = colkey$parplt)
     }
      
-    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+    if (! is.null(dots$alpha)) 
+      col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
-    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+    if (! is.null(dots$alpha)) 
+      col <- setalpha(col, dots$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   

@@ -6,8 +6,8 @@
 addslice <- function(poly, x, y, z, colvar, xs = NULL, 
                      ys = NULL, zs = NULL, plist,
                      col = NULL, NAcol = "white",
-                     border = NA, facets = TRUE, lwd = 1, clim = NULL,
-                     shadedot = NULL,
+                     border = NA, facets = TRUE, lwd = 1, lty = 1, 
+                     clim = NULL, shadedot = NULL,
                      lighting = FALSE, alpha = NULL)  {
 
   if (! ispresent(colvar))
@@ -27,7 +27,7 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
   crange <- diff(clim)
   N      <- length(col) -1
 
- # Colors for values = NA 
+ # Colors for NA values   
   if (any (is.na(colvar)) & ! is.null(NAcol) ) {
     CC <- checkcolors(colvar, col, NAcol, clim)
     clim   <- CC$lim
@@ -55,8 +55,8 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
 
    # add polygon
     poly <<- addimg(poly, xs, ys, zs, colvar = cv, plist = plist, 
-        col = col, NAcol = NAcol, border = border, 
-        facets = facets, resfac = 1, clim = clim, lwd = lwd, 
+        col = col, NAcol = NAcol, border = border, facets = facets, 
+        resfac = 1, clim = clim, lwd = lwd, lty = lty, 
         ltheta = shadedot$ltheta, lphi = shadedot$lphi, 
         shade = shadedot$shade, lighting = lighting, alpha = alpha)
     
@@ -68,7 +68,7 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
     M <- mesh(xs, ys, zs)
     image.plane (M$x[,,], M$y[,,], M$z[,,], i = i) # [,,] to make sure it is an array
 
-  }  # end addplane
+  }  # end function addplane
 
 
   if (any(diff(c( is.matrix(xs), is.matrix(ys), is.matrix(zs)))) != 0)
@@ -83,7 +83,7 @@ addslice <- function(poly, x, y, z, colvar, xs = NULL,
     
     image.plane(xs, ys, zs, paint = TRUE)  
   
-  } else { # xs, ys, zs define the positions in x,y,z on which to plot
+  } else { # xs, ys, zs define the positions in x, y, z on which to plot
     if (! is.null(xs))
       for (x.s in xs[!is.na(xs)])
         add.plane(x.s, y, z, 1)
@@ -112,14 +112,12 @@ slice3D <- function(x, y, z, colvar, ...,
                     border = NA, facets = TRUE, 
                     colkey = list(side = 4), panel.first = NULL,
                     clim = NULL, clab = NULL, bty = "b",
-                    lighting = FALSE, add = FALSE, plot = TRUE) {
+                    lighting = FALSE, shade = NA, ltheta = -135, lphi = 0, 
+                    add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
-  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
+  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist, shade, lphi, ltheta)
 
   iscolkey <- is.colkey(colkey, col)    
   if (iscolkey) 
@@ -148,9 +146,12 @@ slice3D <- function(x, y, z, colvar, ...,
   lwd <- ifelse(is.null(dot$points$lwd), 1, dot$points$lwd)
   dot$points$lwd <- NULL
 
+  lty <- ifelse(is.null(dot$points$lty), 1, dot$points$lty)
+  dot$points$lty <- NULL
+
   Poly <- addslice(NULL, x, y, z, colvar, xs = xs, ys = ys, zs = zs, plist = plist,
                    col = col, NAcol = NAcol, border = border, facets = facets,
-                   clim = clim, shadedot = dot$shade, lwd = lwd,
+                   clim = clim, shadedot = dot$shade, lwd = lwd, lty = lty,
                    lighting = lighting, alpha = dot$alpha)
    
   if (iscolkey)  

@@ -8,7 +8,15 @@
 ## Extend/average to embrace points, but not exceeding boundaries
 ## =============================================================================
 
-extend <- function(x) {
+extendvec <- function(x) {
+  ll <- length(x)  
+  c(x[1] + 0.5*(x[1] - x[2]), x, x[ll] + 0.5*(x[ll] - x[ll-1]))           
+}
+
+
+extend <- function(x, na.rm = TRUE) {
+  if (na.rm & any(is.na(x)))
+    return(extend.na(x))
   x <- rbind(x[1,], x, x[nrow(x),])  
   x <- cbind(x[,1], x, x[,ncol(x)])
   ii <- 2:nrow(x)
@@ -16,10 +24,41 @@ extend <- function(x) {
   0.25*(x[ii, jj] + x[ii-1, jj] + x[ii, jj-1] + x[ii-1, jj-1])           
 }
 
-meangrid <- function(x) {
-  return(0.25*( x[-1,       -1] + x[-1,       -ncol(x)] 
-              + x[-nrow(x), -1] + x[-nrow(x), -ncol(x)]))
+# extending, but ignoring the NAs
+extend.na <- function(x) {
+  x <- rbind(x[1,], x, x[nrow(x),])  
+  x <- cbind(x[,1], x, x[,ncol(x)])
+  nisna <- !is.na(x)
+  x[!nisna] <- 0
+  ii <- 2:nrow(x)
+  jj <- 2:ncol(x)           
+  Sum <- (x[ii, jj] + x[ii-1, jj] + x[ii, jj-1] + x[ii-1, jj-1])
+  Count <- nisna[ii, jj] + nisna[ii-1, jj] + nisna[ii, jj-1] + nisna[ii-1, jj-1]
+  Res <- Sum/Count
+  Res[is.nan(Res)] <- NA
+  return(Res)
 }
+
+meangrid.na <- function(x) {
+  nisna <- !is.na(x)
+  x[!nisna] <- 0
+  nr <- nrow(x)
+  nc <- ncol(x)
+  Sum <-  x[-1, -1] + x[-1, -nc] + x[-nr, -1] + x[-nr, -nc]
+  Count <- nisna[-1, -1] + nisna[-1, -nc] + nisna[-nr, -1] + nisna[-nr, -nc]
+  Res <- Sum/Count
+  Res[is.nan(Res)] <- NA
+  return(Res)
+  
+}
+meangrid <- function(x, na.rm = FALSE) {
+  if (na.rm & any(is.na(x)))
+    return(meangrid.na(x))
+  else
+    return(0.25*( x[-1,       -1] + x[-1,       -ncol(x)] 
+                + x[-nrow(x), -1] + x[-nrow(x), -ncol(x)]))
+}
+
 
 ## =============================================================================
 ## something can be toggled off by putting it = FALSE, NA, NULL
@@ -96,7 +135,10 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
     dDepth <- contour$args$dDepth
   if (is.null(dDepth))
     dDepth <- 1e-1
-
+  levels <- contour$args$levels
+  nlevels <- contour$args$nlevels
+  if (is.null (nlevels  ))
+    nlevels <- 10
   if (! is.null(contour$args$x)) 
     x <- contour$args$x
   if (! is.null(contour$args$y)) 
@@ -107,10 +149,13 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
   if (is.null(cv))
     cv <- z
   contour$args$lighting <- contour$args$shade <- NULL
+  contour$args$levels <- contour$args$nlevels <- NULL
   
-  line.list <- 
-    do.call("contourLines", c(alist(x, y, cv), 
-      contour$args$nlevels, contour$args$levels))
+  if (! is.null(levels))
+    line.list <- 
+      contourLines(x, y, cv, levels = levels)
+  else
+    line.list <-contourLines(x, y, cv, nlevels = nlevels)
 
   col <- contour$args$col
 
@@ -126,7 +171,7 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
   getcol <- function(v) 
      col[1 + trunc((v - clim[1])/crange*N)]
 
-  contour$args$nlevels <- contour$args$levels <- contour$args$col <- contour$args$dDepth <- NULL
+  contour$args$col <- contour$args$dDepth <- NULL
   segm <- NULL
   
   for (side in contour$side) {  
@@ -141,7 +186,7 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
       stop ("cannot add contour on side ", side)
     else
       zz <- as.numeric(side)
- 
+
     if (side == "z")  {     # contour *on* the persp plot
 
       Nx <- length(x)
@@ -207,21 +252,30 @@ XYimage <- function(poly, image, x, y, z,  plist, col) {
     z <- image$args$z
   image$args$x <- image$args$y <- image$args$z <- NULL
   
-  lwd <- image$args$lwd; if (is.null(lwd)) lwd <- 1
-  lty <- image$args$lty; if (is.null(lty)) lty <- 1
+  lwd <- image$args$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
+
+  lty <- image$args$lty
+  if (is.null(lty)) 
+    lty <- 1
+
   image$args$lwd <- image$args$lty <- NULL
 
   for (side in image$side) {  
 
     if (side == "zmin")
       zz <- plist$zlim[1]
+
     else if (side == "zmax")
       zz <- plist$zlim[2]
+
     else if (!is.numeric(as.numeric(side)))
       stop ("cannot add image on side ", side)
+
     else
       zz <- as.numeric(side)
-#    xy <- mesh(x, y) 
+
     zmat <- matrix(nrow = length(x), ncol = length(y), data = zz)           
     poly <- do.call("addimg", c(alist(poly, x, y, z = zmat, 
         colvar = z, plist = plist, lwd = lwd, lty = lty), image$args))
@@ -515,6 +569,50 @@ createcolors <- function(isfacets, border, Cols) {
 }
   
 ## =============================================================================
+## check dimensionality of colvar and colors - for inttype = 2
+## =============================================================================
+
+check.colvar.2 <- function(colvar, z, col, clim, alpha) {
+  
+  iscolvar <- ispresent(colvar)
+
+  if (iscolvar) {
+    
+    if (any (dim(colvar) - dim(z)) != 0)
+      stop("dimension of 'colvar' should be equal to dimension of 'z'")    
+    
+    if (! is.null(clim)) {
+      if (length(clim) != 2)
+        stop("'clim' should be a two-valued vector with the ranges of 'colvar'")
+      colvar[colvar < min(clim)] <- NA
+      colvar[colvar > max(clim)] <- NA
+    }  
+            
+   # check colors  
+    if (length(col) == 1) 
+      if (is.na(col)) 
+        col <- NULL
+
+    if (is.null(col))
+      col <- jet.col(100)
+
+    if (length(col) == 1) {
+      col <- c(col, col)
+    }  
+
+  } else { 
+     if (is.null(col))
+      col <- rep("grey", 2)
+    else
+      col <- rep(col[1], 2)  # take first color
+  }
+  if (! is.null(alpha))
+     col <- setalpha(col, alpha)
+  
+  list(colvar = colvar, col = col)     
+}
+
+## =============================================================================
 ## check dimensionality of colvar and colors
 ## =============================================================================
 
@@ -527,9 +625,9 @@ check.colvar.persp <- function(colvar, z, col, inttype, clim, alpha) {
     if (inttype == 2 & any (dim(colvar) - dim(z)) != 0)
       stop("dimension of 'colvar' should be equal to dimension of 'z'")    
     
-    else if (inttype == 1){
+    else if (inttype != 2){
       if (all (dim(colvar) - dim(z)) == 0)
-        colvar <- meangrid(colvar)  # averages of colvar
+        colvar <- meangrid(colvar, inttype == 3)  # averages of colvar
       else if (any (dim(colvar) - dim(z)) != -1)
         stop("dimension of 'colvar' should be equal to dimension of 'z' or have one row and one column less")    
     }
@@ -639,19 +737,19 @@ check.shade <- function(shadedots, lighting) {
 ## =============================================================================
 
 splitdotpersp <- function(dots, bty = "b", lighting = NULL, 
-   x = NULL, y = NULL, z = NULL, col = NULL, plist = NULL) { 
+   x = NULL, y = NULL, z = NULL, plist = NULL,
+   shade = NA, lphi = 0, ltheta = -135) { 
 
   dots$bty <- bty
 
   namespersp <- c("xlim", "ylim", "zlim", "xlab", "ylab", "zlab",
         "main", "sub", "r", "d", "scale", "expand","box", "axes", 
         "nticks", "ticktype", "col.ticks", "lwd.ticks", "bty", 
-        "cex.axis", "col.axis", "font.axis", 
+        "cex.axis", "col.axis", "font.axis", "xaxs", "yaxs", 
         "col.panel", "lwd.panel", "col.grid", "lwd.grid",
-        "cex.lab", "col.lab", "font.lab",  # col is ignored...
+        "cex.lab", "col.lab", "font.lab",   
         "cex.main", "col.main", "font.main", "alpha")
             
-  namesshade <- c("shade", "lphi", "ltheta")
   setlim <- c(!is.null(dots$xlim), !is.null(dots$ylim), ! is.null(dots$zlim))
 
   # log of color variable
@@ -694,7 +792,7 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
     scalefac <- list(x = NULL, y = NULL, z = NULL, xc = NULL, yc = NULL, zc = NULL)
   
  # shade and lighting parameters
-  shadedots <- dots[names(dots) %in% namesshade]
+  shadedots <- list(ltheta = ltheta, lphi = lphi, shade = shade)
   shadedots <- check.shade(shadedots, lighting)
     
   Persp <- c(dots[ names(dots) %in% namespersp], clog = clog, setlim = setlim)  
@@ -707,7 +805,7 @@ splitdotpersp <- function(dots, bty = "b", lighting = NULL,
       stop("'alpha' should be a number inbetween 0 and 1") 
   }  
   list(persp = Persp,
-       points = dots[!names(dots) %in% c(namespersp, namesshade, "clog", "alpha")],
+       points = dots[!names(dots) %in% c(namespersp, "clog", "alpha")],
        shade = c(shadedots, xs = scalefac$x, ys = scalefac$y, zs = scalefac$z,
          alpha = dots$alpha), 
        clog = clog, alpha = dots$alpha)
@@ -799,7 +897,7 @@ splitpardots <- function(dots) {
 
   # plotting parameters : split in plot parameters and point parameters
   plotnames <- c("xlab", "ylab", "zlab", "xlim", "ylim", "zlim", 
-                 "main", "sub", "log", "asp", "bty", 
+                 "main", "sub", "log", "asp", "bty", "xaxs", "yaxs",  
                  "ann", "axes", "frame.plot", "panel.first", "panel.last",
                  "cex.lab", "col.lab", "font.lab",
                  "cex.axis", "col.axis", "font.axis", 

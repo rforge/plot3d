@@ -12,4 +12,10 @@ getplist <- function()
 setplist <- function(plist)
   .plot3D$plist <- plist
 
-  
+initplist <- function(add) {
+  if (add) 
+    plist <- getplist()
+  else
+    plist <- NULL
+  plist
+}    

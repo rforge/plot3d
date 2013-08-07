@@ -8,14 +8,19 @@
 ## Calculate surface normals from (x, y, z) matrices
 ## =============================================================================
 
-normal.matrix <- function(x, y, z, Extend = TRUE) {  # the x- y- and z matrices
+normal.matrix <- function(x, y, z, Extend = TRUE, na.rm = FALSE) {  # the x- y- and z matrices
  
  # x, y and z: matrices of same dimension
-  if (Extend) {
+  if (Extend & !na.rm) {
     xx <- extend(x) 
     yy <- extend(y) 
     zz <- extend(z) 
-  } else {
+  } else if (Extend & na.rm) {
+    xx <- extend.na(x) 
+    yy <- extend.na(y) 
+    zz <- extend.na(z) 
+  } 
+  else {
     xx <- x 
     yy <- y 
     zz <- z 
@@ -166,15 +171,21 @@ facetcols <- function(x, y, z, col, shade, Extend = TRUE){
 
 facetcols.shadelight <- function(light, Normals, col, shade){
   
+  # we keep "transparent" colors
+  ii <- which (col == "transparent")
+   
   if (shade$type == "shade")
    Col <- facetcols.shade(light, Normals, col, shade$shade)
 
   else if (shade$type == "light")
    Col <- facetcols.light(light, Normals, col, shade)
-   
+  
   if (! is.null(shade$alpha))
     Col <- setalpha(Col, shade$alpha)
-    
+
+  if (length(ii) > 0)
+    Col[ii] <- "transparent"
+      
   return(Col)  
 }
 
@@ -226,4 +237,74 @@ facetcols.shade <- function(light, Normals, col, shade){
   col[] <- rgb(RGB)      # alpha = 1
 
   return(col)
+}
+
+
+facetcolsImage <- function (x, y, z, xlim, ylim, zlim, shade, lighting, alpha, 
+  ltheta, lphi, Col, NAcol) {
+
+  if (is.null(xlim))
+    xlim <- range(x, na.rm = TRUE)
+  if (is.null(ylim))
+    ylim <- range(y, na.rm = TRUE)
+  if (is.null(zlim))
+    zlim <- range(z, na.rm = TRUE)
+  xs <- 0.5 *abs(diff(xlim))
+  ys <- 0.5 *abs(diff(ylim))
+  zs <- 0.5 *abs(diff(zlim))
+  xs <- ifelse (xs == 0, 1, 1 / xs)
+  ys <- ifelse (ys == 0, 1, 1 / ys)
+  zs <- ifelse (zs == 0, 1, 1 / zs)
+
+  if (! is.matrix(x)) {
+    xy <- mesh(x,y)
+    x <- xy$x
+    y <- xy$y  
+  }
+  
+  light   <- setuplight(lphi, ltheta) [1:3]
+  Normals <- normal.matrix(x * xs, y * ys, z * zs, Extend = TRUE, 
+    na.rm = any(is.na(z)))
+  ina <- which (is.na(Normals$u))
+    
+  List <- list (shade = shade, alpha = alpha, type = "none")
+
+  if (! is.null(lighting)) {         
+    if (is.character(lighting))
+      List$type <- "light"
+    else if (is.logical(lighting)) {
+      if (lighting)
+        List$type <- "light"
+    } else if (is.list(lighting)) {
+      if (!is.null(lighting$type)) 
+        List$type <- lighting$type
+      else   
+        List$type <- "light"
+      lighting$type <- NULL
+      List <- c(List, lighting)
+    }
+  }
+  if (! is.null(shade))
+    if (! is.na(shade) & List$type == "none") # lighting overrules shade
+      List$type <- "shade"     
+  if (is.null(List$shade)) 
+    List$shade <- NA
+  
+  # we keep "transparent" colors
+  col <- Col
+  ii <- which (col == "transparent")
+   
+  Col[] <- facetcols.shadelight(light, Normals, col, List)
+
+  if (! is.null(alpha))
+    Col <- setalpha(Col, alpha)
+
+  if (length(ina) > 0)
+    Col[ina] <- NAcol
+    
+  if (length(ii) > 0 )
+    Col[ii] <- "transparent"
+
+  return(Col)
+
 }

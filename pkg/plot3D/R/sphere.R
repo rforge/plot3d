@@ -7,13 +7,10 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
      col = jet.col(100), NAcol = "white", border = NA, facets = TRUE,
      contour = FALSE, colkey = list(side = 4), resfac = 1,
      panel.first = NULL, clim = NULL, clab = NULL,
-     bty = "n", lighting = FALSE, inttype = 1, 
-     full = FALSE, add = FALSE, plot = TRUE) {
+     bty = "n", lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+     inttype = 1, full = FALSE, add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   r <- 1  # sphere radius
   
@@ -33,28 +30,32 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
 
  # check contours
   contour <- check.args(contour)
-  if (contour$add) 
-    cv <- colvar
+  
+  cv <- colvar
+  cvlim <- clim
   
   M <- mesh(X, Y)
   x <- with (M, -r*cos(x)*sin(y))
   y <- with (M, -r*sin(y)*sin(x))
   z <- with (M, -r*cos(y))
   
-  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
+  dot <- splitdotpersp(list(...), bty, lighting, 
+    x, y, z, plist = plist, shade, lphi, ltheta)
 
   DD <- dim(x)
 
+  CC <- check.colvar.persp(colvar, z, col, inttype, clim, dot$alpha)
+  colvar <- CC$colvar
+  col <- CC$col
+  
   if (is.null(clim))
     clim <- range(colvar, na.rm = TRUE)
+  
   if (dot$clog) {
     colvar <- log(colvar)
     clim <- log(clim)
   }
 
-  CC <- check.colvar.persp(colvar, z, col, inttype, clim, dot$alpha)
-  col <- CC$col ; colvar <- CC$colvar
-  
   iscolkey <- is.colkey(colkey, col)
   if (iscolkey) 
     colkey <- check.colkey(colkey)
@@ -72,7 +73,8 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
     panel.first(plist$mat)
 
   Poly <- paintit(colvar, x, y, z, plist, col, NAcol, clim, border,
-          facets, dot$points$lwd, dot$points$lty, dot$shade, Extend, !full)
+          facets, dot$points$lwd, dot$points$lty, dot, Extend, !full, 
+          cv = cv, cvlim = cvlim)
 
   if (contour$add) {
     contour$side <- NULL #"z"
@@ -116,7 +118,7 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
 
   if (iscolkey) 
     plist <- plistcolkey(plist, colkey, col, clim, clab, 
-      dot$clog, type = "spheresurf3D")
+         dot$clog, type = "spheresurf3D")
 
   plist <- plot.struct.3D(plist, poly = Poly, segm = segm, plot = plot)  
 

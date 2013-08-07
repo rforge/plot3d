@@ -1,22 +1,15 @@
 ## =============================================================================
-## contours in 3-D plot
+## Contours in 3-D
 ## =============================================================================
 
-contour3D <- function(x = NULL, y = NULL, 
-                  z, ..., 
-                  colvar = z, phi = 40, theta = 40,
-                  col = NULL, colkey = list(side = 4), resfac = 1, 
-                  panel.first = NULL,
-                  clim = NULL, clab = NULL, bty = "b",
-                  inttype = 1, dDepth = 1e-1, 
-                  add = FALSE, plot = TRUE){
+createsegms <- function (x, y, z, colvar, names = c("x", "y", "z"), 
+  dot, col, clim, dDepth, plist, levels) {  
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  contour <- list(args = dot$points) 
 
- # check input
+  contour$args$col <- col
+  contour$args$levels <- levels
+
   if (!ispresent(colvar)) 
     stop ("'colvar' should be present for contour3D")
 
@@ -31,73 +24,112 @@ contour3D <- function(x = NULL, y = NULL,
     y <- as.vector(y)
 
   if (! is.vector(x))
-    stop("'x' should be a vector")
+    stop(names[1], " should be a vector")
     
-  if (! is.vector(y))
-    stop("'y' should be a vector")
+  if (length(x) != nrow(colvar))
+    stop (names[1], " should be a vector of length = nrow(colvar) or be NULL")
 
-  dot <- splitdotpersp(list(...), bty, FALSE, x, y, z, plist = plist)
-  
-  contour <- list(args = dot$points) 
-  
+  if (! is.vector(y))
+    stop(names[2], " should be a vector")
+
+  if (length(y) != ncol(colvar))
+    stop (names[2], " should be a vector of length = ncol(colvar) or be NULL")
+
   if (! is.matrix(z)) {
     if (length(z) > 1)
       stop("'z'  should be a matrix or one value") 
     contour$side <- z
-    z <- matrix(nrow = length(x), ncol = length(y), data = z)  
+    z <- colvar 
   } else {
     if (length(x) != nrow(z))
-      stop("'x' should be of length = nrow(z)")
+      stop(names[1], " should be of length = nrow(",names[3],")")
     if (length(y) != ncol(z))
-      stop("'y' should be of length = ncol(z)")
+      stop(names[2], " should be of length = ncol(",names[3],")")
     contour$side <- "z"
+    
   }
   
-  if (any(resfac != 1)) {   # change resolution
-    res <- changeres(resfac, x, y, z, colvar)
-    x <- res$x ; y <- res$y ; z <- res$z
-    colvar <- res$colvar
-  }
-  
-  if (is.null(col))
-    col <- jet.col(100)
-  if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
-    
-  contour$args$col <- col
-    
- # swap if decreasing
-  if (all(diff(x) < 0)) {    
-    if (is.null(dot$persp$xlim)) 
-      dot$persp$xlim <- rev(range(x))
-    x <- rev(x)
-    if (ispresent(colvar)) 
-      colvar <- colvar[nrow(colvar):1, ]
-    z <- z[nrow(z):1, ]
-  }
- 
-  if (all(diff(y) < 0)) {    
-    if (is.null(dot$persp$ylim)) 
-      dot$persp$ylim <- rev(range(y))
-    y <- rev(y)
-    if (ispresent(colvar)) 
-      colvar <- colvar[, (ncol(colvar):1)]
-    z <- z[, (ncol(z):1)]
-  }
+ # create contours
+  segm <- contourfunc(contour, x, y, z, plist, cv = colvar, 
+    clim = clim, dDepth = dDepth) 
+  names.from <- paste(names, ".from", sep = "")
+  names.to <- paste(names, ".to", sep = "")
 
+  names(segm)[1:6] <- c(names.from[1], names.to[1], 
+                        names.from[2], names.to[2], 
+                        names.from[3], names.to[3])
+  return(segm)
+}
+
+## =============================================================================
+## main function
+## =============================================================================
+
+contour3D <- function(x = NULL, y = NULL, z = NULL, ..., 
+                  colvar = NULL, phi = 40, theta = 40,
+                  col = NULL, colkey = list(side = 4), 
+                  panel.first = NULL,
+                  clim = NULL, clab = NULL, bty = "b",
+                  dDepth = 1e-1, 
+                  add = FALSE, plot = TRUE){
+
+  xlim <- ylim <- zlim <- c(0, 1)
+  if (!is.null(x))
+    xlim <- range(x, na.rm = TRUE)
+  if (!is.null(y))
+    ylim <- range(y, na.rm = TRUE)
+  if (!is.null(z))
+    zlim <- range(z, na.rm = TRUE)
+
+  plist <- initplist(add)
+
+  dot <- splitdotpersp(list(...), bty, FALSE, xlim, ylim, zlim, plist = plist)
+
+  dots <- dot$points    
+  levels <- dots$levels
+  dots$levels <- NULL
+  
   if (is.null(clim)) 
     clim <- range(colvar, na.rm = TRUE)
-  
-  iscolkey <- is.colkey(colkey, col)
-  if (iscolkey) 
-    colkey <- check.colkey(colkey)
-    
-  if (dot$clog) {                
+
+  clog <- FALSE
+  if (! is.null(dots$log)) {
+    if (length(grep("c", dots[["log"]])) > 0) {
+      dots[["log"]] <- gsub("c", "", dots[["log"]])
+      clog <- TRUE
+    }
+    if (dots[["log"]] == "")
+      dots[["log"]] <- NULL
+  }
+  if (clog) {                
     colvar <- log(colvar)
     clim <- log(clim)
   }
 
+  if (is.null(levels)) {
+    nlevs <- dots$nlevels
+
+    if (is.null(nlevs))
+      nlevs <- 10
+
+    if (clog) 
+      levels <- exp(pretty(log(clim), nlevs))
+    else
+      levels <- pretty(clim, nlevs)
+  }
+  nlevs <- length(levels)
+
+  if (is.null(col))
+    col <- jet.col(nlevs)
+  if (! is.null(dot$alpha)) 
+    col <- setalpha(col, dot$alpha)
+
+  iscolkey <- is.colkey(colkey, col)
+  if (iscolkey) 
+    colkey <- check.colkey(colkey)
+   
   if (is.null(plist)) {
-    do.call("perspbox", c(alist(x, y, z,  
+    do.call("perspbox", c(alist(xlim, ylim, zlim,  
                      phi = phi, theta = theta, plot = plot, 
                      colkey = colkey, col = col), dot$persp))
     plist <- getplist()
@@ -105,17 +137,63 @@ contour3D <- function(x = NULL, y = NULL,
   if (is.function(panel.first)) 
     panel.first(plist$mat)         
                                  
- # create contours
-  segm <- contourfunc(contour, x, y, colvar, plist, cv = colvar, 
-    clim = clim, dDepth = dDepth)
-   
-  if (iscolkey) 
+  isconstant <- NULL
+  ismatrix <- NULL
+  if (length(x) == 1)
+    isconstant <- c(isconstant, 1)
+  else if (is.matrix(x))
+    ismatrix <- c(ismatrix, 1)
+  
+  if (length(y) == 1)
+    isconstant <- c(isconstant, 2)
+  else if (is.matrix(y))
+    ismatrix <- c(ismatrix, 2)
+
+  if (length(z) == 1)
+    isconstant <- c(isconstant, 3)
+  else if (is.matrix(z))
+    ismatrix <- c(ismatrix, 3)
+
+  if (length(isconstant) > 1)
+    stop ("only one of the values 'x' 'y', or 'z' can be one value")
+
+  if (length(ismatrix) > 1)
+    stop ("only one of the values 'x' 'y', or 'z' can be a matrix")
+
+  if (length(isconstant) > 1)
+    stop ("only one of the values 'x' 'y', or 'z' can be one value")
+
+  if (length(ismatrix) == 0 & length(isconstant) == 0)
+    stop ("exactly one of the values 'x' 'y', or 'z' should be a matrix or one value")
+
+  ismapped <- c(isconstant, ismatrix)
+  if (ismapped == 3) {
+    segm <- createsegms(x, y, z, colvar, c("x", "y", "z"), dot, 
+      col, clim, dDepth, plist, levels)
+  } else if (ismapped == 1) {
+    segm <- createsegms(y, z, x, colvar, c("y", "z", "x"), dot, 
+      col, clim, dDepth, plist, levels)
+  } else {
+    segm <- createsegms(x, z, y, colvar, c("x", "z", "y"), dot, 
+      col, clim, dDepth, plist, levels)
+  }
+
+  if (iscolkey) {
+    if (is.null(colkey$at))
+      colkey$at <- levels
+
+    if (nlevs > 1) {
+     # for colors: 
+      dz <- c(-diff(levels[1:2]), diff(levels[(nlevs-1):nlevs])) * 0.5
+      clim <- range(levels) + dz
+    }
     plist <- plistcolkey(plist, colkey, col, clim, clab, 
       dot$clog, type = "contour3D") 
-
+  }
   plist <- plot.struct.3D(plist, segm = segm, plot = plot)  
 
   setplist(plist)   
   invisible(plist$mat)
-}
+  
+}                  
 

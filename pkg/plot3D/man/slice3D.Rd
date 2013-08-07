@@ -31,7 +31,8 @@ slice3D (x, y, z, colvar, ..., phi = 40, theta = 40,
          col = jet.col(100), NAcol = "white", 
          border = NA, facets = TRUE, colkey = list(side = 4), 
          panel.first = NULL, clim = NULL, 
-         clab = NULL, bty = "b", lighting = FALSE, 
+         clab = NULL, bty = "b", 
+         lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,  
          add = FALSE, plot = TRUE) 
 
 slicecont3D (x, y, z, colvar, ..., phi = 40, theta = 40,
@@ -44,11 +45,11 @@ slicecont3D (x, y, z, colvar, ..., phi = 40, theta = 40,
 
 isosurf3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
          level = mean(colvar, na.rm = TRUE), isofunc = createisosurf,
-         col = "grey", border = NA, facets = TRUE, 
+         col = NULL, border = NA, facets = TRUE, 
          colkey = list(side = 4), panel.first = NULL, 
          clab = NULL, bty = "b", 
-         ltheta = -135, lphi = 0, shade = 0.5, 
-         lighting = FALSE, add = FALSE, plot = TRUE) 
+         lighting = FALSE, shade = 0.5, ltheta = -135, lphi = 0, 
+         add = FALSE, plot = TRUE) 
 
 voxel3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
          level = mean(colvar, na.rm = TRUE), eps = 0.01, operator = "=", 
@@ -59,7 +60,8 @@ triangle3D (tri, colvar = NULL, ..., phi = 40, theta = 40,
            col = NULL, NAcol = "white", 
            border = NA, facets = TRUE,
            colkey = list(side = 4), panel.first = NULL,
-           lighting = FALSE, clim = NULL, clab = NULL,
+           lighting = FALSE, shade = 0.5, ltheta = -135, lphi = 0, 
+           clim = NULL, clab = NULL,
            bty = "b", add = FALSE, plot = TRUE)  
 
 createisosurf (x, y, z, colvar, level = mean(colvar, na.rm = TRUE))
@@ -143,22 +145,28 @@ createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
     For \code{voxel3D}, \code{level} should either be one number (if \code{operator}
     equals \code{'=', '<', '>'}) or two numbers (for \code{operator = '<>'}).
     } 
-  \item{ltheta, lphi }{if finite values are specified for \code{ltheta} and 
-    \code{lphi}, the surface is shaded as though it was being illuminated from 
-    the direction specified by azimuth \code{ltheta} and colatitude \code{lphi}.
-    See \link{persp}.
+
+  \item{lighting }{If not \code{FALSE} the facets will be illuminated, and colors may
+    appear more bright. To switch on lighting, the argument \code{lighting} 
+    should be either set to \code{TRUE} (using default settings) or it can be a 
+    list with specifications of one of the following: 
+    \code{ambient, diffuse, specular, exponent, sr} and \code{alpha}. 
+
+    Will overrule \code{shade} not equal to \code{NA}.
+    
+    See examples in \link{jet.col}.
     }
-  \item{shade }{the shade at a surface facet is computed as ((1+d)/2)^shade, 
-    where d is the dot product of a unit vector normal to the facet and 
-    a unit vector in the direction of a light source. 
+  \item{shade }{the degree of shading of the surface facets. 
     Values of shade close to one yield shading similar to a point light 
     source model and values close to zero produce no shading. 
     Values in the range 0.5 to 0.75 provide an approximation to daylight illumination.
     See \link{persp}.
     } 
-  \item{lighting }{If \code{TRUE}, the facets will be illuminated, and colors may
-    appear more bright.  See examples in \link{jet.col}.
-    } 
+  \item{ltheta, lphi }{if finite values are specified for \code{ltheta} and 
+    \code{lphi}, the surface is shaded as though it was being illuminated from 
+    the direction specified by azimuth \code{ltheta} and colatitude \code{lphi}.
+    See \link{persp}.
+    }  
   \item{bty }{The type of the box, the default only draws background panels.
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
@@ -197,9 +205,6 @@ createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
     In addition, the \link{perspbox} arguments
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
-
-    The parameters \code{shade} or \code{lighting} can be used for illuminating 
-    in \code{slice3D} and \code{isosurf3D}.
 
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
 

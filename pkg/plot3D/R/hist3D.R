@@ -10,15 +10,10 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                    colkey = list(side = 4), 
                    image = FALSE, contour = FALSE, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b",
-                   lighting = FALSE, space = 0, 
+                   lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+                   space = 0, 
                    add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
-
- # input check
   if (! is.matrix(z))
     stop("'z'  should be a matrix") 
 
@@ -42,27 +37,33 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
 
   space <- rep(space, length.out = 2) / 2
 
- # dot split  - extend x and y for ranges
-  extendvec <- function(x) {
-    ll <- length(x)  
-    c(x[1] + 0.5*(x[1] - x[2]), x, x[ll] + 0.5*(x[ll] - x[ll-1]))           
-  }
   
-  dot <- splitdotpersp(list(...), bty, lighting, extendvec(x), extendvec(y), z, 
-    plist = plist)
+  plist <- initplist(add)
+
+  dot <- splitdotpersp(list(...), bty, lighting, 
+    extendvec(x), extendvec(y), z, plist = plist, shade, lphi, ltheta)
   
  # swap if decreasing
   if (length(x) > 0 & all(diff(x) < 0)) {     
-    dot$persp$xlim <- rev(range(x))
     x <- rev(x)
+    if (is.null(dot$persp$xlim)) 
+      dot$persp$xlim <- range(x)
+      else if (diff(dot$persp$ylim) < 0)
+        stop("'persp' expects increasing ylim")  
+      else if (diff(dot$persp$xlim) < 0)
+        stop("'persp' expects increasing xlim")  
+
     if (ispresent(colvar)) 
       colvar <- colvar[nrow(colvar):1, ]
     z <- z[nrow(z):1, ]
   }
  
   if (length(y) > 1 & all(diff(y) < 0)) {     
-    dot$persp$ylim <- rev(range(y))
     y <- rev(y)
+    if (is.null(dot$persp$ylim)) 
+      dot$persp$ylim <- range(y)
+    else if (diff(dot$persp$ylim) < 0)
+      stop("'persp' expects increasing ylim")  
     if (ispresent(colvar)) 
       colvar <- colvar[, (ncol(colvar):1)]
     z <- z[, (ncol(z):1)]
@@ -73,9 +74,9 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   if (contour$add) 
     cv <- colvar
 
- # check colvar and colors
-  CC <- check.colvar.persp(colvar, z, col, 2, clim, dot$alpha)
-  colvar <- CC$colvar; col <- CC$col
+  CC <- check.colvar.2(colvar, z, col, clim, dot$alpha)
+  colvar <- CC$colvar
+  col <- CC$col
 
   if (ispresent(colvar)) {
     if (is.null(clim)) 
@@ -122,12 +123,9 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     yy <- extend(y)
   else 
     yy <- dot$persp$ylim
-    
-  xlim <- range(xx)
-  ylim <- range(yy)
-
+ 
   if (is.null(plist)) {
-    do.call("perspbox", c(alist(xlim, ylim, dot$persp$zlim, 
+    do.call("perspbox", c(alist(range(xx), range(yy), dot$persp$zlim, 
                    phi = phi, theta = theta, plot = plot, 
                    colkey = colkey, col = col), dot$persp))
     plist <- getplist()
@@ -241,8 +239,15 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                   colMeans(PolyY, na.rm = TRUE), 
                   colMeans(PolyZ, na.rm = TRUE), plist, TRUE)
 
-  lwd <- dot$points$lwd; if (is.null(lwd)) lwd <- 1
-  lty <- dot$points$lty; if (is.null(lty)) lty <- 1
+  lwd <- dot$points$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
+
+  lty <- dot$points$lty
+  if (is.null(lty)) 
+    lty <- 1
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = ncol(PolyX))
     
   Poly <- list(x      = PolyX,
                y      = PolyY,                                  
@@ -252,6 +257,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                lwd    = rep(lwd , length.out = ncol(PolyX)),
                lty    = rep(lty , length.out = ncol(PolyX)),
                isimg  = rep(0, length.out = ncol(PolyX)),
+               alpha  = alpha, 
                proj   = Proj)
   class(Poly) <- "poly"
 

@@ -1,7 +1,6 @@
 ## =============================================================================
 ## Scatterplots (2-D)
 ## =============================================================================
-# x, y, colvar: vector or matrix of same dimension
 
 scatter2D <- function(x, y, ..., colvar = NULL, 
                     col = NULL, NAcol = "white", 
@@ -9,10 +8,7 @@ scatter2D <- function(x, y, ..., colvar = NULL,
                     clim = NULL, clab = NULL, CI = NULL, 
                     add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   plist <- add2Dplist(plist, "scatter", x = x, y = y, colvar = colvar, 
                     col = col, NAcol = NAcol, 
@@ -27,7 +23,6 @@ scatter2D <- function(x, y, ..., colvar = NULL,
   if (isCI) 
     CI <- check.CI(CI, length(x), 2)
   
- # colors
   if (! is.null(colvar)) {
     if (is.null(col))
       col <- jet.col(100)
@@ -40,9 +35,10 @@ scatter2D <- function(x, y, ..., colvar = NULL,
     iscolkey <- is.colkey(colkey, col)        
 
     if (iscolkey) {
-      colkey <- check.colkey(colkey, add)
+      colkey <- check.colkey(colkey)
       if (! add)       
-        par.ori <- par(plt = colkey$parplt)  
+        plist$plt$main <- colkey$parplt
+      setplist(plist)    
     }  
 
     if (length(colvar) != length(x)) 
@@ -51,18 +47,23 @@ scatter2D <- function(x, y, ..., colvar = NULL,
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     
-    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+    if (! is.null(dots$alpha)) 
+      col <- setalpha(col, dots$alpha)
+    
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else  {  # no colvar
     Col <- col
-    if (is.null(Col)) Col <- "black"
-    if (! is.null(dots$alpha)) Col <- setalpha(Col, dots$alpha)
+    if (is.null(Col)) 
+      Col <- "black"
+    if (! is.null(dots$alpha)) 
+      Col <- setalpha(Col, dots$alpha)
     iscolkey <- FALSE
   }   
 
   useSegments <- FALSE
-  
+  par (plt = plist$plt$main)
+
   if (! is.null(dots$points$type))
     if (dots$points$type %in% c("b", "l", "o"))
       if (length(Col) > 1  )
@@ -79,28 +80,35 @@ scatter2D <- function(x, y, ..., colvar = NULL,
    # mean of point colors for line colors
     LCol <- cbind(Col[-1], Col[-len])
     LCol <- apply(LCol, MARGIN = 1, FUN = MeanColors)
-    if (! is.null(dots$alpha)) LCol <- setalpha(LCol, dots$alpha)
-    
+    if (! is.null(dots$alpha)) 
+      LCol <- setalpha(LCol, dots$alpha)
 
     if (! add) 
       dots$main <- start2Dplot(dots$main, x, y)
     add <- TRUE
-    if (isCI) {plot.CI.2d(CI, x, y, Col) ; isCI <- FALSE}  # do this first
+
+    if (isCI) {
+      plot.CI.2d(CI, x, y, Col) 
+      isCI <- FALSE
+    }
+    
     do.call("points", c(alist(x, y, col = Col), dots$points)) 
     dots$points$type <- NULL
+    
     do.call("segments", c(alist(x[-len], y[-len], x[-1], y[-1], 
                   col = LCol), dots$points))
   }
   
   else if (! add) {
     dots$main <- start2Dplot(dots$main, x, y)
+    
     if (isCI) {
       plot.CI.2d(CI, x, y, Col)   
       isCI <- FALSE
     }
     do.call("points", c(alist(x, y, col = Col), dots$points))
-  }
-  else  {
+  } else  {
+    
     if (isCI) {
       plot.CI.2d(CI, x, y, Col) 
       isCI <- FALSE
@@ -110,52 +118,10 @@ scatter2D <- function(x, y, ..., colvar = NULL,
     
   if (iscolkey) {
     drawcolkey(colkey, col, clim, clab, dots$clog) 
-    if (! add)       
-      par(plt = par.ori)  
-    par(mar = par("mar"))
+    par(plt = plist$plt$ori)  
   }    
+  par(mar = par("mar"))
 
-}
-
-## =============================================================================
-## function that makes a box type
-## =============================================================================
-
-start2Dplot <- function(dots, x, y) {
-  dd <- dots
-  dd$type <- "n"
-
-  bty <- dots$bty
-  dots$bty <- NULL
-
-  if (is.null(bty))
-    bty <- "o"
-
-  if (bty %in% c("b2", "g", "bl")) 
-    dd$bty <- NULL
-    
-  if (is.null(dd$xlab))
-    dd$xlab <- "x"
-      
-  if (is.null(dd$ylab))
-    dd$ylab <- "y"
-
-  do.call("plot", c(alist(x, y), dd))
-
-  if (bty == "b2")
-    grid(col = "grey", lty = 1, lwd = 2)
-  else if (bty == "g") {
-    pu <- par("usr")
-    rect(pu[1], pu[3], pu[2], pu[4],
-      col = grey(0.925), border = grey(0.925))
-    grid(col = "white", lty = 1, lwd = 2)
-  } else if (bty %in% c("bl","bl2")) {
-    pu <- par("usr")
-    rect(pu[1], pu[3], pu[2], pu[4], col = "black")
-    if (bty == "bl2")
-      grid(col = "grey", lty = 1, lwd = 2)
-  }
-  return(dots)
 }
 
 ## =============================================================================
@@ -198,9 +164,13 @@ check.CI <- function(CI, len, dim) {
         stop("number of rows of matrix 'CI$z' should be equal to number of points")
     }      
   parameter <- list(alen = 0.01, lty = par("lty"), lwd = par("lwd"), col = NULL)
-  CIpar <- CI; CIpar$x <- CIpar$y <- CIpar$z <- NULL                           
+  CIpar <- CI
+  CIpar$x <- CIpar$y <- CIpar$z <- NULL                           
+  
   CIpar <- overrulepar(parameter, CIpar)
-  CIpar$x <- CI$x; CIpar$y <- CI$y; CIpar$z <- CI$z
+  CIpar$x <- CI$x
+  CIpar$y <- CI$y
+  CIpar$z <- CI$z
   CIpar
 }
 

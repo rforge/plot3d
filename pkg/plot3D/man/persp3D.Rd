@@ -20,8 +20,8 @@ persp3D (x = seq(0, 1, length.out = nrow(z)),
        colkey = list(side = 4), resfac = 1,
        image = FALSE, contour = FALSE, panel.first = NULL,
        clim = NULL, clab = NULL, bty = "b", 
-       lighting = FALSE, inttype = 1, 
-       curtain = FALSE, add = FALSE, plot = TRUE)
+       lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+       inttype = 1, curtain = FALSE, add = FALSE, plot = TRUE)
 
 ribbon3D (x = seq(0, 1, length.out = nrow(z)), 
       y = seq(0, 1, length.out = ncol(z)), z, ..., 
@@ -30,7 +30,8 @@ ribbon3D (x = seq(0, 1, length.out = nrow(z)),
       colkey = list(side = 4), resfac = 1, 
       image = FALSE, contour = FALSE, panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",
-      lighting = FALSE, space = 0.4, along = "x", 
+      lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+      space = 0.4, along = "x", 
       curtain = FALSE, add = FALSE, plot = TRUE)
 
 hist3D (x = seq(0, 1, length.out = nrow(z)),
@@ -39,7 +40,8 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
       col = NULL, NAcol = "white", border = NA, facets = TRUE,
       colkey = list(side = 4), image = FALSE, contour = FALSE, 
       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
-      lighting = FALSE, space = 0, add = FALSE, plot = TRUE)  
+      lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+      space = 0, add = FALSE, plot = TRUE)  
 }
 
 \arguments{
@@ -51,15 +53,20 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     \code{x} and \code{y} should have the same dimension as \code{z}.
     }
   \item{colvar }{The variable used for coloring. If present, it should have the 
-    same dimension of \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
+    same dimension as \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
     will toggle off coloration according to \code{colvar}. This gives good results
-    only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
+    only if \code{border} is given a color, or when \code{shade} is > 0 or 
+    \code{lighting} is \code{TRUE}).
     }
   \item{col }{Color palette to be used for the \code{colvar} variable.
     If \code{col} is \code{NULL} and \code{colvar} is specified, 
     then a red-yellow-blue colorscheme (\link{jet.col}) will be used.
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
     \code{col} will be \code{grey}. 
+    
+    Finally, to mimic the behavior of \link{persp}, set \code{colvar} = \code{NULL}
+    and make \code{col} a matrix of colors with (nrow(z)-1) rows and 
+    (ncol(z)-1) columns.
     }
   \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
@@ -135,12 +142,30 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     }
-  \item{lighting }{If \code{TRUE}, the facets will be illuminated, and colors may
-    appear more bright.  See examples in \link{jet.col}.
+  \item{lighting }{If not \code{FALSE} the facets will be illuminated, and colors may
+    appear more bright. To switch on lighting, the argument \code{lighting} 
+    should be either set to \code{TRUE} (using default settings) or it can be a 
+    list with specifications of one of the following: 
+    \code{ambient, diffuse, specular, exponent, sr} and \code{alpha}. 
+
+    Will overrule \code{shade} not equal to \code{NA}.
+    
+    See examples in \link{jet.col}.
+    }  
+  \item{shade }{the degree of shading of the surface facets. 
+    Values of shade close to one yield shading similar to a point light 
+    source model and values close to zero produce no shading. 
+    Values in the range 0.5 to 0.75 provide an approximation to daylight illumination.
+    See \link{persp}.
     } 
+  \item{ltheta, lphi }{if finite values are specified for \code{ltheta} and 
+    \code{lphi}, the surface is shaded as though it was being illuminated from 
+    the direction specified by azimuth \code{ltheta} and colatitude \code{lphi}.
+    See \link{persp}.
+    }
   \item{inttype }{The interpolation type to create the polygons, either 
-    interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
-    values (\code{inttype = 2}) - see details.
+    averaging the \code{colvar} (\code{inttype = 1, 3} or extending 
+    the \code{x, y, z} values (\code{inttype = 2}) - see details.
     } 
   \item{add }{Logical. If \code{TRUE}, then the surfaces will be added to the current plot.
     If \code{FALSE} a new plot is started. 
@@ -151,7 +176,7 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
   \item{\dots}{additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}. 
+    scale, expand, box, axes, nticks, ticktype}. 
     The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
     All objects will be plotted, including those that fall out of these ranges.
     To select objects only within the axis limits, use \link{plotdev}.
@@ -160,8 +185,6 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
-    The parameters \code{shade} or \code{lighting} can be used for illuminating.
-
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
 
     For all functions, the arguments \code{lty, lwd} can be specified; this is only
@@ -178,7 +201,7 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
   
   The perspective plots are drawn as filled polygons. Each polygon is defined by 
   4 corners and a color, defined in its centre. 
-  When facets are colored, there are two interpolation schemes as set by \code{inttype}. 
+  When facets are colored, there are three interpolation schemes as set by \code{inttype}. 
 
   The default (\code{inttype = 1}) is similar to R's function \code{persp}, 
   and assumes that the \code{z}-values define the points on the corners of 
@@ -187,6 +210,12 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
   (nx-1)(ny-1), and averages are taken from the original data 
   (nx and ny are number of x and y points). 
   This will make the colors (and/or shading) smoother.
+  When \code{inttype = 1} then \code{NA} values in \code{colvar} will be used as 
+  such during the averaging. This will tend to make the \code{NA} region larger.
+  
+  An alternative is to set \code{inttype = 3}, which is similar to \code{inttype = 1}
+  except for the \code{NA} values, which will be removed during the averaging.
+  This will tend to make the \code{NA} region smaller.
 
   By setting \code{inttype = 2}, a second interpolation scheme 
   is selected. This is mainly of use in case a \code{colvar} is defined, and it 
@@ -328,16 +357,19 @@ The New S Language. Wadsworth & Brooks/Cole.
  V2[3:4, 3:4] <- NA
  V2[4, 5] <- NA
 
- image2D(V2, border = "black")
- persp(V2, col = "lightblue")
+ image2D(V2, border = "black")  # shows true NA region
 
-# averages of V2, with NAs 
+# averages of V2, including NAs, NA region larger
  persp3D(z = VV, colvar = V2, inttype = 1, theta = 0, 
-       phi = 20, border = "black")
+       phi = 20, border = "black", main = "inttype = 1")
 
 # extension of VV; NAs unaffected
  persp3D(z = VV, colvar = V2, inttype = 2, theta = 0, 
-       phi = 20, border = "black")
+       phi = 20, border = "black", main = "inttype = 2")
+
+# average of V2, ignoring NA; NA region smaller
+ persp3D(z = VV, colvar = V2, inttype = 3, theta = 0, 
+       phi = 20, border = "black", main = "inttype = 3")
 
 ## =======================================================================
 ## Use of panel.first

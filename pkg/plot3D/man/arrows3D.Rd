@@ -159,7 +159,7 @@ polygon2D (x, y, ..., colvar = NULL,
     }
   \item{type }{The type of the arrow head, one of \code{"simple"} 
     (which uses R-function \link{arrows}), \code{"curved"} or \code{"triangle"} and \code{"cone"}.
-    The latter two are the same in \code{plot3D} (but differ in package \code{plot3D.rgl}).
+    The latter two are the same in \code{plot3D} (but differ in package \code{plot3Drgl}).
     }
   \item{add }{Logical. If \code{TRUE}, then the arrows, segments, ... will be added to the current plot.
     If \code{FALSE} a new plot is started. 
@@ -176,7 +176,7 @@ polygon2D (x, y, ..., colvar = NULL,
     All objects will be plotted, including those that fall out of these ranges.
     To select objects only within the axis limits, use \link{plotdev}.
     
-    \code{shade} and \code{lighting} parameters will have no effect.
+    \code{shade} and \code{lighting} arguments will have no effect.
     
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
          

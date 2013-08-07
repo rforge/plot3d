@@ -84,15 +84,16 @@ Volcano <- volcano[seq(1, nrow(volcano), by = 3),
 
 <<label=imagecontour,include=FALSE>>=
 par(mfrow = c(3, 3), mar = c(3, 3, 3, 2))
-contour(Volcano)
+contour2D(Volcano, lwd = 2, colkey = FALSE)
 contour2D(Volcano, lwd = 2)
-image(Volcano)
-image(Volcano, col = jet.col(100))
 image2D(Volcano, clab = "m")
+image2D(Volcano, shade = 0.4)
 image2D(Volcano, facets = FALSE)
 image2D(Volcano, contour = TRUE)
 image2D(Volcano, rasterImage = TRUE, contour = list(lwd = 2, col = jet.col(11)))
 image2D(Volcano, theta = 30, NAcol = "black")
+image2D(volcano, lighting = TRUE, rasterImage = TRUE,
+   contour = list(col = "white", labcex = 0.8, lwd = 3, alpha = 0.5))
 @
 
 \setkeys{Gin}{width=1.0\textwidth}
@@ -209,7 +210,8 @@ ix <- seq(1, nrow(Volcano), length.out = 20)
 iy <- seq(1, ncol(Volcano), length.out = 20)
 
 ribbon3D(z = Volcano[, iy])
-ribbon3D(z = Volcano[ix, ], along = "y")
+ribbon3D(z = Volcano[ix, ], along = "y", 
+  curtain = TRUE, space = 0.8, shade = 0.2)
 ribbon3D(z = Volcano[ix, iy], along = "xy")
 hist3D(z = Volcano[ix,iy], shade = 0.5)
 @

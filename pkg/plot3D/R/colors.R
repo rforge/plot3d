@@ -1,6 +1,8 @@
 setalpha <- function(Col, alpha) {
+
   if (is.null(Col))
     return(Col)
+
   ii <- which (! is.na(Col))
   if (length(ii) > 0) {   
     pcol <- alpha.col (Col, alpha)
@@ -33,12 +35,11 @@ jet.col <- function (n = 100, alpha = 1) {
 
 jet2.col <- function (n = 100, alpha = 1) {
 
- # red-green-blue colors on scale of 0 to 1
   red    <- c(0,   0,   255, 255, 128)
   green  <- c(78,  255, 255, 0,   0  )
   blue   <- c(255, 255, 0,   0,   0  )
 
-  x.from <- seq (0, 1, length.out = 5)  # scale from 0-1
+  x.from <- seq (0, 1, length.out = 5)  
   x.to   <- seq (0, 1, length.out = n)
 
   expand <- function(col)
@@ -50,7 +51,6 @@ jet2.col <- function (n = 100, alpha = 1) {
 
 alpha.col <- function (col = "grey", alpha = 0.5) {
 
- # red-green-blue colors on scale of 0 to 1
   RGBini <- col2rgb(col)
 
   return( rgb(t(RGBini), 
@@ -60,10 +60,9 @@ alpha.col <- function (col = "grey", alpha = 0.5) {
 ramp.col <- function (col = c("grey", "black"), 
                       n = 100, alpha = 1) {
 
- # red-green-blue colors on scale of 0 to 1
   RGBini <- col2rgb(col)
 
-  x.from <- seq(0, 1, length.out = length(col))  # scale from 0-1
+  x.from <- seq(0, 1, length.out = length(col)) 
   x.to   <- seq(0, 1, length.out = n)
 
   expand <- function(col)
@@ -87,7 +86,7 @@ gg2.col <-  function (n = 100, alpha = 1) {
                "#D55E00", "#000000"), n = n, alpha = alpha)
 } 
 
-MeanColors <- function(col) {          #vector with 2 values
+MeanColors <- function(col) {           
   rgb(t(rowMeans(col2rgb(col))), maxColorValue = 255)
 }
 

@@ -1,5 +1,5 @@
 ## =============================================================================
-## 3-d surfaces
+## 3-D surfaces
 ## =============================================================================
 # x, y, z, colvar: matrices
 
@@ -10,8 +10,8 @@ surf3D <- function(x, y, z, ...,
                    colkey = list(side = 4), 
                    panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "n",
-                   lighting = FALSE, inttype = 1, 
-                   add = FALSE, plot = TRUE) {
+                   lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+                   inttype = 1, add = FALSE, plot = TRUE) {
 
  # check validity, class and dimensionality
   if (! is.matrix(x))
@@ -30,8 +30,8 @@ surf3D <- function(x, y, z, ...,
   if (any (DD != dim(z)) )
     stop("dimension of 'x' not equal to dimension of 'z'")
 
-
 # check if col or colvar already have the colors to be used
+
   if (is.character(colvar) & is.matrix(colvar)) {
     col <- colvar
     colvar <- NULL
@@ -45,12 +45,17 @@ surf3D <- function(x, y, z, ...,
     return(invisible(pmat))
   }
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
-  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
+  dot <- splitdotpersp(list(...), bty, lighting, 
+    x, y, z, plist = plist, shade, lphi, ltheta)
+  
+  cv <- colvar
+  cvlim <- clim
+  
+  CC <- check.colvar.persp(colvar, z, col, inttype, clim, dot$alpha)
+  colvar <- CC$colvar
+  col <- CC$col
   
   if (ispresent(colvar)) {
 
@@ -69,10 +74,6 @@ surf3D <- function(x, y, z, ...,
   } else 
     iscolkey <- FALSE
 
-  CC <- check.colvar.persp (colvar, z, col, inttype, clim, dot$alpha)
-  col <- CC$col
-  colvar <- CC$colvar
-  
   Extend <- inttype == 2
 
   if (is.null(plist)) {
@@ -85,13 +86,14 @@ surf3D <- function(x, y, z, ...,
   if (is.function(panel.first)) 
     panel.first(plist$mat)  
            
- # painters algorithm
+ # polygons using painters algorithm
   Poly <- paintit(colvar, x, y, z, plist, col, NAcol, clim, border, 
-          facets, dot$points$lwd, dot$points$lty, dot$shade, Extend)
+          facets, dot$points$lwd, dot$points$lty, dot, Extend, 
+          cv = cv, cvlim = cvlim)
 
   if (iscolkey)  
     plist <- plistcolkey(plist, colkey, col, clim, clab, 
-      dot$clog, type = "surf3D") 
+          dot$clog, type = "surf3D") 
 
   plist <- plot.struct.3D(plist, poly = Poly, plot = plot)  
 

@@ -4,21 +4,22 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    colkey = list(side = 4), resfac = 1,
                    clab = NULL, add = FALSE, plot = TRUE) {
 
-  # check colors
   if (length(col) == 1)
-    if (is.na(col)) col <- NULL
+    if (is.na(col)) 
+      col <- NULL
 
- # The plotting arguments
   dots <- list(...)
 
-  if (is.null(add)) add <- FALSE
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
+  plist <- add2Dplist(plist, "contour", z = z, x = x, y = y, 
+                    col = col, NAcol = NAcol, 
+                    colkey = colkey, resfac = resfac,
+                    clab = clab, ...)
+  setplist(plist)
  # log transformation of z-values (log = "c", or log = "z")
   zlog <- FALSE
+
   if (! is.null(dots$log)) {
     if (length(grep("z", dots[["log"]])) > 0) {
       dots[["log"]] <- gsub("z", "", dots[["log"]])
@@ -47,7 +48,8 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
      else zlim <- range(z, na.rm = TRUE)
   } 
   
-  levels <- dots$levels; dots$levels <- NULL
+  levels <- dots$levels
+  dots$levels <- NULL
   
   if (is.null(levels)) {
     nlevs <- dots$nlevels
@@ -64,10 +66,12 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
 
   if (is.null(col))
     col <- jet.col(nlevs)
-  if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+  
+  if (! is.null(dots$alpha)) 
+    col <- setalpha(col, dots$alpha)
+  
   dots$alpha <- NULL
   
-    
   if (nlevs > 1) {
    # for colors: 
     dz <- c(-diff(levels[1:2]), diff(levels[(nlevs-1):nlevs])) * 0.5
@@ -79,8 +83,9 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
   if (iscolkey) {
     colkey <- check.colkey(colkey)
     if (!add)
-      plt.or <- par(plt = colkey$parplt)
+      plist$plt$main <- colkey$parplt
   }
+  par (plt = plist$plt$main)
 
   if (! is.vector(x) | ! is.vector(y)) {
     if (is.array(x)) {
@@ -127,38 +132,33 @@ contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
    }
 
  # labels
-  if (is.null(dots[["xlab"]])) dots[["xlab"]] <- "x"
-  if (is.null(dots[["ylab"]])) dots[["ylab"]] <- "y"
+  if (is.null(dots[["xlab"]])) 
+    dots[["xlab"]] <- "x"
+  if (is.null(dots[["ylab"]])) 
+    dots[["ylab"]] <- "y"
 
   # contours
   if (zlog)
     if (!is.null(dots$levels))
       dots$levels <- log(dots$levels)
 
-  if (is.null(add))
-    add <- FALSE
-
-  if (any (is.na(z)) & !is.null(NAcol)) {
+  if (any (is.na(z)) & !is.null(NAcol)) { 
     do.call("image2D", c(list(z = z, x = x, y = y, col = "transparent", 
       NAcol = NAcol, add = add, colkey = FALSE, plot = plot), dots))
     add <- TRUE
   }
-  plist <- add2Dplist(plist, "contour", z = z, x = x, y = y, 
-                    col = col, NAcol = NAcol, 
-                    colkey = colkey, resfac = resfac,
-                    clab = clab, ...)
-  setplist(plist)
+
   if (!plot) return()
   
   do.call("contour", c(list(z = z, x = x, y = y, col = col, 
     levels = levels, add = add), dots))
 
   if (iscolkey)  {
-    colkey$at <- levels
-    drawcolkey(colkey, col, zlim, clab, FALSE)
-    if (!add)
-      par(plt = plt.or)
-    par(mar = par("mar"))
+    if (is.null(colkey$at))
+      colkey$at <- levels
+    drawcolkey(colkey, col, zlim, clab, FALSE) 
+    par(plt = plist$plt$ori)  
   }
+  par(mar = par("mar"))
 
 }

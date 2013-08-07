@@ -1,57 +1,60 @@
- # a function to create polygons
-  add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border, lwd = 1, lty = 1, ...)  {
 
-    nr <- nrow(x) - 1
-    nc <- ncol(x) - 1
+# a function to create polygons from vectors
+
+add.poly <- function(poly, x, y, z, cv, col, NAcol, clim, facets, border, 
+  lwd = 1, lty = 1, ...)  {
+
+  nr <- nrow(x) - 1
+  nc <- ncol(x) - 1
     
  # create polygons
-    ix <- rep(1:nr, nc)
-    iy <- as.vector(matrix(nrow = nr, ncol = nc, 
+  ix <- rep(1:nr, nc)
+  iy <- as.vector(matrix(nrow = nr, ncol = nc, 
                      data = 1:nc, byrow =TRUE))
-    xx <- x
-    yy <- y
-    zz <- z
+  xx <- x
+  yy <- y
+  zz <- z
     
-  # the polygon coordinates
-    PolyX <- rbind(xx[cbind(ix,     iy    )],
-                   xx[cbind(ix + 1, iy    )],
-                   xx[cbind(ix + 1, iy + 1)],
-                   xx[cbind(ix,     iy + 1)], NA)
-    PolyY <- rbind(yy[cbind(ix,     iy    )],
-                   yy[cbind(ix + 1, iy    )],
-                   yy[cbind(ix + 1, iy + 1)],
-                   yy[cbind(ix,     iy + 1)], NA)
-    PolyZ <- rbind(zz[cbind(ix,     iy    )],
-                   zz[cbind(ix + 1, iy    )],
-                   zz[cbind(ix + 1, iy + 1)],
-                   zz[cbind(ix,     iy + 1)], NA)
+ # the polygon coordinates
+  PolyX <- rbind(xx[cbind(ix,     iy    )],
+                 xx[cbind(ix + 1, iy    )],
+                 xx[cbind(ix + 1, iy + 1)],
+                 xx[cbind(ix,     iy + 1)], NA)
+  PolyY <- rbind(yy[cbind(ix,     iy    )],
+                 yy[cbind(ix + 1, iy    )],
+                 yy[cbind(ix + 1, iy + 1)],
+                 yy[cbind(ix,     iy + 1)], NA)
+  PolyZ <- rbind(zz[cbind(ix,     iy    )],
+                 zz[cbind(ix + 1, iy    )],
+                 zz[cbind(ix + 1, iy + 1)],
+                 zz[cbind(ix,     iy + 1)], NA)
 
-   # colvar is converted to colors.
-    if (! is.null(cv)) {
-      if (length(cv) == nrow(x))
-        cv <- 0.5*(cv[-1] + cv[-length(cv)])
+ # colvar is converted to colors.
+  if (! is.null(cv)) {
+    if (length(cv) == nrow(x))    # take colvar averages
+      cv <- 0.5*(cv[-1] + cv[-length(cv)])
 
-   # Colors for values = NA 
-      if (any (is.na(cv)) & ! is.null(NAcol) ) {
-        CC <- checkcolors(cv, col, NAcol, clim)
-        clim   <- CC$lim
-        col    <- CC$col
-        cv     <- CC$colvar
-      }
-      crange <- diff(clim)
-      N      <- length(col) -1
-      Col <- col[1 + trunc((cv - clim[1])/crange*N)]
-    } else 
-      Col <- rep(col, length.out = length(cv))
+ # Colors for values = NA 
+    if (any (is.na(cv)) & ! is.null(NAcol) ) {
+      CC <- checkcolors(cv, col, NAcol, clim)
+      clim   <- CC$lim
+      col    <- CC$col
+      cv     <- CC$colvar
+    }
+    crange <- diff(clim)
+    N      <- length(col) -1
+    Col <- col[1 + trunc((cv - clim[1])/crange*N)]
+  } else 
+    Col <- rep(col, length.out = length(cv))
       
-    Lty <- rep(lty, length.out = length(cv))
-    Lwd <- rep(lwd, length.out = length(cv))
+  Lty <- rep(lty, length.out = length(cv))
+  Lwd <- rep(lwd, length.out = length(cv))
 
  # border and colors 
-    Col <- createcolors(facets, border, Col)
+  Col <- createcolors(facets, border, Col)
       
  # update polygons.
-    poly <- 
+  poly <- 
       list(x       = cbind(poly$x, PolyX),
            y       = cbind(poly$y, PolyY),               
            z       = cbind(poly$z, PolyZ),               
@@ -61,31 +64,34 @@
            lwd     = c(poly$lwd, Lwd),
            isimg   = c(poly$isimg, rep(0, length.out = length(cv))),
            img     = poly$img
-          )
+        )
 
-    return(poly)
-  } 
+  return(poly)
+} 
 
 ## =============================================================================
 ## Adding polygons from images or persps
 ## =============================================================================
 
 addimg <- function(poly, x, y, z, colvar = z, plist,
-                     col = NULL, NAcol = "white", 
-                     border = NA, facets = TRUE, lwd = 1, lty = 1,
-                     resfac = 1, clim = NULL,   
-                     ltheta = -135, lphi = 0, shade = NA, 
-                     lighting = FALSE, alpha = NULL, ...)  {
+                   col = NULL, NAcol = "white", 
+                   border = NA, facets = TRUE, lwd = 1, lty = 1,
+                   resfac = 1, clim = NULL,   
+                   ltheta = -135, lphi = 0, shade = NA, 
+                   lighting = FALSE, alpha = NULL, ...)  {
 
   if (missing(poly) | is.null(poly) | length(poly) == 0) 
     poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
                  lwd = NULL, lty = NULL, proj = NULL, isimg = NULL,
                  img = list())                    
+
   else if (class(poly) != "poly")
     stop ("'poly' not of correct type for addimg")
 
-  dot <- splitdotpersp(list(ltheta = ltheta, lphi = lphi, shade = shade), 
-                       bty = NULL, lighting, x, y, z, plist = plist)
+  dot <- splitdotpersp(list(), 
+                       bty = NULL, lighting, x, y, z, plist = plist, 
+                       ltheta = ltheta, lphi = lphi, shade = shade)
+
   if (! is.null(plist$xs)) {
     dot$shade$xs <- plist$scalefac$x
     dot$shade$ys <- plist$scalefac$y
@@ -112,9 +118,11 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
  # if x and y are a vector: check resfac and convert to matrix
   X <- x
   Y <- y
+
   if (is.vector(X))  {
     if (! is.vector(Y))
       stop("'y' should be a vector if 'x' is one")
+
     if (any(resfac != 1)) {   # change resolution
       res <- changeres(resfac, X, Y, z, colvar)
       X <- res$x
@@ -122,10 +130,14 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
       z <- res$z
       colvar <- res$colvar
     }
+
     XY <- mesh(X, Y)
     x <- XY$x
     y <- XY$y
-  } else { x <- X; y <- Y}
+  } else { 
+    x <- X
+    y <- Y
+  }
      
  # check class and dimensionality
   if (! is.matrix(x))
@@ -172,10 +184,14 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
   if (! dot$shade$type == "none") 
     Col <- facetcols (x, y, z, Col, dot$shade)
 
-  if (! is.null(alpha)) Col <- setalpha(Col, alpha)
+  if (! is.null(alpha)) 
+    Col <- setalpha(Col, alpha)
 
- # border and colors 
   imgCol <- createcolors(facets, border, Col)
+  
+  if (is.null(alpha)) alpha <- NA
+  Alpha <- alpha
+  alpha <- rep(alpha, length.out = length(x))
   
  # update polygons.
   numimg <- length(poly$img)    
@@ -188,7 +204,8 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
          lwd    = c(poly$lwd, rep(lwd , length.out = length(x))),
          lty    = c(poly$lty, rep(lty , length.out = length(x))),
          proj   = c(poly$proj, Proj),
-         isimg = c(poly$isimg, rep(1, length.out = length(x))),
+         isimg  = c(poly$isimg, rep(1, length.out = length(x))),
+         alpha  = c(poly$alpha, alpha),
          img    = poly$img)
   if (numimg == 0)
     poly$img <- list()
@@ -197,92 +214,13 @@ addimg <- function(poly, x, y, z, colvar = z, plist,
                col = matrix(nrow = nrow(colvar), 
                ncol = ncol(colvar), data = Col), NAcol = NAcol, sl = sl, 
                facets = facets, border = border, lwd = lwd, lty = lty,
-               mapped = TRUE)      
+               alpha = Alpha, mapped = TRUE)      
 
   class(poly) <- "poly"
   
   return(poly)
 }
 
-## =============================================================================
-## Adding segments 
-## =============================================================================
-
-addsegments <- function(segm, x0, x1, y0, y1, z0, z1, colvar = NULL, plist,
-                     col = NULL, NAcol = "white", lwd = 1, lty = 1,
-                     clim = NULL, ...) {
-  if (missing(segm) | is.null(segm)) 
-    segm <- list(x.from = NULL, x.to = NULL, 
-                 y.from = NULL, y.to = NULL,
-                 z.from = NULL, z.to = NULL,
-                 col = NULL, border = NULL, 
-                 lwd = NULL, proj = NULL)                    
-  else if (class(segm) != "segments")
-    stop ("'segm' not of correct type, 'segments', for addsegments")
-    
-  if (any (c(! is.vector(x0), ! is.vector(x1), 
-             ! is.vector(y0), ! is.vector(y1), 
-             ! is.vector(z0), ! is.vector(z1) )))
-    stop("'x0', 'y0, 'z0', 'x1', 'y1', 'z1', should be vectors")
-
-  len <- length(z0)
-  if (any (c(length(x0) != len, length(x1) != len, 
-             length(y0) != len, length(y1) != len,
-             length(z1) != len)))
-    stop("'x0', 'y0, 'z0', 'x1', 'y1', 'z1', should be of equal length")
-  
-  if (! is.null(colvar)) {
-    if (! is.vector(colvar))
-      stop("'colvar' should be a vector or NULL")
-
-    if (length(colvar) != len) 
-      stop("'colvar' should have same length as 'x0',...")
-
-    if (is.null(col))
-      col <- jet.col(100)
-  }
-
-  if (is.null(col))
-    col <- "black"
-  
- # depth view of the midpoints of each segment 
-  Proj   <- project(0.5*(x0 + x1), 0.5*(y0 + y1), 0.5*(z0 + z1), plist)
-  
- # colvar is converted to colors.
-  if (! is.null(colvar)) {
-    if (is.null(clim))
-      clim <- range(colvar, na.rm = TRUE)     
-
- # Colors for values = NA 
-    if (any (is.na(colvar)) & ! is.null(NAcol) ) {
-      CC <- checkcolors(colvar, col, NAcol, clim)
-      clim   <- CC$lim
-      col    <- CC$col
-      colvar <- CC$colvar
-    }
-    crange <- diff(clim)
-    N      <- length(col) -1
-    Col <- col[1 + trunc((colvar - clim[1])/crange*N)]
-  } else 
-    Col <- rep(col, length.out = len-1)
-
-  Col <- facetcols (x0, y0, z0, Col, NULL)
-
-  Col    <- rep(Col, length.out = len-1)
-  
- # update and return segments.
-  segm <- list(x.from = c(segm$x.from, x0), 
-               x.to   = c(segm$x.to,   x1), 
-               y.from = c(segm$y.from, y0),                                  
-               y.to   = c(segm$y.to,   y1),                                  
-               z.from = c(segm$z.from, z0),                                  
-               z.to   = c(segm$z.to,   z1),                                  
-               col    = c(segm$col, Col),
-               lwd    = c(segm$lwd, rep(lwd , length.out = len-1)),
-               proj   = c(segm$proj, Proj))
-  class(segm) <- "segments"
-  return(segm)
-}                     
 
 ## =============================================================================
 ## Adds lines to segments
@@ -303,8 +241,9 @@ addlines <- function(segm, x, y, z, plist,
   else if (class(segm) != "segments")
     stop ("'segm' not of correct type, 'segments', for addlines")
                              
-  dot <- splitdotpersp(list(ltheta = ltheta, lphi = lphi, shade = shade), 
-                       bty = NULL, lighting, x, y, z, plist = plist)
+  dot <- splitdotpersp(list(), 
+                       bty = NULL, lighting, x, y, z, plist = plist, 
+                       ltheta = ltheta, lphi = lphi, shade = shade)
   if (is.null(col))
     col <- "black"
   
@@ -330,6 +269,9 @@ addlines <- function(segm, x, y, z, plist,
 
   if (! dot$shade$type == "none") 
     Col <- facetcols (x, y, z, Col, dot$shade)
+
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len-1)
   
  # update and return segments.
   segm <- list(
@@ -342,6 +284,7 @@ addlines <- function(segm, x, y, z, plist,
        col    = c(segm$col, Col),
        lwd    = c(segm$lwd, rep(lwd , length.out = len-1)),
        lty    = c(segm$lty, rep(lty , length.out = len-1)),
+       alpha  = c(segm$alpha, alpha),
        proj   = c(segm$proj, Proj))
   class(segm) <- "segments"
   return(segm)

@@ -7,24 +7,26 @@
   \code{contour3D} adds a \link{contour} in a 3-D plot. 
 }
 \usage{
-contour3D (x = NULL, y = NULL, z, 
-       ..., colvar = z, phi = 40, theta = 40,
-       col = NULL, colkey = list(side = 4), resfac = 1,
+contour3D (x = NULL, y = NULL, z = NULL, 
+       ..., colvar = NULL, phi = 40, theta = 40,
+       col = NULL, colkey = list(side = 4), 
        panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
-       inttype = 1, dDepth = 1e-1, add = FALSE, plot = TRUE)
+       dDepth = 1e-1, add = FALSE, plot = TRUE)
 }
 
 \arguments{
-  \item{z }{Matrix (2-D) or one value containing the values where the 
-    \link{contour2D} is to be plotted. 
+  \item{x, y, z }{Matrix (2-D), vector, or one value containing the values 
+    where the image is to be plotted. 
+    At least one of them should be one number, as this will determine where the 
+    image is plotted, parallel to the (y-z) plane (x one number), 
+    to the (x-z) plane (y one number) or to the (z-y) plane (z one number).
+
+    If two are vectors, the first vector should be of length equal to 
+    \code{nrow(colvar)} and the second should be of length equal to 
+    \code{ncol(colvar)}. 
     }
-  \item{x, y }{Vectors with x and y values, or one value where the \link{contour2D} 
-    is to be plotted. 
-    \code{x} should be of length equal to \code{nrow(colvar)} and 
-    \code{y} should be of length equal to \code{ncol(colvar)}. 
-    }
-  \item{colvar }{The variable used for coloring. If present, it should have the 
-    same dimension as \code{z}. Values of \code{NULL}, \code{NA}, or \code{FALSE}
+  \item{colvar }{The variable used for coloring. 
+    Values of \code{colvar} equal to \code{NULL}, \code{NA}, or \code{FALSE}
     will toggle off coloration according to \code{colvar}. This gives good results
     only if \code{border} is given a color, or when \code{shade} is >0 (see \link{persp}).
     }
@@ -51,13 +53,6 @@ contour3D (x = NULL, y = NULL, z,
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
     for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
-  \item{resfac }{Resolution factor, one value or a vector of two numbers, for 
-    the x and y- values respectively. A value > 1 will increase the 
-    resolution. For instance, if \code{resfac} equals \code{3} then for each 
-    adjacent pair of x- and y-values, z will be interpolated to two intermediary points. 
-    This uses simple linear interpolation. If \code{resfac} is one number then
-    the resolution will be increased similarly in x and y-direction.  
-    }
   \item{theta, phi }{The angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. 
     see \link{persp}.
@@ -72,10 +67,6 @@ contour3D (x = NULL, y = NULL, z,
     Only effective if the \link{persp} 
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     }
-  \item{inttype }{The interpolation type to create the polygons, either 
-    interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
-    values (\code{inttype = 2}) - see \link{persp3D}.
-    } 
   \item{dDepth }{When a contour is added on an image, the image polygons may
     hide some contour segments. To avoid that, the viewing depth of the segments
     can be artificially decreased with the factor \code{dDepth} times the 
@@ -93,7 +84,7 @@ contour3D (x = NULL, y = NULL, z,
 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.      
     The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
     All objects will be plotted, including those that fall out of these ranges.
     To select objects only within the axis limits, use \link{plotdev}.
@@ -104,7 +95,7 @@ contour3D (x = NULL, y = NULL, z,
     
     The arguments \code{lty, lwd} can also be specified.
     
-    \code{shade} and \code{lighting} parameters will have no effect.
+    \code{shade} and \code{lighting} arguments will have no effect.
     
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
          
@@ -127,39 +118,48 @@ contour3D (x = NULL, y = NULL, z,
 ## =======================================================================
 ## Contours
 ## =======================================================================
+ par (mfrow = c(2, 2))
 
- contour3D(z = 100, colvar = volcano, zlim = c(0, 150),
+ r <- 1:nrow(volcano)
+ c <- 1:ncol(volcano)
+ contour3D(x = r, y = c, z = 100, colvar = volcano, zlim = c(0, 150),
    clab = c("height", "m"))
 
+ contour3D(x = 100, y = r, z = c, colvar = volcano, clab = c("height", "m"))
+
  contour3D(z = volcano, colvar = volcano, lwd = 2, 
-   nlevels = 20, clab = c("height", "m"))
+   nlevels = 20, clab = c("height", "m"), colkey = FALSE)
+
+ contour3D(y = volcano, colvar = volcano, lwd = 2, 
+   nlevels = 10, clab = c("height", "m"))
 
 ## =======================================================================
 ## Composite images and contours in 3D
 ## =======================================================================
  persp3D(z = volcano, zlim = c(90, 300), col = "white", 
-         shade = 0.1, d = 2)
- contour3D(z = volcano, colvar = volcano, lwd = 2, 
-         add = TRUE, nlevels = 20, clab = c("height", "m"))
+         shade = 0.1, d = 2, plot = FALSE)
+ contour3D(z = volcano, colvar = volcano, lwd = 2, add = TRUE, 
+         nlevels = 20, clab = c("height", "m"), plot = FALSE,
+         colkey = list(at = seq(90, 190, length.out = 5)))
  contour3D(z = 300, colvar = volcano, lwd = 2, col = "grey",
-         add = TRUE, nlevels = 20, clab = c("height", "m"))
+         add = TRUE, nlevels = 5)
           
 ## =======================================================================
 ## the viewing depth of contours (dDepth)
 ## =======================================================================
- par(mfrow = c(2, 2))
+
 # too low
- persp3D(z = volcano, col = "white", shade = 0.1)
+ persp3D(z = volcano, col = "white", shade = 0.1, plot = FALSE)
  contour3D(z = volcano, colvar = volcano, lwd = 2, 
          add = TRUE, dDepth = 0, col = "black")
 
 # default
- persp3D(z = volcano, col = "white", shade = 0.1)
+ persp3D(z = volcano, col = "white", shade = 0.1, plot = FALSE)
  contour3D(z = volcano, colvar = volcano, lwd = 2, 
          add = TRUE, dDepth = 0.1, col = "black")
 
 # too high
- persp3D(z = volcano, col = "white", shade = 0.1)
+ persp3D(z = volcano, col = "white", shade = 0.1, plot = FALSE)
  contour3D(z = volcano, colvar = volcano, lwd = 1, 
          add = TRUE, dDepth = 0.5, col = "black")
 

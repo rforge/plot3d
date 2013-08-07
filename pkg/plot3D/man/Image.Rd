@@ -21,11 +21,12 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
          clab = NULL, add = FALSE, plot = TRUE)
 
 \method{image2D}{matrix}(z, x = seq(0, 1, length.out = nrow(z)), 
-               y = seq(0, 1, length.out = ncol(z)), ...,
+               y = seq(0, 1, length.out = ncol(z)), colvar = z, ...,
                col = jet.col(100), NAcol = "white", 
                border = NA, facets = TRUE, contour = FALSE, 
-               colkey = list(side = 4), resfac = 1, 
-               clab = NULL, theta = 0, rasterImage = FALSE,
+               colkey = list(side = 4), resfac = 1, clab = NULL, 
+               lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+               theta = 0, rasterImage = FALSE,
                add = FALSE, plot = TRUE) 
 
 \method{image2D}{array}(z, margin = c(1, 2), subset, ask = NULL, ...) 
@@ -34,13 +35,19 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
 
 \arguments{
   \item{z }{Matrix (2-D) or array (3-D) or a list with matrices or arrays,
-    to be colored as an \link{image}. 
+    with z-values. By default \code{colvar} is equal to \code{z}, hence 
+    \code{z} also defines the variable used to color the \link{image}. 
+    Only when \code{shade} or \code{lighting} is toggled on does it make 
+    sense to use \code{z} different from \code{colvar}.
     }
   \item{x, y }{Vectors or matrix with x and y values. 
      If a vector \code{x} should be of length equal to \code{nrow(z)} and 
      \code{y} should be of length equal to \code{ncol(z)}. 
      If a matrix (only for \code{image2D}), they should have
      the same dimension as \code{z}.
+    }
+  \item{colvar }{Only used when \code{shade} or \code{lighting} is toggled on.
+    The variable used to color the image. 
     }
   \item{col }{Color palette to be used for the \link{image} function or for the contours.
     See details.
@@ -75,6 +82,27 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
     This uses simple linear interpolation. If \code{resfac} is one number then
     the resolution will be increased similarly in x and y-direction.  
     }
+  \item{lighting }{If not \code{FALSE} the facets will be illuminated, and colors may
+    appear more bright. To switch on lighting, the argument \code{lighting} 
+    should be either set to \code{TRUE} (using default settings) or it can be a 
+    list with specifications of one of the following: 
+    \code{ambient, diffuse, specular, exponent, sr} and \code{alpha}. 
+
+    Will overrule \code{shade} not equal to \code{NA}.
+    
+    See examples in \link{jet.col}.
+    } 
+  \item{shade }{the degree of shading of the surface facets. 
+    Values of shade close to one yield shading similar to a point light 
+    source model and values close to zero produce no shading. 
+    Values in the range 0.5 to 0.75 provide an approximation to daylight illumination.
+    See \link{persp}.
+    } 
+  \item{ltheta, lphi }{if finite values are specified for \code{ltheta} and 
+    \code{lphi}, the surface is shaded as though it was being illuminated from 
+    the direction specified by azimuth \code{ltheta} and colatitude \code{lphi}.
+    See \link{persp}.
+    }   
   \item{theta }{The angle defining the azimuthal direction. 
     Implemented for consistency with the other functions based on \link{persp}.
     }
@@ -151,20 +179,20 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
   plotting elements.  
 }
 \note{
-  Parts of this help page come from the help pages of the R-core function 
-   \link{image}, on which the implementation of \code{image2D} is based.
-   
-  The first argument, \code{z} determines the color variable. 
-  Hence, for consistency with the other functions
-  in this package, it could have been called \code{colvar}. It was called 
-  \code{z} for consistency with the R-function \link{image}.
+  The first argument, \code{z} generally determines the color variable. 
+  For consistency with the other functions, another variable, \code{colvar}
+  is also defined and set by default equal to \code{z}. \code{colvar} will
+  only be used if \code{shade} or \code{lighting} are toggled on. In this case,
+  \code{z} will be used to define the shading (orientation of each facet), while 
+  \code{colvar} will define the color.
 
-  The coloring when \code{x} and \code{y} is a vector is as in \link{image}.
+  When \code{x} and \code{y} is a vector, the function uses R-function \link{image}.
   This means that the x- and y- axis will extend the x- and y- values with half
   a grid cell. 
   
   In contrast, when \code{x} and \code{y} are a matrix, 
   the axis will not extend the x- or y- values.  See first example.
+  
 }
 
 
@@ -202,28 +230,51 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
  image2D(z, x, y, border = "black", theta = 45)
 
 ## =======================================================================
-## Adding points and lines
+## shading, light, adding contours, points and lines
 ## =======================================================================
 
  par(mfrow = c(2, 2))
  nr <- nrow(volcano)
  nc <- ncol(volcano)
 
- image2D(volcano, x = 1:nr, y = 1:nc,  
+ image2D(volcano, x = 1:nr, y = 1:nc, lighting = TRUE, 
        main = "volcano", clab = "height, m")
 
  abline(v = seq(10, 80, by = 10))
  abline(h = seq(10, 60, by = 10))
  points(50, 30, pch = 3, cex = 5, lwd = 3, col = "white")
 
- contour2D(volcano, x = 1:nr, y = 1:nc, lwd = 2,
+ image2D(z = volcano, x = 1:nr, y = 1:nc, lwd = 2, shade = 0.2,
        main = "volcano", clab = "height, m")
 
- image2D(volcano, x = 1:nr, y = 1:nc, contour = TRUE,
-       main = "volcano", clab = "height, m")
+ image2D(volcano, x = 1:nr, y = 1:nc, contour = TRUE, shade = 0.5, lphi = 0,
+       col = "lightblue", main = "volcano")
 
  image2D(volcano, x = 1:nr, y = 1:nc, col = jet.col(12),
        main = "volcano", clab = "height, m")
+
+## =======================================================================
+## Contour plots
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ V <- volcano - 150
+ 
+# default, no color key
+ contour2D(z = V, colkey = FALSE, lwd = 2)
+
+# imposed levels
+ contour2D(z = V, lwd = 2, levels = seq(-40, 40, by = 20))
+
+# negative levels dashed
+ contour2D(z = V, col = "black", lwd = 2, 
+           levels = seq(0, 40, by = 20))
+ contour2D(z = V, col = "black", lwd = 2, lty = 2, 
+           levels = seq(-40, -20, by = 20), add = TRUE)
+
+# no labels, imposed number of levels, colorkey
+ contour2D(z = V, lwd = 2, nlevels = 20, drawlabels = FALSE, 
+           colkey = list(at = seq(-40, 40, by = 20)))
 
 ## =======================================================================
 ## A large data set, input is an array
@@ -328,11 +379,11 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
 ## =======================================================================
 
  par(mfrow = c(1, 1))
- image2D(volcano, 
+ image2D(volcano, shade = 0.2, rasterImage = TRUE,
    contour = list(col = "white", labcex = 0.8, lwd = 3, alpha = 0.5))
 # same:
 \dontrun{
- image2D(z = volcano)
+ image2D(z = volcano, shade = 0.2, rasterImage = TRUE)
  contour2D(z = volcano, col = "white", labcex = 0.8, 
    lwd = 3, alpha = 0.5, add = TRUE)
 }

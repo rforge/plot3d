@@ -132,7 +132,7 @@ text2D (x, y, labels, ..., colvar = NULL,
 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.      
     The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes for 3D plots.
     All objects will be plotted, including those that fall out of these ranges.
     To select objects only within the axis limits, use \link{plotdev}.
@@ -141,7 +141,7 @@ text2D (x, y, labels, ..., colvar = NULL,
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
 
-    \code{shade} and \code{lighting} parameters will have no effect.
+    \code{shade} and \code{lighting} arguments will have no effect.
     
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
          
@@ -271,9 +271,9 @@ text2D (x, y, labels, ..., colvar = NULL,
        col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
        main = "Oxygen saturation along ship track", colkey = FALSE)
 
-# add to image; with  a color key
+# add data to image; with  a color key
  scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
-         add = TRUE, cex = 2, colkey = TRUE, clab = "\%")
+         add = TRUE, cex = 2, colkey = list(dist = 0.1), clab = "\%")
          
  par(mar = PM)
  

@@ -15,15 +15,11 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
                    clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
   
   dot  <- splitdotpersp(list(...), bty, NULL, 
     c(x0, x1), c(y0, y1), c(z0, z1), plist = plist)
 
-# checks
   len <- length(x0)
   if (length(y0) != len)
     stop("'y0' should have same length as 'x0'")
@@ -36,7 +32,6 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
   if (length(z1) != len)
     stop("'z1' should have same length as 'x0'")
 
-  # colors
   if (ispresent(colvar)) {
     if (length(colvar) != len)
       stop("'colvar' should have same length as 'x0', 'y0' and 'z0'")
@@ -50,7 +45,7 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
-    if (dot$clog) {                    # log transformation of color-values
+    if (dot$clog) {      
       colvar <- log(colvar)
       clim <- log(clim)
     }
@@ -59,13 +54,15 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "black"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)
     iscolkey <- FALSE
   }
@@ -81,10 +78,17 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
   if (is.function(panel.first))
     panel.first(plist$mat)
 
-  lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
+  lwd <- dot$points$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
   lwd <- rep(lwd, length.out = len)
-  lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+
+  lty <- dot$points$lty 
+  if (is.null(lty)) 
+    lty <- 1
   lty <- rep(lty, length.out = len)
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   segm <- list()
   
@@ -105,7 +109,8 @@ border3D  <- function(x0, y0, z0, x1, y1, z1,
         z1[i], z1[i], z1[i], z1[i], z1[i], z1[i], z1[i]),
       col    = c(segm$col, rep(Col[i], 12)),
       lwd    = c(segm$lwd, rep(lwd[i], length.out = 12)),
-      lty    = c(segm$lty, rep(lty[i], length.out = 12))
+      lty    = c(segm$lty, rep(lty[i], length.out = 12)),
+      alpha  = c(segm$alpha, alpha)
     )
   }
   
@@ -138,15 +143,11 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   dot  <- splitdotpersp(list(...), bty, NULL, c(x0, x1), c(y0, y1), c(z0, z1), 
     plist = plist)
 
-# checks
   len <- length(x0)
   if (length(y0) != len)
     stop("'y0' should have same length as 'x0'")
@@ -168,7 +169,6 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
     if (length(z1) != len)
       stop("'z1' should have same length as 'x0' if not NULL")
 
-  # colors
   if (ispresent(colvar)) {
     if (length(colvar) != len)
       stop("'colvar' should have same length as 'x0', 'y0' and 'z0'")
@@ -191,18 +191,19 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)
     iscolkey <- FALSE
   }
 
-# The colors of facets and border
   Col <- createcolors(facets, border, Col)  
 
   if (is.null(plist)) {
@@ -216,10 +217,18 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
   if (is.function(panel.first))
     panel.first(plist$mat)
 
-  lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
+  lwd <- dot$points$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
   lwd <- rep(lwd, length.out = len)
-  lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+  
+  lty <- dot$points$lty 
+  if (is.null(lty)) 
+    lty <- 1
   lty <- rep(lty, length.out = len)
+
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   poly <- list()
   for (i in 1: len) {
@@ -244,7 +253,8 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
       border = c(poly$border, Col$border[i]),
       lwd    = c(poly$lwd,    lwd[i]),
       lty    = c(poly$lty,    lty[i]),
-      isimg  = c(poly$isimg, 0)
+      isimg  = c(poly$isimg, 0),
+      alpha  = c(poly$alpha, alpha)
       
     )
   }
@@ -270,22 +280,18 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
 ## =============================================================================
 
 box3D  <- function(x0, y0, z0, x1, y1, z1,
-                  
                    ...,  colvar = NULL, phi = 40, theta = 40,
                    col = NULL, NAcol = "white",
                    border = NA, facets = TRUE,
                    colkey = list(side = 4), panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+
+  plist <- initplist(add)
 
   dot  <- splitdotpersp(list(...), bty, NULL, c(x0, x1), c(y0, y1), c(z0, z1), 
     plist = plist)
 
-# checks
   len <- length(x0)
   if (length(y0) != len)
     stop("'y0' should have same length as 'x0'")
@@ -298,7 +304,6 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
   if (length(z1) != len)
     stop("'z1' should have same length as 'x0'")
 
- # colors
   if (ispresent(colvar)) {
     if (length(colvar) != len)
       stop("'colvar' should have same length as 'x0', 'y0' and 'z0'")
@@ -321,13 +326,15 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "grey"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)
     iscolkey <- FALSE
   }
@@ -346,10 +353,18 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
   if (is.function(panel.first))
     panel.first(plist$mat)
 
-  lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
+  lwd <- dot$points$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
   lwd <- rep(lwd, length.out = len)
-  lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+
+  lty <- dot$points$lty 
+  if (is.null(lty)) 
+    lty <- 1
   lty <- rep(lty, length.out = len)
+
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   poly <- list()
   for (i in 1: len) {
@@ -376,7 +391,8 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
       border = c(poly$border, rep(Col$border[i], length.out = 6)),
       lwd    = c(poly$lwd,    rep(lwd[i], length.out = 6)),
       lty    = c(poly$lty,    rep(lty[i], length.out = 6)),
-      isimg  = c(poly$isimg,  rep(0, length.out = 6))
+      isimg  = c(poly$isimg,  rep(0, length.out = 6)),
+      alpha  = c(poly$alpha, alpha)
       
     )
   }

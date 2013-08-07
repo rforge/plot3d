@@ -5,22 +5,18 @@
 # x, y, z, colvar: same length
     
 text3D <- function(x, y, z, labels, ..., colvar = NULL, 
-                      phi = 40, theta = 40,
-                      col = NULL, NAcol = "white", 
-                      colkey = list(side = 4), 
-                      panel.first = NULL,
-                      clim = NULL, clab = NULL, bty = "b",
-                      add = FALSE, plot = TRUE) {
+                   phi = 40, theta = 40,
+                   col = NULL, NAcol = "white", 
+                   colkey = list(side = 4), 
+                   panel.first = NULL,
+                   clim = NULL, clab = NULL, bty = "b",
+                   add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
- # checks
-  x     <- as.vector(x)
-  y     <- as.vector(y)
-  z     <- as.vector(z)
+  x <- as.vector(x)
+  y <- as.vector(y)
+  z <- as.vector(z)
   
   if (length(y) != length(x))
     stop("'y' should have same length as 'x'")
@@ -31,7 +27,6 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
 
   dot <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist)
 
- # colors   
   if (ispresent(colvar)) {
   
     if (length(colvar) != length(x))
@@ -54,13 +49,16 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
      
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
+
     Col <- variablecol(colvar, col, NAcol, clim)
     
   } else {
     if (is.null(col))
       col <- "black"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = length(x))  
     iscolkey <- FALSE
   }
@@ -76,8 +74,7 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
   if (is.function(panel.first)) 
     panel.first(plist$mat)  
 
- # sort labels according to view
-  Proj   <- project(x, y, z, plist)
+  Proj   <- project(x, y, z, plist)      # sort labels according to view
 
   setargs <- function(dot, default) {
     if (is.null(dot)) 
@@ -87,6 +84,8 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
     else 
       rep(unlist(dot), length.out = length(x))  
   }
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = length(x))
 
   tlist <- list(x    = x,
                 y    = y,
@@ -96,17 +95,17 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
                 adj = setargs (dot$points$adj, 0),
                 cex = setargs (dot$points$cex, 1),
                 font = setargs(dot$points$font, 1),
+                alpha = alpha,
                 proj = Proj)                 
 
   if (iscolkey) 
     plist <- plistcolkey(plist, colkey, col, clim, clab, 
-      dot$clog, type = "label3D") 
+         dot$clog, type = "label3D") 
                  
   plist <- plot.struct.3D (plist, labels = tlist, plot = plot)        
 
   setplist(plist)   
   invisible(plist$mat)
-
 }
 
 
@@ -116,12 +115,11 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
 ## =============================================================================
 ## text in 2D
 ## =============================================================================
-# x, y, colvar: same length
     
 text2D <- function(x, y, labels, ..., colvar = NULL, 
-                      col = NULL, NAcol = "white", 
-                      colkey = list(side = 4), 
-                      clim = NULL, clab = NULL, add = FALSE, plot = TRUE) {
+                   col = NULL, NAcol = "white", 
+                   colkey = list(side = 4), 
+                   clim = NULL, clab = NULL, add = FALSE, plot = TRUE) {
 
   if (add) 
     plist <- getplist()
@@ -135,7 +133,6 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
   setplist(plist)
   if (!plot) return()
 
- # checks
   x     <- as.vector(x)
   y     <- as.vector(y)
   
@@ -147,7 +144,6 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
 
   dots <- splitpardots(list(...))
 
- # colors
   if (! is.null(colvar)) {
     if (is.null(col))
       col <- jet.col(100)
@@ -174,10 +170,12 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
     if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim)
 
-  } else  {  # no colvar
+  } else  {  
     Col <- col
-    if (is.null(Col)) Col <- "black"
-    if (! is.null(dots$alpha)) Col <- setalpha(Col, dots$alpha)
+    if (is.null(Col)) 
+      Col <- "black"
+    if (! is.null(dots$alpha)) 
+      Col <- setalpha(Col, dots$alpha)
     iscolkey <- FALSE
   }
 

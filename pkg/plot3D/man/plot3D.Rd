@@ -81,7 +81,6 @@ This is because an assumption is made as to how the perspective plots are viewed
  example(image2D)
  example(image3D)
  example(contour3D)
- example(arrows3D)
  example(colkey) 
  example(jet.col) 
  example(perspbox)

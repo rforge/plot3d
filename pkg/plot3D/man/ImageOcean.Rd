@@ -39,7 +39,8 @@ Hypsometry
 ## =======================================================================
 
  par(mfrow = c(2, 1))
- image2D(Hypsometry, asp = TRUE, xlab = "dg", ylab = "dg", contour = TRUE)
+ image2D(Hypsometry, asp = TRUE, xlab = "dg", ylab = "dg", 
+   contour = TRUE)
 
 # remove ocean
  zz         <- Hypsometry$z
@@ -54,8 +55,9 @@ Hypsometry
  ImageOcean()
  ImageOcean(asp = TRUE, xlab = "dg E", ylab = "dg N", 
             contour = TRUE)
- ImageOcean(xlim = c(-90, 90), NAcol = grey(0.4))
- ImageOcean(col = "white", contour = list(levels = seq(-6000, 0, by = 2000)))
+ ImageOcean(xlim = c(-90, 90), NAcol = grey(0.4), shade = 0.2)
+ ImageOcean(col = "white", 
+   contour = list(levels = seq(-6000, 0, by = 2000)))
 
 ## =======================================================================
 ## A complex image of part of the ocean 
@@ -91,13 +93,13 @@ Hypsometry
  panelfunc(x = c(0, 0, 1, 1), y = c(0, 1, 1, 0),
            z = c(zlim[1], zlim[1], zlim[1], zlim[1]))
  
-# Actual bathymetry, 4 times increased resolution, with contours
- persp3D(z = Hypsometry$z[ii,jj], add = TRUE, resfac = 4,  
+# Actual bathymetry, 2 times increased resolution, with contours
+ persp3D(z = Hypsometry$z[ii,jj], add = TRUE, resfac = 2,  
        contour = list(col = "grey", side = c("zmin", "z")), 
        zlim = zlim, clab = "depth, m", 
        colkey = list(side = 1, length = 0.5, dist = -0.1))
 
-# faster alternative for same plot
+# shorter alternative for same plot, higher resolution
 \dontrun{
  persp3D(z = Hypsometry$z[ii,jj], resfac = 4,  
        contour = list(col = "grey", side = c("zmin", "z")), 

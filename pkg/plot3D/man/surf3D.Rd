@@ -15,8 +15,8 @@ surf3D (x, y, z, ..., colvar = z, phi = 40, theta = 40,
         facets = TRUE, colkey = list(side = 4), 
         panel.first = NULL,
         clim = NULL, clab = NULL, bty = "n", 
-        lighting = FALSE, inttype = 1, 
-        add = FALSE, plot = TRUE)
+        lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+        inttype = 1, add = FALSE, plot = TRUE)
 
 spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE), 
         ..., phi = 0, theta = 0,
@@ -24,8 +24,8 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
         facets = TRUE, contour = FALSE, 
         colkey = list(side = 4), resfac = 1,
         panel.first = NULL, clim = NULL, clab = NULL, bty = "n", 
-        lighting = FALSE, inttype = 1, full = FALSE,
-        add = FALSE, plot = TRUE) 
+        lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+        inttype = 1, full = FALSE, add = FALSE, plot = TRUE) 
 }
 
 \arguments{
@@ -98,12 +98,35 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
   \item{bty }{The type of the box, the default is to draw no box.
     See \link{perspbox}.
     }
-  \item{lighting }{If \code{TRUE}, the facets will be illuminated, and colors may
-    appear more bright.  See examples in \link{jet.col}.
+  \item{lighting }{If not \code{FALSE} the facets will be illuminated, and colors may
+    appear more bright. To switch on lighting, the argument \code{lighting} 
+    should be either set to \code{TRUE} (using default settings) or it can be a 
+    list with specifications of one of the following: 
+    \code{ambient, diffuse, specular, exponent, sr} and \code{alpha}. 
+
+    Will overrule \code{shade} not equal to \code{NA}.
+    
+    See examples in \link{jet.col}.
     } 
+  \item{shade }{the degree of shading of the surface facets. 
+    Values of shade close to one yield shading similar to a point light 
+    source model and values close to zero produce no shading. 
+    Values in the range 0.5 to 0.75 provide an approximation to daylight illumination.
+    See \link{persp}.
+    } 
+  \item{ltheta, lphi }{if finite values are specified for \code{ltheta} and 
+    \code{lphi}, the surface is shaded as though it was being illuminated from 
+    the direction specified by azimuth \code{ltheta} and colatitude \code{lphi}.
+    See \link{persp}.
+    }
   \item{inttype }{The interpolation type to create the polygons, either 
-    interpolating the \code{colvar} (\code{inttype = 1}) or the \code{x, y, z}
-    values (\code{inttype = 2}) - see details of \link{persp3D}.
+    taking the mean of the \code{colvar} variable (\code{inttype = 1, 3} or 
+    extending the \code{x, y, z} values (\code{inttype = 2}). 
+    Values \code{1, 3} differ in how they treat \code{NA}s in the \code{colvar} variable. 
+    For \code{inttype = 3}, \code{NA}s are removed before taking averages; 
+    this will tend to make the \code{NA} region smaller. 
+    \code{NA}s are included when \code{inttype = 1}. This will tend to make the \code{NA} region larger.
+    See details and an example in \link{persp3D}.
     } 
   \item{full }{Logical. If \code{TRUE}, the full sphere will be drawn, including the 
     invisible part. If \code{FALSE} only the visible half will be drawn (faster). 
@@ -117,7 +140,7 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
   \item{\dots}{Additional arguments passed to the plotting methods. 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.      
     The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
     All objects will be plotted, including those that fall out of these ranges.
     To select objects only within the axis limits, use \link{plotdev}.

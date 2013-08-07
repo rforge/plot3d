@@ -38,7 +38,7 @@ plot.plist <- function(x, ...)  {
     shadenames <- c("ltheta", "lphi", "shade", "lighting")
     if (sum( shadenames %in% names(dot)) > 0)
       if (! is.null(x$poly))
-        x$poly <- color3D(x$poly, x$scalefac, dot[shadenames], dot$lighting)
+        x$poly <- color3D(x$poly, x$scalefac, dot[shadenames], dot$lighting, dot[["alpha"]])
   
     if ("alpha" %in% names(dot))
       x <- alpha3D(x, dot[["alpha"]])
@@ -75,6 +75,11 @@ plot.struct.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     expand = plot)
 
   if (plot) {
+#    if (length(plist$img) > 0) { 
+#      plist <- mapimg(plist)
+#      setplist(plist)
+#    }
+  
     plotlist3D(plist)
     if (plist$persp$bty == "f")
       drawfullbox(plist)
@@ -114,12 +119,17 @@ alpha3D <- function(plist, alpha) { # makes colors transparant
 
 ## =============================================================================
 
-color3D <- function(poly, scalefac, shade, lighting) {  # lighting and shading
+color3D <- function(poly, scalefac, shade, lighting, hasalpha = NULL) {  # lighting and shading
 
   shade$lighting <- NULL
   
   shade <- check.shade(shade, lighting)
-
+  
+  if (is.null(hasalpha) & any(!is.na(poly$alpha))) {
+    shade$alpha <- poly$alpha
+    shade$alpha[is.na(shade$alpha)] <- 1
+  }
+   
   light   <- setuplight(shade$lphi, shade$ltheta) [1:3]              
   px <- poly$x * scalefac$x
   py <- poly$y * scalefac$y
@@ -283,6 +293,7 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$pt$pch    <- c(plist$pt$pch,    pt$pch)   
     plist$pt$bg     <- c(plist$pt$bg,     pt$bg)
     plist$pt$cex    <- c(plist$pt$cex,    pt$cex)   
+    plist$pt$alpha  <- c(plist$pt$alpha,  pt$alpha)   
     plist$pt$proj   <- c(plist$pt$proj,   pt$proj)
   }
 
@@ -307,6 +318,7 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$CIpt$bg     <- c(plist$CIpt$bg,    CIpt$bg)
     plist$CIpt$cex    <- c(plist$CIpt$cex,   CIpt$cex)   
     plist$CIpt$proj   <- c(plist$CIpt$proj,  CIpt$proj)
+    plist$CIpt$alpha  <- c(plist$CIpt$alpha, CIpt$alpha)
 
     plist$CIpt$CIpar$col  <- c(plist$CIpt$CIpar$col, CIpt$CIpar$col)
     plist$CIpt$CIpar$lwd  <- c(plist$CIpt$CIpar$lwd, CIpt$CIpar$lwd)
@@ -321,11 +333,12 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$labels$y      <- c(plist$labels$y,  labels$y)
     plist$labels$z      <- c(plist$labels$z,  labels$z)
     plist$labels$labels <- c(plist$labels$labels, labels$labels)
-    plist$labels$adj    <- c(plist$labels$adj,  labels$adj)
-    plist$labels$cex    <- c(plist$labels$cex,  labels$cex)
-    plist$labels$col    <- c(plist$labels$col,  labels$col)
-    plist$labels$font   <- c(plist$labels$font, labels$font)
-    plist$labels$proj   <- c(plist$labels$proj, labels$proj)
+    plist$labels$adj    <- c(plist$labels$adj,    labels$adj)
+    plist$labels$cex    <- c(plist$labels$cex,    labels$cex)
+    plist$labels$col    <- c(plist$labels$col,    labels$col)
+    plist$labels$font   <- c(plist$labels$font,   labels$font)
+    plist$labels$proj   <- c(plist$labels$proj,   labels$proj)
+    plist$labels$alpha  <- c(plist$labels$alpha,  labels$alpha)
   }
     
   if (! is.null(poly)) {
@@ -344,7 +357,7 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
               img$mapped <- TRUE
             if (!img$mapped) {
               Poly <- with (img, polyfill(x, y, z, col[sl$list], NAcol,        
-                facets, border, sl, lwd, lty, sl$Proj[sl$list]))
+                facets, border, sl, lwd, lty, sl$Proj[sl$list], alpha = alpha))
               poly <- addPoly(poly, Poly)
             }
           }
@@ -370,6 +383,7 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$segm$lwd    <- c(plist$segm$lwd,    segm$lwd)
     plist$segm$lty    <- c(plist$segm$lty,    segm$lty)
     plist$segm$col    <- c(plist$segm$col,    segm$col)
+    plist$segm$alpha  <- c(plist$segm$alpha,  segm$alpha)
   }
 
   if (is.null(plist$arr))
@@ -389,6 +403,7 @@ update.3D <- function(plist, pt = NULL, CIpt = NULL, poly = NULL,
     plist$arr$lty    <- c(plist$arr$lty,    arr$lty)
     plist$arr$col    <- c(plist$arr$col,    arr$col)
     plist$arr$type   <- c(plist$arr$type,   arr$type)
+    plist$arr$alpha  <- c(plist$arr$alpha,  arr$alpha)
   }                                                                     
   return (plist)
 }
@@ -485,31 +500,12 @@ plotlist3D <- function(plist) {
              font = labels$font[sortlist] )
 
       } else if (!is.null(arr)) {  # only simple arrows
-        ii <- which(arr$type[sortlist] == "simple")
-        ss <- sortlist[ii]
-        if (length(ss) > 0)
-          arrows(arr.from$x[ss], arr.from$y[ss],  
-                 arr.to$x[ss], arr.to$y[ss], 
-                 length = arr$length[ss],
-                 angle = arr$angle[ss],
-                 code = arr$code[ss],
-                 col = arr$col[ss],
-                 lwd = arr$lwd[ss],
-                 lty = arr$lty[ss])
+         ArrType (arr.from$x[sortlist], arr.from$y[sortlist], 
+            arr.to$x[sortlist], arr.to$y[sortlist], arr$length[sortlist], 
+            arr$angle[sortlist], arr$code[sortlist], 
+            col = arr$col[sortlist], type = arr$type[sortlist], 
+            lwd = arr$lwd[sortlist], lty = arr$lty[sortlist])
                  
-                 
-        ii <- which(arr$type[sortlist] %in% c("triangle", "cone"))
-        ss <- sortlist[ii]
-        if (length(ss) > 0) {
-          arrtria(arr.from$x[ss], arr.from$y[ss],  
-                 arr.to$x[ss], arr.to$y[ss], 
-                 code = arr$code[ss],
-                 col = arr$col[ss],
-                 lwd = arr$lwd[ss],
-                 lty = arr$lty[ss], length = arr$length[ss], 
-                 angle = arr$angle[ss])
-        }         
-
       }
       if (is.null(CIpt))
         return()    
@@ -589,23 +585,11 @@ plotlist3D <- function(plist) {
 
     } else if (type[ii] == 5) {
        io <- i - LCPSL
-       if (arr$type[io] == "simple")
-         arrows(arr.from$x[io], arr.from$y[io],  
-              arr.to$x[io], arr.to$y[io], 
-              length = arr$length[io], 
-              angle = arr$angle[io], 
-              code = arr$code[io], 
-              col = arr$col[io], 
-              lwd = arr$lwd[io], 
-              lty = arr$lty[io])
-       else 
-         arrtria(arr.from$x[io], arr.from$y[io],  
-                 arr.to$x[io], arr.to$y[io], 
-                 code = arr$code[io],
-                 col = arr$col[io],
-                 lwd = arr$lwd[io],
-                 lty = arr$lty[io], length = arr$length[io], 
-                 angle = arr$angle[io])
+         ArrType (arr.from$x[io], arr.from$y[io], 
+            arr.to$x[io], arr.to$y[io], arr$length[io], 
+            arr$angle[io], arr$code[io], 
+            col = arr$col[io], type = arr$type[io], 
+            lwd = arr$lwd[io], lty = arr$lty[io])
 
    } else if (type[ii] == 6) {
       io <- i - LCPSLA
@@ -620,60 +604,6 @@ plotlist3D <- function(plist) {
 
 }
 
-
-# triangular arrows 
-
-arrtria <- function (x.from, y.from, x.to, y.to, code, 
-    col, lty, lwd, length, angle = 30)       
-{
-  segments(x.from, y.from, x.to, y.to, col = col, lty = lty, lwd = lwd)
-
- # scales
-  user <- par("usr")
-  pcm <- par("pin") 
-  sx <- diff(user[1:2])/pcm[1]
-  sy <- diff(user[3:4])/pcm[2]
-  
-  eps <- 1e-8
-
-  arrhead <- function (Code) {
-  
-    i <- which (Code == code)
-    if (length(i) == 0) return()
-    Len <- length[i]
-    Col    <- col[i]
-    Angle  <- angle[i]/pi*180
-    Angle[is.nan(Angle)] <- 0
-
-    if (Code %in% c(1, 3)) {
-    	x1 <- x.from[i]
-    	y1 <- y.from[i]
-  	  x0 <- x.to[i]
-  	  y0 <- y.to[i]
-    } else {
-    	x1 <- x.to[i]
-    	y1 <- y.to[i]
-  	  x0 <- x.from[i]
-  	  y0 <- y.from[i]
-    }
-  	xc <- x0 - x1
-   	yc <- y0 - y1
-
-    rot <- atan2(yc/sy, xc/sx) 
-
-   	x <- rbind (x1 - Len * sx * cos(rot+Angle), x1, 
-                x1 - Len * sx * cos(rot-Angle), NA)
-   	y <- rbind (y1 - Len * sy * sin(rot+Angle), y1,  
-                y1 - Len * sy * sin(rot-Angle), NA)
-    polygon(x = x, y = y, col = col[i], border = col[i],
-        lty = lty[i], lwd = lwd[i])                    
-  }
-  arrhead(1)
-  arrhead(2)
-  arrhead(3)
-}
-
-
 selectplist <- function (plist, SS) {
  #
  
@@ -683,7 +613,7 @@ selectplist <- function (plist, SS) {
     if (sum(ipt) > 0)
       plist$pt <- with(pt, list(x.mid = x.mid[ipt], y.mid = y.mid[ipt],
         z.mid = z.mid[ipt], col = col[ipt], pch = pch[ipt],
-        cex = cex[ipt], bg = bg[ipt], proj = proj[ipt]))
+        cex = cex[ipt], bg = bg[ipt], alpha = alpha[ipt], proj = proj[ipt]))
     else
       plist$pt <- NULL
   }
@@ -697,7 +627,7 @@ selectplist <- function (plist, SS) {
        z.from = z.from[ipt,], nCI = nCI[ipt], x.mid = x.mid[ipt],
        y.mid = y.mid[ipt], z.mid = z.mid[ipt], length = CIpt$length[ipt],
        col= col[ipt], pch = pch[ipt],
-       bg = bg[ipt], cex = cex[ipt], proj = proj[ipt],
+       bg = bg[ipt], cex = cex[ipt], alpha = alpha[ipt], proj = proj[ipt],
        CIpar = list (col = CIpar$col[ipt], lwd = CIpar$lwd[ipt],
         lty = CIpar$lty[ipt], alen = CIpar$alen[ipt])))
     else
@@ -730,7 +660,7 @@ selectplist <- function (plist, SS) {
       plist$poly <- with (plist$poly, list(x = as.matrix(x[,ip]), 
          y = as.matrix(y[,ip]), z = as.matrix(z[,ip]),
         col = col[ip], border = border[ip], lwd = lwd[ip], lty = lty[ip], 
-        isimg = isimg[ip], proj = proj[ip]))
+        alpha = alpha[ip], isimg = isimg[ip], proj = proj[ip]))
     else
       plist$poly <- NULL
   } else
@@ -746,7 +676,9 @@ selectplist <- function (plist, SS) {
       img <- plist$img[[i]]
       
      # because col has one row and column less than x, y, z 
-      Col <- img$col
+      Col <- img$col.full
+      if (is.null(Col)) 
+        Col <- img$col
       if (nrow(Col) != nrow(img$z))
         Col <- rbind(Col, Col[nrow(Col),])
       if (ncol(Col) != ncol(img$z))
@@ -787,13 +719,14 @@ selectplist <- function (plist, SS) {
         Select <- img$z; Select[] <- ipt
         Noselect <- which(!ipt)
         Col[Noselect] <- "transparent"
-        img$z[Noselect] <- zset
+        img$z[Noselect] <- NA #zset
         arrsel <- which (Select == 1, arr.ind = TRUE)
         xr <- range(arrsel[,1])
         yr <- range(arrsel[,2])
   
         xsel <- xr[1] : xr[2]
         ysel <- yr[1] : yr[2]
+        
         if (is.vector(plist$img[[i]]$x)) 
           plist$img[[i]]$x <- plist$img[[i]]$x[xsel]
         else
@@ -805,16 +738,19 @@ selectplist <- function (plist, SS) {
           plist$img[[i]]$y <- img$y[xsel, ysel]
         
         plist$img[[i]]$z <- img$z[xsel, ysel]
-        plist$img[[i]]$col <- Col[xsel, ysel]
+        plist$img[[i]]$col <- plist$img[[i]]$col.full <- Col[xsel, ysel]
         imgxrange <- range( c(imgxrange, plist$img[[i]]$x), na.rm = TRUE) 
         imgyrange <- range( c(imgyrange, plist$img[[i]]$y), na.rm = TRUE) 
         imgzrange <- range( c(imgzrange, plist$img[[i]]$z), na.rm = TRUE) 
 
-        if (! is.null(remove))  {
-          plist$img[[i]]$x[is.na(plist$img[[i]]$x)] <- imgxrange[1]
-          plist$img[[i]]$y[is.na(plist$img[[i]]$y)] <- imgyrange[1]
-          plist$img[[i]]$z[is.na(plist$img[[i]]$z)] <- imgzrange[1]
-        }
+# Too complicated - toggle off ? 
+#        isel <- which (plist$img[[i]]$sl$ix >= xr[1] & plist$img[[i]]$sl$ix <= xr[2] &
+#                       plist$img[[i]]$sl$iy >= yr[1] & plist$img[[i]]$sl$iy <= yr[2])
+#        plist$img[[i]]$sl$ix <-plist$img[[i]]$sl$ix[isel]-xr[1]+1 
+#        plist$img[[i]]$sl$iy <-plist$img[[i]]$sl$iy[isel]-yr[1]+1 
+
+#        plist$img[[i]]$sl$list <-plist$img[[i]]$sl$list[isel] - (xr[1]*yr[1]) + 1
+#        plist$img[[i]]$sl$Proj <-plist$img[[i]]$sl$Proj[isel] 
 
       } else {
         plist$img[[i]] <- NULL    
@@ -829,7 +765,7 @@ selectplist <- function (plist, SS) {
     if (sum(il) > 0)
       plist$labels <- with (labels, list(x = x[il], y = y[il], z = z[il],
       labels = labels[il], adj = adj[il], cex = cex[il],
-      col = col[il], font = font[il], proj = proj[il]))
+      col = col[il], font = font[il], alpha = alpha[il], proj = proj[il]))
     else
       plist$labels <- NULL
   }
@@ -843,7 +779,7 @@ selectplist <- function (plist, SS) {
         y.from = as.vector(y.from)[is], z.from = as.vector(z.from)[is], 
         x.to = as.vector(x.to)[is], y.to = as.vector(y.to)[is], 
         z.to = as.vector(z.to)[is],
-        proj = proj[is], lwd  = lwd[is], lty  = lty[is], col  = col[is]))
+        proj = proj[is], lwd  = lwd[is], lty  = lty[is], alpha = alpha[is], col  = col[is]))
     else
       plist$segm <- NULL
   }
@@ -858,7 +794,7 @@ selectplist <- function (plist, SS) {
         x.to = as.vector(x.to)[is], y.to = as.vector(y.to)[is], 
         z.to = as.vector(z.to)[is],
         proj = proj[is], lwd  = lwd[is], lty  = lty[is], col  = col[is],
-        code = code[is], angle = angle[is], length = length[is], type = type[is]))
+        code = code[is], angle = angle[is], length = length[is], type = type[is], alpha = alpha[is]))
     else
       plist$arr <- NULL
   }

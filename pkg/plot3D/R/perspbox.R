@@ -13,8 +13,8 @@ checklim <- function(lim) {
 # ==============================================================================
 
 perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
-                     y = seq(0, 1, length.out = ncol(z)),
-                     z,  bty = c("b", "b2", "f", "g", "bl", "bl2", "u", "n"),    # predefined types
+                     y = seq(0, 1, length.out = ncol(z)), z,  
+                     bty = c("b", "b2", "f", "g", "bl", "bl2", "u", "n"),    # predefined types
                      ..., col.axis = "black", 
                      col.panel = NULL, lwd.panel = 1,
                      col.grid = NULL, lwd.grid = 1,
@@ -111,7 +111,7 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
     }
   
     if (back & is.null(col.panel)) {
-      col.panel <- "white" #par("bg")    toggled off as this opens a window...
+      col.panel <- "white" #par("bg")   toggled off as this opens a window...
 #      if (col.panel == "transparent")
 #        col.panel <- "white"
     }  

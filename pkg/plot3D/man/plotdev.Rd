@@ -110,7 +110,7 @@ selectplist(plist, SS)
  
  \code{plotdev} and \code{plot(getplist())} are the same.
  
- In an extension package, \code{plot3D.rgl}, a similar function, \code{plotrgl},
+ In an extension package, \code{plot3Drgl}, a similar function, \code{plotrgl},
  plots the graphs to the device opened with \code{rgl}. This allows interactive
  zooming, rotating, etc...
 }
@@ -239,11 +239,11 @@ selectplist(plist, SS)
 
 # add a plane (image) at z = 170; jetcolored, transparant: only border
  image3D(x, y, z = 170, add = TRUE, clim = range(V), 
-         colvar = V, facets = NA, plot = FALSE)
+         colvar = V, facets = NA, plot = FALSE, colkey = FALSE)
 
 # add a contour (image) at z = 170; jetcolored, 
  contour3D(x, y, z = 170, add = TRUE, clim = range(V),
-           colvar = V, plot = FALSE)
+           colvar = V, plot = FALSE, colkey = FALSE)
 
 # plot it  - 
  plot(getplist())   #  same as plotdev()

@@ -13,41 +13,38 @@ image2D.default <- function (z, ...) image2D.matrix(z, ...)
 ## =============================================================================
 
 image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)), 
-                   y = seq(0, 1, length.out = ncol(z)), ..., 
+                   y = seq(0, 1, length.out = ncol(z)), colvar = z, ..., 
                    col = jet.col(100), NAcol = "white", 
-                   border = NA, facets = TRUE, 
-                   contour = FALSE, colkey = list(side = 4), resfac = 1, 
-                   clab = NULL, theta = 0, rasterImage = FALSE,
+                   border = NA, facets = TRUE, contour = FALSE, 
+                   colkey = list(side = 4), resfac = 1, clab = NULL, 
+                   lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+                   theta = 0, rasterImage = FALSE,
                    add = FALSE, plot = TRUE) {
 
-  if (is.null(add)) 
-    add <- FALSE
-
- 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  if (rasterImage & theta != 0)
+    stop ("cannot combine 'rasterImage' and 'theta' != 0")
+    
+  plist <- initplist(add)
 
   plist <- add2Dplist(plist, "image", z = z, x = x, y = y, 
                     col = col, NAcol = NAcol, border = border, facets = facets,
                     contour = contour, colkey = colkey, resfac = resfac,
-                    clab = clab, theta = theta, rasterImage = rasterImage, ...)
+                    clab = clab, theta = theta, rasterImage = rasterImage, 
+                    ...)
   setplist(plist)
   if (!plot) return()
   
- if (is.character(z)) {
-   ImageNULL (z = NULL, x = x, y = y, ..., col = z, NAcol = NAcol, 
+  if (is.character(z)) {
+    ImageNULL (z = NULL, x = x, y = y, ..., col = z, NAcol = NAcol, 
               border = border, facets = facets,
               rasterImage = rasterImage, angle = theta, add = add)   
    return(invisible())
- } 
- # check colors  
+  } 
+
   if (length(col) == 1)
     if (is.na(col)) 
       col <- NULL
   
- # The plotting arguments
   dots <- splitpardots(list(...))
   dotimage <- dots$main
   dotother <- dots$points
@@ -55,9 +52,11 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   iscolkey <- is.colkey(colkey, col)       
   if (iscolkey) {
     colkey <- check.colkey(colkey)
-    if (!add)
-      plt.or <- par(plt = colkey$parplt)
+    if (! add)       
+      plist$plt$main <- colkey$parplt
+    setplist(plist)    
   }  
+  par (plt = plist$plt$main)
   
  # check contours
   iscontour <- ! is.null(contour)
@@ -87,12 +86,21 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (! is.matrix(x)) 
       x <- matrix(nrow = nrow(y), ncol = ncol(y), data = x)
 
+  if (!lighting & is.na(shade)) 
+    colvar <- NULL
+  else if (any(dim(colvar) - dim(z)) != 0)
+    stop("'colvar' and 'z' not compatible")  
  # change resolution
-  if (any(resfac != 1)) {   
-    res <- changeres(resfac, x, y, z)
+  if (any(resfac != 1)) { 
+   if (lighting | !is.na(shade)) 
+     res <- changeres(resfac, x, y, z, colvar)
+   else
+     res <- changeres(resfac, x, y, z)
     x <- res$x
     y <- res$y
     z <- res$z
+   if (lighting | !is.na(shade)) 
+     colvar <- res$colvar
   }
  
   if (iscontour) {
@@ -119,7 +127,47 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     y <- matrix(nrow = nrow(z), ncol = ncol(z), data = XY[, 2])
   }
 
+ # Check for decreasing values of x and y    
+  if (! is.matrix(x) & all(diff(x) < 0)) {     
+    if (is.null(dotimage$xlim)) 
+      dotimage$xlim <- rev(range(x))
+    x <- rev(x)
+    z <- z[nrow(z):1, ]
+    if (! is.null(colvar))
+      colvar <- colvar[nrow(colvar):1, ]
+    
+    if (iscontour)
+      contour$x <- x
+  }
+  
+  if (! is.matrix(y) & all(diff(y) < 0)) {    
+    if (is.null(dotimage$ylim)) 
+      dotimage$ylim <- rev(range(y))
+    y <- rev(y)
+    z <- z[, (ncol(z):1)]
+    if (! is.null(colvar))
+      colvar <- colvar[, (ncol(colvar):1)]
+    if (iscontour)
+      contour$y <- y
+   }
+
   useimage <- TRUE     # default it to use the image function
+  lightshade <- FALSE
+  height <- NULL
+  if (lighting | !is.na(shade)) {
+    if (! rasterImage & ! is.matrix(x)) {
+      xy <- mesh(x,y)
+      x <- xy$x
+      y <- xy$y  
+    }
+    if (! rasterImage)
+      useimage <- TRUE
+
+    lightshade <- TRUE
+    height <- z
+    z <- colvar
+  }
+  
   if (is.matrix(x)) {  # ..but not if x and y are matrix 
     if (any (dim(x) - dim(y) != 0))
       stop("matrices 'x' and 'y' not of same dimension") 
@@ -128,24 +176,6 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     useimage <- FALSE
   } 
   
- # Check for decreasing values of x and y    
-   if (! is.matrix(x) & all(diff(x) < 0)) {     
-     if (is.null(dotimage$xlim)) 
-       dotimage$xlim <- rev(range(x))
-     x <- rev(x)
-     z <- z[nrow(z):1, ]
-    if (iscontour)
-      contour$x <- x
-  }
-  
-   if (! is.matrix(y) & all(diff(y) < 0)) {    
-     if (is.null(dotimage$ylim)) 
-       dotimage$ylim <- rev(range(y))
-     y <- rev(y)
-     z <- z[, (ncol(z):1)]
-    if (iscontour)
-      contour$y <- y
-   }
   
  # log transformation of z-values (can be specified with log = "c", or log = "z"
   zlog <- FALSE 
@@ -191,7 +221,8 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (zlog) 
       zlim  <- log(zlim )
                                 
-  if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+  if (! is.null(dots$alpha)) 
+    col <- setalpha(col, dots$alpha)
   colkeyZlim <- zlim
   colkeyCol  <- col
   
@@ -215,11 +246,12 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   if (! useimage | rasterImage) {  # use colored polygons if x- and y are matrix
 
     # create colors
-    zmin   <- zlim[1]
-    zrange <- diff(zlim)
-    N      <- length(col) -1
-    Col    <- matrix(nrow = nrow(z), data = col[1 + trunc((z - zmin)/zrange*N)])
+    Col    <- variablecol (z, col, NAcol, zlim)
 
+    if (! is.na(shade) | lighting) 
+      Col <- facetcolsImage(x, y, height, dotimage[["xlim"]], dotimage[["ylim"]], 
+        NULL, shade, lighting, dots$alpha, ltheta, lphi, Col, NAcol)
+        
  # empty plot
     dotimage$type <- "n"
     dotimage$xaxs <- "i"
@@ -246,15 +278,16 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
                        dotother))
  
   } else if (rasterImage) {
+    Col <- matrix(nrow = nrow(z), data = Col)
     addraster (x, y, Col, dotimage[["xlim"]], dotimage[["ylim"]], 
       theta, dotother)
 
-  } else {
+  } else {                  
     do.call("image", c(alist(z = z, x = x, y = y, col = col, add = add, 
       zlim = zlim), dotimage))
   }
 
-  if (useimage & !is.na(border)){
+  if (useimage & !is.na(border)) {
     do.call("abline", c(alist(h = 0.5*(y[-1]+y[-length(y)]), col = border), dotother))
     do.call("abline", c(alist(v = 0.5*(x[-1]+x[-length(x)]), col = border), dotother))
   }
@@ -281,10 +314,9 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   
   if (iscolkey)  {
     drawcolkey(colkey, colkeyCol, colkeyZlim, clab, zlog) 
-    if (!add)
-      par(plt = plt.or)  
-    par(mar = par("mar")) 
+    par(plt = plist$plt$ori)  
   }               
+  par(mar = par("mar")) 
    
 }
 ## =============================================================================
@@ -295,12 +327,7 @@ addraster <- function (x, y, col, xlim, ylim, angle, dots) {
   
   if (is.matrix(x) | is.matrix(y))
     stop("'x' or 'y' cannot be a matrix if rasterImage is used")
-#  dx <- range(diff(x))
-#  if (abs(diff(dx)) > 1e-8)
-#    stop("'x' should be equally spaced if  rasterImage is used")
-#  dy <- range(diff(y))
-#  if (abs(diff(dy)) > 1e-8)
-#    stop("'y' should be equally spaced if  rasterImage is used")
+
 # check the x- and y-values, to be ~equally spaced and monotonously increasing/decreasing
   dx <- diff(x)
   if (any(dx == 0) | max(sign(dx)) != min(sign(dx)))
@@ -342,11 +369,11 @@ addraster <- function (x, y, col, xlim, ylim, angle, dots) {
 ## =============================================================================
 
 ImageNULL <- function(z = NULL,
-                       x = seq(0, 1, length.out = nrow(col)),
-                       y = seq(0, 1, length.out = ncol(col)), ...,
-                       col, NAcol = "white",
-                       border = NA, facets = TRUE,
-                       rasterImage = FALSE, angle, add) {
+                      x = seq(0, 1, length.out = nrow(col)),
+                      y = seq(0, 1, length.out = ncol(col)), ...,
+                      col, NAcol = "white",
+                      border = NA, facets = TRUE,
+                      rasterImage = FALSE, angle, add) {
 
   # check colors
   if (! is.character(col) | ! is.matrix(col))

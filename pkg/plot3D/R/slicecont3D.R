@@ -1,7 +1,25 @@
 ## =============================================================================
-## 3-d representation using contour slices in x, y or z
+## 3-D visualisation of volumetric data using contour slices in x, y or z
 ## =============================================================================
 # x, y, z vectors or arrays, colvar: array
+
+ContourLines <- function (x = seq(0, 1, length.out = nrow(z)), 
+    y = seq(0, 1, length.out = ncol(z)), z, nlevels = 10, 
+    levels = pretty(range(z, na.rm = TRUE), nlevels)) {
+ # Check for decreasing values of x and y    
+  if (all(diff(x) < 0)) {     
+    x <- rev(x)
+    z <- z[nrow(z):1, ]
+  }
+  
+  if (all(diff(y) < 0)) {    
+    y <- rev(y)
+    z <- z[, (ncol(z):1)]
+   }
+    
+  contourLines(x = x, y = y, z= z, nlevels = nlevels, levels = levels)
+}    
+    
 
 slicecont3D <- function(x, y, z, colvar, ..., 
                    phi = 40, theta = 40, 
@@ -48,7 +66,8 @@ slicecont3D <- function(x, y, z, colvar, ...,
   if (is.null(col)) 
     col <- jet.col(100)
 
-  if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+  if (! is.null(dot$alpha)) 
+    col <- setalpha(col, dot$alpha)
   
   iscolkey <- is.colkey(colkey, col)    
   if (iscolkey) 
@@ -62,7 +81,7 @@ slicecont3D <- function(x, y, z, colvar, ...,
     clim <- log(clim)
   }
 
- # Colors for values = NA 
+ # Colors for NA values
   if (any (is.na(colvar)) & ! is.null(NAcol) ) {
     CC <- checkcolors(colvar, col, NAcol, clim)
     clim   <- CC$lim
@@ -76,13 +95,11 @@ slicecont3D <- function(x, y, z, colvar, ...,
   getcol <- function(v) 
     col[1 + trunc((v - clim[1])/crange*N)]
 
-  lwd <- dot$points$lwd
-  if (is.null(lwd)) lwd<- 1
-  dot$points$lwd   <- NULL
-  
-  lty <- dot$points$lty
-  if (is.null(lty)) lty<- 1
-  dot$points$lty   <- NULL
+  lwd <- ifelse(is.null(dot$points$lwd), 1, dot$points$lwd)
+  dot$points$lwd <- NULL
+
+  lty <- ifelse(is.null(dot$points$lty), 1, dot$points$lty)
+  dot$points$lty <- NULL
 
   if (is.null(plist)) {
     do.call("perspbox", c(alist(x = range(x), y = range(y), 
@@ -91,9 +108,13 @@ slicecont3D <- function(x, y, z, colvar, ...,
              dot$persp))
     plist <- getplist()
   }  
+
   if (is.function(panel.first)) 
     panel.first(plist$mat)         
+
   Seg <- NULL
+  
+  
   templines <- function(clines, x = NULL, y = NULL, z = NULL) {
     
     if (! is.null(x)){
@@ -111,60 +132,59 @@ slicecont3D <- function(x, y, z, colvar, ...,
     }
     Col <- getcol(clines[[1]])
 
-    Seg <<- addlines(Seg, x = x,
-                    y = y, z = z, col = Col,
-                    plist = plist, lwd = lwd, lty = lty)
+    Seg <<- addlines(Seg, x = x, y = y, z = z, col = Col,
+                    plist = plist, lwd = lwd, lty = lty, alpha = dot$alpha)
   
-  }
+  } # end function templines
 
   if (is.null(level)) 
     level <- pretty(clim, 10)
   
   for (x.s in xs) {
-    ix <- max(1,FindInterval(x.s, x, all.inside = FALSE))
-    Data <- colvar[ix,,]
-    cL <- contourLines(y, z, Data, levels = level)  
+    ix <- max(1, FindInterval(x.s, x, all.inside = FALSE))
+    Data <- colvar[ix, , ]
+    cL <- ContourLines(y, z, Data, levels = level)  
     invisible(lapply(cL, templines, x = x.s))
   }
   for (y.s in ys) {
-    iy <- max(1,FindInterval(y.s, y, all.inside = FALSE))
-    Data <- colvar[,iy,]
-    cL <- contourLines(x, z, Data, levels = level)  
+    iy <- max(1, FindInterval(y.s, y, all.inside = FALSE))
+    Data <- colvar[, iy, ]
+    cL <- ContourLines(x, z, Data, levels = level)  
     invisible(lapply(cL, templines, y = y.s))
   }
-    
   for (z.s in zs)  {
-    iz <- max(1,FindInterval(z.s, z, all.inside = FALSE))
-    Data <- colvar[,,iz]
-    cL <- contourLines(x, y, Data, levels = level)  
+    iz <- max(1, FindInterval(z.s, z, all.inside = FALSE))
+    Data <- colvar[, , iz]
+    cL <- ContourLines(x, y, Data, levels = level)  
     invisible(lapply(cL, templines, z = z.s))
   }
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "slicecont3D") 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, 
+      type = "slicecont3D") 
 
   if (ispresent(border)) {
     for (x.s in xs) 
       Seg <- addlines(Seg, x = rep(x.s, length.out = 4), 
-                            y = c(y[1], y[1], y[length(y)], y[length(y)]),
-                            z = c(z[1], z[length(z)], z[length(z)], z[1]), 
-                            plist = plist, col = border)
+                           y = c(y[1], y[1], y[length(y)], y[length(y)]),
+                           z = c(z[1], z[length(z)], z[length(z)], z[1]), 
+                           plist = plist, col = border)
 
     for (y.s in ys) 
       Seg <- addlines(Seg, z = c(z[1], z[length(z)], z[length(z)], z[1]),
-                            x = c(x[1], x[1], x[length(x)], x[length(x)]), 
-                            y = rep(y.s, length.out = 4), 
-                            plist = plist, col = border)
+                           x = c(x[1], x[1], x[length(x)], x[length(x)]), 
+                           y = rep(y.s, length.out = 4), 
+                           plist = plist, col = border)
 
     for (z.s in zs)  
       Seg <- addlines(Seg, x = c(x[1], x[length(x)], x[length(x)], x[1]),
-                            y = c(y[1], y[1], y[length(y)], y[length(y)]), 
-                            z = rep(z.s, length.out = 4), 
-                            plist = plist, col = border)
+                           y = c(y[1], y[1], y[length(y)], y[length(y)]), 
+                           z = rep(z.s, length.out = 4), 
+                           plist = plist, col = border)
   }
+ # change projection depth such that lines are on top of images
   Seg$proj <- Seg$proj + dDepth*plist$persp$expand 
   
- # plot it
   plist <- plot.struct.3D(plist, segm = Seg, plot = plot)  
   
   setplist(plist)

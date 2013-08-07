@@ -6,7 +6,7 @@
 ## =============================================================================
 
 ## =============================================================================
-## Is it necessary to draw a color key?
+## Check if necessary to draw a color key
 ## =============================================================================
 
 is.colkey <- function(colkey, col) {
@@ -71,7 +71,9 @@ check.colkey <- function(colkeypar, add = FALSE) {
       tck = NULL, tcl = NULL, las = NULL)
                              
   colkeypar$parleg <- colkeypar$parplt <- NULL
+  
   colkey <- overrulepar(parameter, colkeypar)
+  
   if (is.numeric(colkey$labels))
     colkey$labels <- as.logical(colkey$labels)
   if (is.null(colkey$side)) 
@@ -193,10 +195,10 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
   axispar <- colkeypar
   
   # remove arguments not in axis function
-  axispar$side <- NULL; axispar$length <- NULL ; axispar$width <- NULL
-  axispar$parleg <- NULL; axispar$parplt <- NULL; axispar$dist <- NULL
-  axispar$shift <- NULL; axispar$col.box <- NULL  
-  axispar$col.clab <- NULL; axispar$cex.clab <- NULL
+  axispar$side <- axispar$length <- axispar$width <- NULL
+  axispar$parleg <- axispar$parplt <- axispar$dist <- NULL
+  axispar$shift <-axispar$col.box <- NULL  
+  axispar$col.clab <- axispar$cex.clab <- NULL
 
   if (colkeypar$side %in% c(2, 4)) {
   
@@ -215,6 +217,7 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
     do.call("axis", c(list(side = colkeypar$side, mgp = c(3, 1, 0), las = 1), 
          axispar))
   }
+  
   if (zlog) {
     if (colkeypar$side %in% c(2, 4))  
       par (ylog = FALSE)
@@ -289,7 +292,7 @@ colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
   drawcolkey (colkey, col, zlim = clim, zlab = clab, 
                         zlog = clog,New = add)
 
-  par(mar = par("mar")) # TO PREVENT R FROM SETTING DEFAULTPLOT = FALSE
+  par(mar = par("mar")) # to prevent R from setting defaultplot = false
 
 }
 

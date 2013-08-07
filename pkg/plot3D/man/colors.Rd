@@ -38,8 +38,10 @@ alpha.col (col = "grey", alpha = 0.5)
     }
   \item{alpha }{Value in the range [0, 1] for alpha 
     transparency channel (0 means transparent and 1 means opaque).
-    Transparency is overruled when \code{lighting} or \code{shading}
-    is switched on. To combine transparency with lighting or shading, use \link{plotdev}.
+    Transparency defined in the color palette is overruled when 
+    \code{lighting} or \code{shading} is switched on. 
+    To combine transparency with lighting or shading, pass argument {alpha} 
+    to the plotting functions directly.
     }
   \item{col }{Colors to interpolate, change.
     }
@@ -59,7 +61,8 @@ The gg-plot type of colors \code{gg.plot} is a color-blind friendly palette from
 }
 \details{
 In addition to the color functions described here, colors 
-can also be adapted by shading and lighting, or made transparent. Shading will overrule lighting.
+can also be adapted by shading and lighting, or made transparent. 
+Shading will be overruled if lighting is not \code{FALSE}.
 
 To make colors transparent, use argument \code{alpha}, with a value inbetween 0 and 1.
 

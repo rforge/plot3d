@@ -10,7 +10,8 @@
 image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL, 
       phi = 40, theta = 40, col = jet.col(100), 
       NAcol = "white", border = NA, facets = TRUE,
-      colkey = list(side = 4), panel.first = NULL,
+      colkey = list(side = 4), resfac = 1,
+      panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",
       inttype = 1, add = FALSE, plot = TRUE)
 }
@@ -19,8 +20,10 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
   \item{x, y, z }{Matrix (2-D), vector, or one value containing the values 
     where the image is to be plotted. 
     At least one of them should be one number, as this will determine where the 
-    image is to be plotted.
-    If two are vectors vectors, the first vector should be of length equal to 
+    image is plotted, parallel to the (y-z) plane (x one number), 
+    to the (x-z) plane (y one number) or to the (z-y) plane (z one number).
+
+    If two are vectors, the first vector should be of length equal to 
     \code{nrow(colvar)} and the second should be of length equal to 
     \code{ncol(colvar)}. 
     }
@@ -47,6 +50,13 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable, used
     for the color key. Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
+  \item{resfac }{Resolution factor, one value or a vector of two numbers, for 
+    the x and y- values respectively. A value > 1 will increase the 
+    resolution. For instance, if \code{resfac} equals \code{3} then for each 
+    adjacent pair of x- and y-values, z will be interpolated to two intermediary points. 
+    This uses simple linear interpolation. If \code{resfac} is one number then
+    the resolution will be increased similarly in x and y-direction.  
+    }
   \item{theta, phi }{The angles defining the viewing direction. 
     \code{theta} gives the azimuthal direction and \code{phi} the colatitude. 
     see \link{persp}.
@@ -71,8 +81,13 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
     argument (\code{box}) equals \code{TRUE} (this is the default). See \link{perspbox}.
     }
   \item{inttype }{The interpolation type to create the polygons, either 
-    interpolating the \code{colvar} (\code{inttype = 1} or the \code{x, y, z}
-    values (\code{inttype = 2}) - see \link{persp3D}.
+    taking the mean of the \code{colvar} variable (\code{inttype = 1, 3} or 
+    extending the \code{x, y, z} values (\code{inttype = 2}). 
+    Values \code{1, 3} differ in how they treat \code{NA}s in the \code{colvar} variable. 
+    For \code{inttype = 3}, \code{NA}s are removed before taking averages; 
+    this will tend to make the \code{NA} region smaller. 
+    \code{NA}s are included when \code{inttype = 1}. This will tend to make the \code{NA} region larger.
+    see details and an example in \link{persp3D}.
     } 
   \item{add }{Logical. If \code{TRUE}, then the image will be added to the current plot.
     If \code{FALSE} a new plot is started. 
@@ -84,7 +99,7 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
 
     The following \link{persp} arguments can be specified: 
     \code{xlim, ylim, zlim, xlab, ylab, zlab, main, sub, r, d, 
-    scale, expand, box, axes, nticks, ticktype, shade, ltheta, lphi}.      
+    scale, expand, box, axes, nticks, ticktype}.      
     The arguments \code{xlim}, \code{ylim}, \code{zlim} only affect the axes.
     All objects will be plotted, including those that fall out of these ranges.
     To select objects only within the axis limits, use \link{plotdev}.
@@ -93,8 +108,8 @@ image3D (x = NULL, y = NULL, z = NULL, ..., colvar = NULL,
     \code{col.axis, col.panel, lwd.panel, col.grid, lwd.grid} can 
     also be given a value.
     
-    The parameters \code{shade} or \code{lighting} can be used for illuminating.
-    
+    \code{shade} and \code{lighting} arguments will have no effect.
+
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
          
     Also the arguments \code{lty, lwd} can be specified (when \code{border} is not \code{NA}).

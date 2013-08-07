@@ -11,13 +11,11 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
                    colkey = list(side = 4), resfac = 1, 
                    image = FALSE, contour = FALSE, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
-                   lighting = FALSE, space = 0.4, along = "x", 
+                   lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+                   space = 0.4, along = "x", 
                    curtain = FALSE, add = FALSE, plot = TRUE) {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   if (any(space > 0.9))
     stop("'space' too large, should be smaller than or equal to 0.9")
@@ -49,6 +47,7 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
 
   rx <- range(x)
   ry <- range(y)
+
   if (length(grep("x", along)) > 0) {
     dY <- 0.5*(1 - space[2]) * diff(y)
     dY <- c(dY[1], dY, dY[length(dY)])
@@ -61,7 +60,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
     rx <- rx + c(- dX[1], dX[length(dX)])
   }
 
-  dot <- splitdotpersp(list(...), bty, lighting, rx, ry, z, plist = plist)
+  dot <- splitdotpersp(list(...), bty, lighting,
+    rx, ry, z, plist = plist, shade, lphi, ltheta)
 
  # swap if decreasing
   if (! is.matrix(x) & all(diff(x) < 0)) {    
@@ -86,8 +86,9 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
   if (contour$add) 
     cv <- colvar
 
-  CC <- check.colvar.persp(colvar, z, col, 2, clim, dot$alpha)
-  colvar <- CC$colvar; col <- CC$col
+  CC <- check.colvar.2(colvar, z, col, clim, dot$alpha)
+  colvar <- CC$colvar
+  col <- CC$col
 
   if (ispresent(colvar)) {
 
@@ -126,11 +127,16 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
   Nx <- dim(z) [1]
   Ny <- dim(z) [2]
 
-  lwd <- dot$points$lwd; if (is.null(lwd)) lwd <- 1
-  lty <- dot$points$lty; if (is.null(lty)) lty <- 1
+  lwd <- dot$points$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
+  lty <- dot$points$lty
+  if (is.null(lty)) 
+    lty <- 1
 
   Poly <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
-               lwd = NULL, lty = NULL, img = NULL, proj = NULL)                    
+               lwd = NULL, lty = NULL,  
+               img = NULL, alpha = NULL, proj = NULL)                    
 
   zmin <- min(plist$zlim[1], min(z, na.rm = TRUE))
 
@@ -233,6 +239,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
   Poly$lwd     <- rep(lwd , length.out = length(Poly$col))
   Poly$lty     <- rep(lty , length.out = length(Poly$col))
   Poly$isimg   <- rep(0 , length.out = length(Poly$col))
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  Poly$alpha   <- rep(alpha, length.out = length(Poly$col))
   class(Poly)  <- "poly"
 
   if (image$add) 
@@ -244,7 +252,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
     segm <- NULL
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "ribbon3D") 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, 
+      type = "ribbon3D") 
    
   plist <- plot.struct.3D(plist, poly = Poly, segm = segm, plot = plot)  
 

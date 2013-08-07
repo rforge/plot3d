@@ -9,15 +9,11 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
                     clim = NULL, clab = NULL, bty = "b", 
                     add = FALSE, plot = TRUE)  {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   dot  <- splitdotpersp(list(...), bty, NULL, 
     c(x0, x1), c(y0, y1), c(z0, z1), plist = plist)
 
- # checks
   len <- length(x0)
   if (length(y0) != len)
     stop("'y0' should have same length as 'x0'")
@@ -52,13 +48,15 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
     if (iscolkey) 
       colkey <- check.colkey(colkey)
 
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- variablecol(colvar, col, NAcol, clim) 
 
   } else {
     if (is.null(col))
       col <- "black"
-    if (! is.null(dot$alpha)) col <- setalpha(col, dot$alpha)
+    if (! is.null(dot$alpha)) 
+      col <- setalpha(col, dot$alpha)
     Col <- rep(col, length.out = len)  
     iscolkey <- FALSE
   }   
@@ -74,8 +72,16 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
   if (is.function(panel.first)) 
     panel.first(plist$mat)
   
-  lwd <- dot$points$lwd ; if (is.null(lwd)) lwd <- 1
-  lty <- dot$points$lty ; if (is.null(lty)) lty <- 1
+  lwd <- dot$points$lwd
+  if (is.null(lwd)) 
+    lwd <- 1
+
+  lty <- dot$points$lty
+  if (is.null(lty)) 
+    lty <- 1
+
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  alpha <- rep(alpha, length.out = len)
 
   Proj   <- project(0.5*(x0 + x1), 0.5*(y0 + y1), 
                     0.5*(z0 + z1), plist)
@@ -89,6 +95,7 @@ segments3D  <- function(x0, y0, z0, x1 = x0, y1 = y0, z1 = z0,
                col    = Col,
                lwd    = rep(lwd , length.out = len),
                lty    = rep(lty , length.out = len),
+               alpha  = alpha,
                proj   = Proj)
   class(segm) <- "segments"
 

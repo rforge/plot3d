@@ -40,12 +40,17 @@ The Netherlands
 \Plainauthor{Karline Soetaert}
 
 \Abstract{
-  \R{ }package \p \citep{plot3D} contains functions for plotting 2-, 3-dimensional
+  \R{ }package \p \citep{plot3D} contains functions for plotting multi-dimensional
   data. Many functions are derived from the \code{persp} function, other
   functions start from the \code{image} function.
-  
-  This vignette is mainly a copy-paste from part of the help files. 
-  Many more examples can be found in the help of each function.
+
+  Two related packages are: 
+  \begin{itemize}
+   \item   \pkg{plot3Drgl} \citep{plot3Drgl}, that plots multidimensional data
+    using openGL graphics (and using package \pkg{rgl} \citep{rgl}).
+   \item  \pkg{OceanView} \citep{OceanView} that contains functions for visualing
+    oceanographic data.  
+  \end{itemize}
 }
 
 %% The address of (at least) one author should be given
@@ -87,13 +92,11 @@ or or R's \code{image} and \code{contour} function.
 
 The main extensions to these functions are:
 \begin{itemize}
- \item In addition to the x, y (and z) values, there is a color variable 
-   (\code{colvar}) which defines the colors. 
-   \footnote{For \code{image2D} and \code{contour2D} this color variable is called 'z',
-   for consistency with R's \code{image} function.}.
- \item A color key (\code{colkey}) can be written next to the figure.  
+ \item In addition to the x, y (and z) values, there an additional data dimension 
+ can be represented by a color variable (argument \code{colvar}) which defines the coloration. 
+ \item A color key (argument \code{colkey}) can be written next to the figure.  
    It is possible to log-transform the color key, rescale it, adjust its position, ...   
- \item The resolution of a figure can be increased (\code{resfac}). 
+ \item The resolution of a figure can be increased (argument \code{resfac}). 
  \item Either the \code{facets} can be colored, just the border, or both.    
 \end{itemize}
 
@@ -115,7 +118,7 @@ Package \p contains:
    \end{itemize}
  \item Functions defined on the \code{image} or \code{contour} function:
    \begin{itemize}
-     \item \code{image2D}, \code{contour2D}, for an extended function to visualise 2-D or 3-D data.
+     \item \code{image2D}, \code{contour2D}, for an extended version of these functions to visualise 2-D or 3-D data.
      \item \code{ImageOcean}, for an image of the ocean's bathymetry.
    \end{itemize}
  \item Other functions
@@ -125,7 +128,7 @@ Package \p contains:
  \item Colors and colorkeys:
    \begin{itemize}
      \item \code{colkey}: color legendS.
-     \item \code{jet.col}, \code{gg.col}, \code{ramp.col}: suitable colors.
+     \item \code{jet.col}, \code{gg.col}, \code{ramp.col}: suitable color palettes.
    \end{itemize}
  \item Utility functions:
    \begin{itemize}
@@ -141,9 +144,8 @@ Package \p contains:
    \end{itemize}
 \end{itemize}
 
-This vignette contains some examples from the help-files. 
-
-Many more examples can be found in the package; to run all examples:
+This vignette contains some examples; more can be found in the package's help files.
+To run all examples:
 \begin{verbatim}
  example(persp3D)  
  example(surf3D)  
@@ -151,6 +153,8 @@ Many more examples can be found in the package; to run all examples:
  example(scatter3D)
  example(segments3D)
  example(image2D)
+ example(image3D)
+ example(contour3D)
  example(colkey) 
  example(jet.col) 
  example(perspbox)
@@ -173,15 +177,16 @@ Many examples of the use of \code{image2D} and \code{persp3D} are in vignette \c
 
 Here, a part of the \code{Hypsometry} data set is depicted.
 
-We first plot the data, with the zoomed part. The 0-contour lines are added.
+We first plot the data, with the zoomed part. The 0 m contour lines are added.
+Slight shading gives the plot a perspective view.
 <<label=hyps,include=FALSE>>=
 image2D(Hypsometry, xlab = "longitude", ylab = "latitude", 
-      contour = list(levels = 0, col = "black"),
-      main = "Hypsometry data set", clab = "m")
+      contour = list(levels = 0, col = "black", lwd = 2),
+      shade = 0.1, main = "Hypsometry data set", clab = "m")
 rect(-50, 10, -20, 40, lwd = 3)
 @
 
-\setkeys{Gin}{width=0.6\textwidth}
+\setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}
 \begin{center}
 <<label=hyps,fig=TRUE,echo=FALSE, width = 10, height = 6, pdf = FALSE, png = TRUE>>=
@@ -209,8 +214,8 @@ par(mfrow = c(1, 1))
 persp3D(z = Hypsometry$z[ii,jj], xlab = "longitude", bty = "bl2",
         ylab = "latitude", zlab = "depth", clab = "depth, m", 
         expand = 0.5, d = 2, phi = 20, theta = 30, resfac = 3,  
-        contour = list(col = "grey", side = c("zmin", "z")), zlim = zlim, 
-        colkey = list(side = 1, length = 0.5))
+        contour = list(col = "grey", side = c("zmin", "z")),
+         zlim = zlim, colkey = list(side = 1, length = 0.5))
 @
 
 \setkeys{Gin}{width=0.6\textwidth}
@@ -220,29 +225,35 @@ persp3D(z = Hypsometry$z[ii,jj], xlab = "longitude", bty = "bl2",
 <<ocean2>>
 @
 \end{center}
-\caption{Bathymetry - complex}
+\caption{Bathymetry of a part of the ocean}
 \label{fig:ocean2}
 \end{figure}
 
-\section{slice3D}
-\code{slice3D} draws slices from volumetric (3D) data.
+\section{slices and isosurfaces}
+Function \code{slice3D} draws slices from volumetric (3D) data, 
+function \code{isosurf3D} creates and plots isosurfaces. 
+It makes use of a function from package \code{misc3d} \citep{misc3d}.
 
 <<>>=
 args(slice3D)
 @
 Function \code{mesh} is used to generate a full rectangular 3-D mesh. 
-This is used to generate the volumetric data that defines the color.
-This is visualised by one slice in x and 3 slices in y direction
+This is used to generate the volumetric data (\code{p}) that defines the coloration.
+The data are visualised by one slice in x (\code{xs}) and 3 slices in y direction
+(\code{ys}).
+
 <<label=slice,include=FALSE>>=
-par(mfrow = c(1, 1))
-x <- y <- z <- seq(-4, 4, by = 0.1)
+par(mfrow = c(1, 2))
+x <- y <- z <- seq(-4, 4, by = 0.2)
 M <- mesh(x, y, z)
 
 R <- with (M, sqrt(x^2 + y^2 +z^2))
 p <- sin(2*R)/(R+1e-3)
 
-slice3D(x, y, z, colvar = p, edge = FALSE, 
-        xs = 0, ys = c(-4, 0, 4), zs = NULL, d = 2)
+slice3D(x, y, z, colvar = p, 
+        xs = 0, ys = c(-4, 0, 4), zs = NULL)
+
+isosurf3D(x, y, z, colvar = p, level = 0, col = "red")
 @
 
 \setkeys{Gin}{width=0.8\textwidth}
@@ -252,7 +263,7 @@ slice3D(x, y, z, colvar = p, edge = FALSE,
 <<slice>>
 @
 \end{center}
-\caption{Slices from volumetric data}
+\caption{Slices and isosurfaces from volumetric data}
 \label{fig:slice}
 \end{figure}
 
@@ -261,12 +272,11 @@ slice3D(x, y, z, colvar = p, edge = FALSE,
 <<>>=
 args(surf3D)
 @
-Here are 4 applications, showing the different options.
+Here are 4 applications, showing the different options of coloration.
 <<label=surf,include=FALSE>>=
   par(mfrow = c(2, 2), mar = c(0, 0, 0, 0)) 
 
  # Shape 1
-
   M  <- mesh(seq(0,  6*pi, length.out = 100), 
              seq(pi/3, pi, length.out = 100))
   u  <- M$x ; v <- M$y
@@ -275,7 +285,7 @@ Here are 4 applications, showing the different options.
   y <- u/2 * sin(v) * sin(u)
   z <- u/2 * cos(v)
 
-  surf3D(x, y, z, colvar = z, colkey = FALSE, box = FALSE, phi = 50)
+  surf3D(x, y, z, colvar = z, colkey = FALSE, box = FALSE)
 
 
  # Shape 2: add border
@@ -289,16 +299,14 @@ Here are 4 applications, showing the different options.
 
   surf3D(x, y, z, colvar = z, border = "black", colkey = FALSE)
 
- # shape 3: uses same mesh, other perspective (d >1)
-
+ # shape 3: uses same mesh, white facets
   x <- (3 + cos(v/2)*sin(u) - sin(v/2)*sin(2*u))*cos(v)
   y <- (3 + cos(v/2)*sin(u) - sin(v/2)*sin(2*u))*sin(v)
   z <- sin(v/2)*sin(u) + cos(v/2)*sin(2*u)
  
-  surf3D(x, y, z, colvar = z, colkey = FALSE, d = 2, facets = FALSE)
+  surf3D(x, y, z, colvar = z, colkey = FALSE, facets = FALSE)
 
  # shape 4: more complex colvar
-
   M  <- mesh(seq(-13.2, 13.2, length.out = 50), 
              seq(-37.4, 37.4, length.out = 50))
   u  <- M$x   ; v <- M$y
@@ -310,7 +318,7 @@ Here are 4 applications, showing the different options.
   z <- (2*w*cosh(b*u)*(-(w*sin(v)*cos(w*v)) + cos(v)*sin(w*v))) / D
 
   surf3D(x, y, z, colvar = sqrt(x + 8.3), colkey = FALSE, 
-         theta = 10, border = "black", box = FALSE)
+         border = "black", box = FALSE)
 @
 
 \setkeys{Gin}{width=0.8\textwidth}
@@ -331,13 +339,12 @@ Functions \code{scatter2D} and \code{scatter3D} draw scatterplots.
 args(scatter2D)
 args(scatter3D)
 @
-We first plot the dataset \code{quakes}, and then create a mathematical data set.
-<<label=scatter,include=FALSE>>=
-par(mfrow = c(1, 2))
+We plot the dataset \code{quakes}, using function \code{scatter3D}.
+Before the 3-D quakes data are drawn, small dots are added on the bottom 
+and on the depth plane (\code{panelfirst}).
 
-# the quakes data set
- # before the scatters are drawn, 
- # add small dots on basal plane and on the depth plane
+<<label=scatter,include=FALSE>>=
+par(mfrow = c(1, 1))
   panelfirst <- function(pmat) {
     zmin <- min(-quakes$depth)
     XY <- trans3D(quakes$long, quakes$lat, 
@@ -360,66 +367,42 @@ par(mfrow = c(1, 2))
        panel.first = panelfirst, theta = 10, d = 2, 
        colkey = list(length = 0.5, width = 0.5, cex.clab = 0.75))
        )
-
-
-
-# a full grid sphere
-  M  <- mesh(seq(0, 2*pi, length.out = 100), 
-             seq(0,   pi, length.out = 100))
-  u  <- M$x ; v  <- M$y
-
-  x <- cos(u)*sin(v)
-  y <- sin(u)*sin(v)
-  z <- cos(v)
-
-  scatter3D(x, y, z, colvar = z, pch = ".", cex = 2, 
-            theta = 10, d = 2, colkey = FALSE, main = "A sphere")
 @
 
 \setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}
 \begin{center}
-<<label=scatter,fig=TRUE,echo=FALSE, width = 10, height = 6, pdf = FALSE, png = TRUE>>=
+<<label=scatter,fig=TRUE,echo=FALSE, pdf = FALSE, png = TRUE>>=
 <<scatter>>
 @
 \end{center}
-\caption{Scatterplot}
+\caption{Scatter plot}
 \label{fig:scatter}
 \end{figure}
 
-\subsection{arrows3D}
+\subsection{arrows3D, arrows2D}
+<<label=arrows,include=FALSE>>=
+par (mfrow = c(1, 2))
+arrows2D(x0 = runif(10), y0 = runif(10), 
+         x1 = runif(10), y1 = runif(10), colvar = 1:10, 
+         code = 3, main = "arrows2D")
 
+arrows3D(x0 = runif(10), y0 = runif(10), z0 = runif(10),
+         x1 = runif(10), y1 = runif(10), z1 = runif(10),
+         colvar = 1:10, code = 1:3, main = "arrows3D", colkey = FALSE)
 
-\section{More complex coloring}
-<<label=world,include=FALSE>>=
-Theta <- seq(0, 2*pi, length.out = 359) 
-Phi   <- seq(0,   pi, length.out = 180)  
-
-M <- mesh(Theta, Phi)
-theta <- M$x; phi <- M$y
-x <- cos(theta)*sin(phi)
-y <- sin(theta)*sin(phi)
-z <- cos(phi)
-# mask the land 
-BB <- Hypsometry$z; BB[BB>=0] <- NA
-
-par(mfrow = c(1, 1))
-par(mar = c(3, 2, 3, 3))
-surf3D(-x, -y, -z, colvar = BB, phi = 20, theta = 60, d = 3,
-        main = "Bathymetry on surface", 
-        colkey = list(side = 1, length = 0.5, width = 0.5), 
-        box = TRUE, NAcol = "black", clab = "depth, m")
 @
-\setkeys{Gin}{width=0.6\textwidth}
+\setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}
 \begin{center}
-<<label=world,fig=TRUE,echo=FALSE, pdf = FALSE, png = TRUE>>=
-<<world>>
+<<label=arrows,fig=TRUE,echo=FALSE, width = 10, height = 6, pdf = FALSE, png = TRUE>>=
+<<arrows>>
 @
 \end{center}
-\caption{The ocean baythmetry, draped on a spherical surface}
-\label{fig:world}
+\caption{Arrows}
+\label{fig:scatter}
 \end{figure}
+
 
 \section{Functions based on image}
 The \code{image2D} function is an extended version of \code{image}.
@@ -444,7 +427,7 @@ dim(Oxsat$val)
 We use \code{image2D.array} to plot several depth intervals at once, looping over
 the first and second margin:
 <<label=image2D,include=FALSE>>=
-  image2D(z = Oxsat$val, subset = 1:8, 
+image2D(z = Oxsat$val, subset = 1:8, 
         x = Oxsat$lon, y = Oxsat$lat,
         margin = c(1, 2), NAcol = "black", colkey = FALSE,
         xlab = "longitude", ylab = "latitude", 
@@ -464,12 +447,13 @@ colkey(clim = c(0, 115), clab = c("O2 saturation", "percent"))
 \label{fig:image2D}
 \end{figure}
 
-\section{Composite figures and color keys}
+\section{Composite figures}
+It is also possible to make a composite figure combining several functions.
 <<label=Composite,include=FALSE>>=
- persp3D(z = volcano, zlim = c(-60, 200), phi = 20, bty = "b",   
+ persp3D(z = volcano, zlim = c(-60, 200), phi = 20,    
     colkey = list(length = 0.2, width = 0.4, shift = 0.15,
       cex.axis = 0.8, cex.clab = 0.85), lighting = TRUE, lphi = 90,
-    clab = c("","height","m"), plot = FALSE)
+    clab = c("","height","m"), bty = "f", plot = FALSE)
 
 # create gradient in x-direction
  Vx <- volcano[-1, ] - volcano[-nrow(volcano), ]
@@ -478,7 +462,11 @@ colkey(clim = c(0, 115), clab = c("O2 saturation", "percent"))
  image3D(z = -60, colvar = Vx/10, add = TRUE, 
     colkey = list(length = 0.2, width = 0.4, shift = -0.15,
       cex.axis = 0.8, cex.clab = 0.85),
-   clab = c("","gradient","m/m"), plot = TRUE)
+   clab = c("","gradient","m/m"), plot = FALSE)
+
+# add contour  
+ contour3D(z = -60+0.01, colvar = Vx/10, add = TRUE, 
+    col = "black", plot = TRUE)
 @
 \setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}

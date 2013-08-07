@@ -1,7 +1,7 @@
 ## =============================================================================
-## 3-d representation using contours in x, y or z
+## 3-D visualisation of volumetric data using points
 ## =============================================================================
-# x, y, z vectors or arrays, colvar: array
+# x, y, z vectors, colvar: array
 
 voxel3D <- function(x, y, z, colvar, ..., 
                     phi = 40, theta = 40, 
@@ -9,15 +9,12 @@ voxel3D <- function(x, y, z, colvar, ...,
                     operator = "=", col = jet.col(100), 
                     panel.first = NULL, bty = "b", 
                     add = FALSE, plot = TRUE) {
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   dot <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist)
 
   if (length(level) != 1 & operator != "<>" )
-    stop ("'level' should be one numbers if 'operator' not equal to '<>'")
+    stop ("'level' should be one number if 'operator' not equal to '<>'")
   else if (length(level) != 2 & operator == "<>" )
     stop ("'level' should be two numbers if 'operator' equals '<>'")
   
@@ -43,7 +40,8 @@ voxel3D <- function(x, y, z, colvar, ...,
     colvar <- vox$cv    
   
   do.call("scatter3D", c(alist(x = vox$x, y = vox$y, z = vox$z, 
-          add = TRUE, col = col, colkey = FALSE, plot = plot, alpha = dot$alpha), dot$points))
+          add = TRUE, col = col, colkey = FALSE, plot = plot, 
+          alpha = dot$alpha), dot$points))
   plist <- getplist()
   invisible(plist$mat)
 }

@@ -1,3 +1,46 @@
+## =============================================================================
+## function that makes a box type in 2D
+## =============================================================================
+
+start2Dplot <- function(dots, x, y) {
+  dd <- dots
+  dd$type <- "n"
+
+  bty <- dots$bty
+  dots$bty <- NULL
+
+  if (is.null(bty))
+    bty <- "o"
+
+  if (bty %in% c("b2", "g", "bl")) 
+    dd$bty <- NULL
+    
+  if (is.null(dd$xlab))
+    dd$xlab <- "x"
+      
+  if (is.null(dd$ylab))
+    dd$ylab <- "y"
+
+  do.call("plot", c(alist(x, y), dd))
+
+  if (bty == "b2")
+    grid(col = "grey", lty = 1, lwd = 2)
+  else if (bty == "g") {
+    pu <- par("usr")
+    rect(pu[1], pu[3], pu[2], pu[4],
+      col = grey(0.925), border = grey(0.925))
+    grid(col = "white", lty = 1, lwd = 2)
+  } else if (bty %in% c("bl","bl2")) {
+    pu <- par("usr")
+    rect(pu[1], pu[3], pu[2], pu[4], col = "black")
+    if (bty == "bl2")
+      grid(col = "grey", lty = 1, lwd = 2)
+  }
+  return(dots)
+}
+
+## =============================================================================
+
 plot2Dplist <- function (plist, ...) {
   
   checkdots <-  function(pdots, dots, add) {
@@ -56,6 +99,8 @@ plot2Dplist <- function (plist, ...) {
   invisible(plist)
 }
 
+## =============================================================================
+
 add2Dplist <- function(plist, method, ...) {
   dots <- list(...)
   
@@ -63,8 +108,8 @@ add2Dplist <- function(plist, method, ...) {
     setlim <- c(!is.null(dots$xlim), !is.null(dots$ylim), !is.null(dots$zlim))
     plist <- list(type = "2D", 
       xlim = dots$xlim, ylim = dots$ylim, zlim = dots$zlim, setlim = setlim,
-      twoD = list(order = NULL))
-  }
+      twoD = list(order = NULL), plt = list(main = par("plt"), ori = par("plt")))
+  } 
   
   if (plist$type == "3D")
     plist$type <- "23D" 
@@ -159,10 +204,7 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
                     clim = NULL, clab = NULL, add = FALSE,
                     plot = TRUE, method = "arrows") {
 
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
+  plist <- initplist(add)
 
   plist <- add2Dplist(plist, method, x0 = x0, y0 = y0, x1 = x1, y1 = y1, 
     colvar = colvar, col = col, NAcol = NAcol, colkey = colkey, clim = clim,
@@ -179,15 +221,17 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
 
     if (dots$clog) {
       colvar <- log(colvar)
-      if (! is.null(clim)) clim <- log(clim)
+      if (! is.null(clim)) 
+        clim <- log(clim)
     }
 
     iscolkey <- is.colkey(colkey, col)
 
     if (iscolkey) {
-      colkey <- check.colkey(colkey, add)
-      if (! add)
-        par.ori <- par(plt = colkey$parplt)
+      colkey <- check.colkey(colkey)
+      if (! add)       
+        plist$plt$main <- colkey$parplt
+      setplist(plist)    
     }
 
     if (length(colvar) != length(x0))
@@ -196,15 +240,18 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
     if (is.null(clim))
       clim <- range(colvar, na.rm = TRUE)
 
-    if (! is.null(dots$alpha)) col <- setalpha(col, dots$alpha)
+    if (! is.null(dots$alpha)) 
+      col <- setalpha(col, dots$alpha)
     Col <- variablecol(colvar, col, NAcol, clim)
 
   } else  {  # no colvar
     Col <- col
     if (is.null(Col)) Col <- "black"
-    if (! is.null(dots$alpha)) Col <- setalpha(Col, dots$alpha)
+    if (! is.null(dots$alpha)) 
+      Col <- setalpha(Col, dots$alpha)
     iscolkey <- FALSE
   }
+  par (plt = plist$plt$main)
 
   if (! add)
     dots$main <- start2Dplot(dots$main, c(x0, x1), c(y0, y1))
@@ -213,13 +260,15 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
 
   if (iscolkey) {
     drawcolkey(colkey, col, clim, clab, dots$clog)
-    if (! add)
-      par(plt = par.ori)
-    par(mar = par("mar"))
+    par(plt = plist$plt$ori)  
   }
+  par(mar = par("mar"))
 
 }
 
+## =============================================================================
+## specific plot functions (2-D)
+## =============================================================================
 arrows2D <- function(x0, y0, x1 = x0, y1 = y0,..., colvar = NULL,
                     col = NULL, NAcol = "white", 
                     colkey = list(side = 4),
@@ -231,6 +280,7 @@ arrows2D <- function(x0, y0, x1 = x0, y1 = y0,..., colvar = NULL,
                     clim = clim, clab = clab, add = add,
                     plot = plot, method = "ArrType")
 
+## =============================================================================
 segments2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
                     colkey = list(side = 4),
@@ -241,6 +291,7 @@ segments2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     clim = clim, clab = clab, add = add,
                     plot = plot, method = "segments")
 
+## =============================================================================
 rect2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
                     colkey = list(side = 4),

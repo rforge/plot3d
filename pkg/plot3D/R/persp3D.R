@@ -11,9 +11,14 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
                   colkey = list(side = 4), resfac = 1, 
                   image = FALSE, contour = FALSE, panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",
-                  lighting = FALSE, inttype = 1, 
-                  curtain = FALSE, add = FALSE, plot = TRUE){
+                  lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
+                  inttype = 1, curtain = FALSE, add = FALSE, plot = TRUE){
 
+  plist <- initplist(add)
+      
+  dot <- splitdotpersp(list(...), bty, lighting, 
+    x, y, z, plist = plist, shade, lphi, ltheta)
+    
  # check dimensionality
   if (! is.vector(x) & length(dim(x)) == 1)
     x <- as.vector(x)
@@ -62,17 +67,21 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   
  # swap if decreasing
     if (all(diff(x) < 0)) {     
-      if (is.null(dot$persp$xlim)) 
-        dot$persp$xlim <- rev(range(x))
       x <- rev(x)
+      if (is.null(dot$persp$xlim)) 
+        dot$persp$xlim <- range(x)
+      else if (diff(dot$persp$xlim) < 0)
+        stop("'persp' expects increasing xlim")  
       if (ispresent(colvar)) 
         colvar <- colvar[nrow(colvar):1, ]
       z <- z[nrow(z):1, ]
     }
     if (all(diff(y) < 0)) {     
-      if (is.null(dot$persp$ylim)) 
-        dot$persp$ylim <- rev(range(y))
       y <- rev(y)
+      if (is.null(dot$persp$ylim)) 
+        dot$persp$ylim <- range(y)
+      else if (diff(dot$persp$ylim) < 0)
+        stop("'persp' expects increasing ylim")  
       if (ispresent(colvar)) 
         colvar <- colvar[, (ncol(colvar):1)]
       z <- z[, (ncol(z):1)]
@@ -89,16 +98,10 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     pmat <- persp3Db(x = x, y = y, z = z, col = col, ..., 
              phi = phi, theta = theta, NAcol = NAcol, border = border, 
              facets = facets, panel.first = panel.first,
-             bty = bty, lighting = lighting, add = add, plot = plot)
+             bty = bty, lighting = lighting, shade = shade, ltheta = ltheta,
+             lphi = lphi, add = add, plot = plot)
     return(invisible(pmat))
   }
-    
-  if (add) 
-    plist <- getplist()
-  else
-    plist <- NULL
-      
-  dot <- splitdotpersp(list(...), bty, lighting, x, y, z, plist = plist)
     
   image   <- check.args(image)
   contour <- check.args(contour)
@@ -107,12 +110,14 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   if (contour$add & is.matrix(x))  
       stop("cannot combine 'x' a matrix and 'contour'")
 
-  if (contour$add | curtain) 
-    cv <- colvar
-      
+  cv <- colvar
+  cvlim <- clim
+        
  # check colvar and colors
   CC <- check.colvar.persp(colvar, z, col, inttype, clim, dot$alpha)
-  colvar <- CC$colvar; col <- CC$col
+  colvar <- CC$colvar
+  col <- CC$col
+
   Extend <- inttype == 2
   
   if (ispresent(colvar)) {
@@ -153,7 +158,7 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
   lty <- ifelse (is.null (dot$points$lty), 1, dot$points$lty)
 
   Poly <- paintit (colvar, X, Y, z, plist, col, NAcol, clim, 
-           border, facets, lwd, lty, dot$shade, Extend, plot = plot)
+           border, facets, lwd, lty, dot, Extend, cv = cv, cvlim = cvlim)
 
   if (curtain) {
     P <- list(x = NULL, y = NULL, col = NULL, border = NULL, 
@@ -216,9 +221,9 @@ persp3D <- function(x = seq(0, 1, length.out = nrow(z)),
     segm <- NULL
 
   if (iscolkey) 
-    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, type = "persp3D") 
+    plist <- plistcolkey(plist, colkey, col, clim, clab, dot$clog, 
+      type = "persp3D") 
 
- # plot it
   plist <- plot.struct.3D(plist, poly = Poly, segm = segm, plot = plot)  
 
   setplist(plist)   
