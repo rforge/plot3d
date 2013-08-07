@@ -85,9 +85,10 @@ uncutrgl <- function(...) {
       axis3d("x")
       axis3d("y") 
     }
+  invisible(plist)  
 }
 
 uncroprgl <- function(...) 
-  uncutrgl(...)
+  invisible(uncutrgl(...))
 
 

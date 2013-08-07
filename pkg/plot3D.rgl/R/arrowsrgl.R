@@ -2,9 +2,9 @@
 # the 2D arrows function, using rgl
 # ==============================================================================
 
-arrowsrgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
+arrows2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
                     col = NULL, NAcol = "white",
-                    clim = NULL, type = "simple", 
+                    clim = NULL, type = "simple", dz = 0.1, 
                     add = FALSE)  {
 
 # ------------------------------------------------------------------------------
@@ -17,7 +17,7 @@ arrowsrgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
   namesextra <- c("code", "length", "angle", "lwd", "lty", "type")  
   dotpersp <- dots[names(dots) %in% c(namesextra,namespersp)]
 
-  z <- rep(1.001, length.out = length(x0))
+  z <- rep(1 + dz, length.out = length(x0))
   do.call("arrows3D", c(alist(x0 = x0, y0 = y0, z0 = z, 
     x1 = x1, y1 = y1, z1 = z, colkey = FALSE, type = type,
     colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",
@@ -31,9 +31,9 @@ arrowsrgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
 # the 2D arrows function, using rgl
 # ==============================================================================
 
-segmentsrgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
+segments2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
                     col = NULL, NAcol = "white",
-                    clim = NULL, type = "simple", 
+                    clim = NULL, type = "simple", dz = 0.1,
                     add = FALSE)  {
 
 # ------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ segmentsrgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
   namesextra <- c("lwd", "lty")  
   dotpersp <- dots[names(dots) %in% c(namesextra,namespersp)]
 
-  z <- rep(1.001, length.out = length(x0))
+  z <- rep(1+dz, length.out = length(x0))
   do.call("segments3D", c(alist(x0 = x0, y0 = y0, z0 = z, 
     x1 = x1, y1 = y1, z1 = z, colkey = FALSE, type = type,
     colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",

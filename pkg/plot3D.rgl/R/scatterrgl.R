@@ -2,14 +2,14 @@
 # the 2D scatterplot (lines, points) function, using rgl
 # ==============================================================================
 
-scatterrgl <- function(x, y, colvar = NULL, ...,
+scatter2Drgl <- function(x, y, colvar = NULL, ...,
                     col = NULL, NAcol = "white",
-                    clim = NULL, CI = NULL, add = FALSE)  {
+                    clim = NULL, CI = NULL, dz = 0.1, add = FALSE)  {
 # ------------------------------------------------------------------------------
 # check input
 # ------------------------------------------------------------------------------
-  dots <- plot2Drgl("scatter3D", x, y, z = rep(1.001, length.out = length(x)),
-    colvar, col, NAcol, clim, add,
+  dots <- plot2Drgl("scatter3D", x, y, 
+    colvar, col, NAcol, clim, add, z = rep(1 + dz, length.out = length(x)),
     namesextra = c("type", "pch", "cex", "lwd", "lty", "CI"), CI = CI, ...)
 
   finishplotrgl(dots, namesextra = c("type", "pch", "cex", "lwd", "lty", "CI"),
@@ -17,13 +17,13 @@ scatterrgl <- function(x, y, colvar = NULL, ...,
 }
 
 
-textrgl <- function(x, y, labels, colvar = NULL, ...,
+text2Drgl <- function(x, y, labels, colvar = NULL, ...,
                     col = NULL, NAcol = "white",
-                    clim = NULL, CI = NULL, add = FALSE)  {
+                    clim = NULL, CI = NULL, dz = 0.1, add = FALSE)  {
 # ------------------------------------------------------------------------------
 # check input
 # ------------------------------------------------------------------------------
-  dots <- plot2Drgl("text3D", x, y, z = rep(1.001, length.out = length(x)),
+  dots <- plot2Drgl("text3D", x, y, z = rep(1 + dz, length.out = length(x)),
     colvar, col, NAcol, clim, add, 
     namesextra = c("labels", "cex", "font"), labels = labels, ...)
 

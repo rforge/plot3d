@@ -2,8 +2,6 @@
 ## from the help page of rgl.setMouseCallbacks
 ## =============================================================================
 
-## Not quite right --- this doesn't play well with rescaling
-
  pan3d <- function(button) {
    start <- list()
 

@@ -54,13 +54,16 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  (when \code{scale = TRUE} and \code{expand = 1}).
 
  The translation of \link{scatter3D} ignores the \code{pch} argument but displays
- all symbols as squares.  
+ all symbols as squares (if pch = ".") or as filled circles.  
 
  The color key is not (cannot be) plotted in rgl.
  
  In \code{rgl}, both \code{lty} and \code{lwd} have to be one number. 
  For \code{lwd}, this has been overruled, i.e. line widths can be a vector. 
  It is still not possible to use different line types in one type of object. 
+
+  The actions of the mouse on the plots is to rotate (left), to move (middle), 
+  and to zoom it (right).
 }
 
 \examples{

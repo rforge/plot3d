@@ -1,41 +1,53 @@
 \name{2D plots in rgl}
-\alias{imagergl}
-\alias{contourrgl}
-\alias{scatterrgl}
-\alias{arrowsrgl}
+\alias{image2Drgl}
+\alias{contour2Drgl}
+\alias{scatter2Drgl}
+\alias{text2Drgl}
+\alias{arrows2Drgl}
+\alias{segments2Drgl}
 \title{
- 2-D image, contour, scatterplots and arrows in rgl.
+ 2-D image, contour, scatterplots, segments and arrows in rgl.
 }
 \description{
-  \code{imagergl} plots an image in rgl. 
+  \code{image2Drgl} plots an image in rgl. 
   
-  \code{contourrgl} creates a contourplot in rgl. 
+  \code{contour2Drgl} creates a contourplot in rgl. 
 
-  \code{scatterrgl} creates a scatterplot (lineplot, points, ...) in rgl. 
+  \code{scatter2Drgl} creates a scatterplot (lineplot, points, ...) in rgl. 
   
-  \code{arrowsrgl} plots arrows in rgl. 
+  \code{arrows2Drgl} and \code{segments3D} plot arrows and segments in rgl. 
+  
+  \code{text2Drgl} plot labels in rgl. 
   
   These functions were implemented for their sideeffect that rgl plots can be 
   zoomed, translocated, rectangular selections taken.
 }
 \usage{
-imagergl (z, x = seq(0, 1, length.out = nrow(z)), 
+image2Drgl (z, x = seq(0, 1, length.out = nrow(z)), 
           y = seq(0, 1, length.out = ncol(z)), ...,
           col = jet.col(100), NAcol = "white", border = NA,
           contour = FALSE, smooth = FALSE,
-          clim = NULL, inttype = 1, add = FALSE) 
+          clim = NULL, inttype = 1, dz = 0, add = FALSE) 
 
-contourrgl (z, x = seq(0, 1, length.out = nrow(z)),
+contour2Drgl (z, x = seq(0, 1, length.out = nrow(z)),
             y = seq(0, 1, length.out = ncol(z)), ...,
-            col = NULL, clim = NULL, add = FALSE) 
+            col = NULL, clim = NULL, dz = 0.1, add = FALSE) 
 
-scatterrgl (x, y, colvar = NULL, ...,
+scatter2Drgl (x, y, colvar = NULL, ...,
           col = NULL, NAcol = "white",
-          clim = NULL, CI = NULL, add = FALSE) 
+          clim = NULL, CI = NULL, dz = 0.1, add = FALSE) 
 
-arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
+text2Drgl (x, y, labels, colvar = NULL, ...,
+          col = NULL, NAcol = "white",
+          clim = NULL, CI = NULL, dz = 0.1, add = FALSE) 
+
+arrows2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
            col = NULL, NAcol = "white", clim = NULL, 
-           type = "simple", add = FALSE)  
+           type = "simple", dz = 0.1, add = FALSE)  
+
+segments2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
+           col = NULL, NAcol = "white", clim = NULL, 
+           type = "simple", dz = 0.1, add = FALSE)  
 
 }
 
@@ -52,6 +64,9 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
     }
   \item{colvar }{The variable used for coloring the scatter plot or the arrows. 
     If \code{NULL}, then \code{col} will be used as such.
+    }
+  \item{labels }{The text to be written. A vector of length equal to length of
+    x, y.
     }
   \item{col }{Color palette to be used for the \code{z} or \code{colvar} variable.
     If \code{colvar} is \code{NULL}, then the colors are used as such.
@@ -89,6 +104,8 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
    (the default, which uses R-function \link{arrows}) or
     \code{"triangle"}.
     }
+  \item{dz }{The 'layer depth', The z-position is defined as 1 + dz. 
+    }
   \item{add }{Logical. If \code{TRUE}, then the image, contour or points will be 
     added to the current plot.
     If \code{FALSE} a new plot is started. 
@@ -107,26 +124,32 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
     }
 }
 \details{
-  \code{imagergl} and \code{contourrgl} call the \link{image3D} and \link{contour3D}
-  functions of R-package \code{plot3D}, with \code{colvar} equal to \code{z}. 
-  Functions \code{scatterrgl} and \code{arrowsrgl} call \link{scatter3D} and \link{arrows3D}.
-  
-  The z value argument to \code{image3D} is set equal to \code{1}; 
-  for \code{contour3D}, \code{scatter3D} and  \code{arrows3D}, it is set to \code{1.001}.
-  This way, contours, points and arrows will be drawn on top of the image. 
+  The first step in 2D rgl plotting consists in calling a 3-D function from package \code{plot3D}
+  with argument \code{plot} set to \code{FALSE}.
 
-  The first step is to create a 3-D plot, by calling \link{plotrgl}.   
-  After that, the viewing arguments are set equal to 
-  \code{view3d(phi = 0, fov = 0)}.
+  \code{image2Drgl} and \code{contour2Drgl} call the \link{image3D} and \link{contour3D}
+  functions of R-package \code{plot3D}, with \code{colvar} equal to \code{z}. 
+  Functions \code{scatter2Drgl} and \code{arrows2Drgl} call \link{scatter3D} and \link{arrows3D}.
   
-  The actions of the mouse on the plots is to zoom (left, middle), and to move it (right).
+  The z value argument to the 3-D functions is set equal to \code{1 + dz}; 
+  For \code{contour3D}, \code{scatter3D} and \code{arrows3D}, it is by default equal to \code{1.1},
+  while for \code{image3D} it is \code{1}.
+  This way, contours, points, segments and arrows will be drawn on top of the image. 
+
+  The next step is to create a 3-D rgl plot, by calling \link{plotrgl}.   
+  After that, the viewing arguments are set equal to 
+  \code{view3d(phi = 0, fov = 0)}, i.e. the plot is viewed at from the top.
+  
+  The actions of the mouse on the plots is to zoom (left, middle), and to move it (right key).
 }
 \seealso{
-  \link{image3D}, \link{contour3D}, \link{scatter3D} and \link{arrows3D} 
+  \link{image3D}, \link{contour3D}, \link{scatter3D}, \link{segments3D}, 
+  \link{text3D} and \link{arrows3D} 
    on which the functions are based.
 
-  \link{image2D}, \link{contour2D}, \link{scatter2D}, \link{arrows2D} 
-  for \code{plot3D}'s 2-D image function.
+  \link{image2D}, \link{contour2D}, \link{scatter2D},  \link{segments2D}, 
+   \link{text2D}, \link{arrows2D} 
+  for \code{plot3D}'s functions, to plot in ordinary R graphics.
 
   \link{cutrgl} for cutting a rectangular region from the 2D plot.
 }
@@ -137,8 +160,8 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
 ## =======================================================================
 ## image and points
 ## =======================================================================
- imagergl(z = volcano, contour = TRUE, main = "volcano")
- scatterrgl(x = seq(0, 1, by = 0.2), y = seq(0, 1, by = 0.2), 
+ image2Drgl(z = volcano, contour = TRUE, main = "volcano")
+ scatter2Drgl(x = seq(0, 1, by = 0.2), y = seq(0, 1, by = 0.2), 
    cex = 3, add = TRUE)
 
 \dontrun{
@@ -150,12 +173,12 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
 ## scatter points, and lines
 ## =======================================================================
 
- scatterrgl(cars[,1], cars[,2], xlab = "speed", ylab = "dist")
+ scatter2Drgl(cars[,1], cars[,2], xlab = "speed", ylab = "dist")
 \dontrun{
   cutrgl()
 }
  lc <- lowess(cars)
- scatterrgl(lc$x, lc$y, type = "l", add = TRUE, lwd = 4)
+ scatter2Drgl(lc$x, lc$y, type = "l", add = TRUE, lwd = 4)
 \dontrun{
   cutrgl()
   uncutrgl()
@@ -172,19 +195,19 @@ arrowsrgl (x0, y0, x1, y1, colvar = NULL, ...,
  CI$x <- matrix (nrow = length(x), data = c(rep(0.125, 2*length(x))))
  scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
 
- scatterrgl(x, y, colvar = cv, cex = 2, CI = CI)
+ scatter2Drgl(x, y, colvar = cv, cex = 2, CI = CI)
  
 ## =======================================================================
 ## arrows
 ## =======================================================================
 
- arrowsrgl(x0 = 100*runif(30), y0 = runif(30), x1 = 100*runif(30), 
+ arrows2Drgl(x0 = 100*runif(30), y0 = runif(30), x1 = 100*runif(30), 
     y1 = runif(30), length = 0.1*runif(30), col = 1:30, angle = 15:45, 
     type = c("simple", "triangle"), lwd = 2)
 
  x0 <- 1:30
  x1 <- 2:31
- arrowsrgl(x0 = x0, y0 = sin(x0), x1 = x1, y1 = sin(x1), 
+ arrows2Drgl(x0 = x0, y0 = sin(x0), x1 = x1, y1 = sin(x1), 
    colvar = x1, lwd = 2)
 }
 \keyword{ hplot }
