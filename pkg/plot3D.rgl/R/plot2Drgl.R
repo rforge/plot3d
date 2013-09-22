@@ -54,7 +54,7 @@ finishplotrgl <- function(dots, namesextra = NULL, add = FALSE) {
   axis3d("x")
   axis3d("y") 
   pp <- getplist()
-  pp$type <- "2D"
+#  pp$type <- "2D"
   pp$dot$ticktype <- "simple"
   pp$rgl$userMatrix <- par3d("userMatrix")
   setplist(pp) 
