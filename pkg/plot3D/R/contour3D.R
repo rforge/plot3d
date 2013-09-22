@@ -3,7 +3,7 @@
 ## =============================================================================
 
 createsegms <- function (x, y, z, colvar, names = c("x", "y", "z"), 
-  dot, col, clim, dDepth, plist, levels) {  
+  dot, col, clim, dDepth, plist, levels, addbox) {  
 
   contour <- list(args = dot$points) 
 
@@ -51,7 +51,7 @@ createsegms <- function (x, y, z, colvar, names = c("x", "y", "z"),
   
  # create contours
   segm <- contourfunc(contour, x, y, z, plist, cv = colvar, 
-    clim = clim, dDepth = dDepth) 
+    clim = clim, dDepth = dDepth, addbox = addbox) 
   names.from <- paste(names, ".from", sep = "")
   names.to <- paste(names, ".to", sep = "")
 
@@ -70,7 +70,7 @@ contour3D <- function(x = NULL, y = NULL, z = NULL, ...,
                   col = NULL, colkey = list(side = 4), 
                   panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",
-                  dDepth = 1e-1, 
+                  dDepth = 1e-1, addbox = TRUE,
                   add = FALSE, plot = TRUE){
 
   xlim <- ylim <- zlim <- c(0, 1)
@@ -169,13 +169,13 @@ contour3D <- function(x = NULL, y = NULL, z = NULL, ...,
   ismapped <- c(isconstant, ismatrix)
   if (ismapped == 3) {
     segm <- createsegms(x, y, z, colvar, c("x", "y", "z"), dot, 
-      col, clim, dDepth, plist, levels)
+      col, clim, dDepth, plist, levels, addbox)
   } else if (ismapped == 1) {
     segm <- createsegms(y, z, x, colvar, c("y", "z", "x"), dot, 
-      col, clim, dDepth, plist, levels)
+      col, clim, dDepth, plist, levels, addbox)
   } else {
     segm <- createsegms(x, z, y, colvar, c("x", "z", "y"), dot, 
-      col, clim, dDepth, plist, levels)
+      col, clim, dDepth, plist, levels, addbox)
   }
 
   if (iscolkey) {

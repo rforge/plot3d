@@ -17,5 +17,10 @@ initplist <- function(add) {
     plist <- getplist()
   else
     plist <- NULL
+# test for setting the correct plt parameters:
+  if (!add) {
+    plot.new()
+    par(new = TRUE)
+  }  
   plist
 }    

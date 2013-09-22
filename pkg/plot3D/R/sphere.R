@@ -78,7 +78,7 @@ spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byro
 
   if (contour$add) {
     contour$side <- NULL #"z"
-    Pmin <- min(Poly$proj) # minimal projection depth behind which lines not drawn
+    Pmin <- min(Poly$img[[1]]$sl$Proj) # minimal projection depth behind which lines not drawn
     
     col.lines <- contour$args$col
     if (is.null(col.lines))

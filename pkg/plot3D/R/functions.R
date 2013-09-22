@@ -129,7 +129,7 @@ check.args <- function(ll) {
 ## =============================================================================
     
 contourfunc <- function(contour, x, y, z, plist, cv = NULL, 
-  clim = range(cv), dDepth = NULL, addborder = TRUE) { 
+  clim = range(cv), dDepth = NULL, addbox = TRUE) { 
 
   if (is.null(dDepth))
     dDepth <- contour$args$dDepth
@@ -225,7 +225,7 @@ contourfunc <- function(contour, x, y, z, plist, cv = NULL,
           line.list[[i]]$y, z = rep(zz, length(line.list[[i]]$x)), 
           col = getcol(line.list[[i]]$level), plist = plist), contour$args))
 
-     if (side != "z" & addborder)      
+     if (side != "z" & addbox)      
       segm <- addlines(segm, x = c(x[1], x[length(x)],x[length(x)], x[1], x[1]),
                y = c(y[1], y[1], y[length(y)],y[length(y)], y[1]), 
                z = rep(zz, length.out = 5), col = "black", plist = plist)
@@ -897,9 +897,10 @@ splitpardots <- function(dots) {
 
   # plotting parameters : split in plot parameters and point parameters
   plotnames <- c("xlab", "ylab", "zlab", "xlim", "ylim", "zlim", 
-                 "main", "sub", "log", "asp", "bty", "xaxs", "yaxs",  
+                 "main", "sub", "log", "asp", "bty", 
+                 "xaxs", "yaxs", "xaxt", "yaxt", 
                  "ann", "axes", "frame.plot", "panel.first", "panel.last",
-                 "cex.lab", "col.lab", "font.lab",
+                 "cex.lab", "col.lab", "font.lab", "las", "tck", "tcl", "mgp", 
                  "cex.axis", "col.axis", "font.axis", 
                  "cex.main", "col.main", "font.main")
 

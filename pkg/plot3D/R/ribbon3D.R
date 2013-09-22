@@ -229,6 +229,8 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
     }
   }
 
+  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
+  Poly$alpha   <- rep(alpha, length.out = length(Poly$col))
   if (! dot$shade$type == "none") 
     Poly <- color3D(Poly, plist$scalefac, dot$shade, lighting)
 
@@ -239,8 +241,6 @@ ribbon3D <- function(x = seq(0, 1, length.out = nrow(z)),
   Poly$lwd     <- rep(lwd , length.out = length(Poly$col))
   Poly$lty     <- rep(lty , length.out = length(Poly$col))
   Poly$isimg   <- rep(0 , length.out = length(Poly$col))
-  alpha <- dot$alpha; if (is.null(alpha)) alpha <- NA
-  Poly$alpha   <- rep(alpha, length.out = length(Poly$col))
   class(Poly)  <- "poly"
 
   if (image$add) 

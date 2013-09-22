@@ -1,3 +1,18 @@
+lines2D <- function(x, y, ...) {
+  dot <- list(...)
+  if (is.null(dot$type)) 
+    dot$type <- "l"
+  do.call("scatter2D", c(alist(x, y), dot))
+}
+
+points2D <- function(x, y,  ...) {
+  dot <- list(...)
+  if (is.null(dot$type)) 
+    dot$type <- "p"
+  do.call("scatter2D", c(alist(x, y), dot))
+}
+
+
 ## =============================================================================
 ## Scatterplots (2-D)
 ## =============================================================================

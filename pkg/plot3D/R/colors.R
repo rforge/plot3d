@@ -35,7 +35,7 @@ jet.col <- function (n = 100, alpha = 1) {
 
 jet2.col <- function (n = 100, alpha = 1) {
 
-  red    <- c(0,   0,   255, 255, 128)
+  red    <- c(0,   0,   255, 255, 210)
   green  <- c(78,  255, 255, 0,   0  )
   blue   <- c(255, 255, 0,   0,   0  )
 

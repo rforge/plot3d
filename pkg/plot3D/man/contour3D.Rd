@@ -11,7 +11,7 @@ contour3D (x = NULL, y = NULL, z = NULL,
        ..., colvar = NULL, phi = 40, theta = 40,
        col = NULL, colkey = list(side = 4), 
        panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
-       dDepth = 1e-1, add = FALSE, plot = TRUE)
+       dDepth = 1e-1, addbox = TRUE, add = FALSE, plot = TRUE)
 }
 
 \arguments{
@@ -73,6 +73,9 @@ contour3D (x = NULL, y = NULL, z = NULL,
     \link{persp} argument \code{expand} (usually = 1), to make them 
     appear in front of the polygons. Too large values of \code{dDepth} 
     may create visible artifacts.
+    }   
+  \item{addbox }{If \code{TRUE} will draw a box around the
+    plot.
     }   
   \item{add }{Logical. If \code{TRUE}, then the contours will be added to the current plot.
     If \code{FALSE} a new plot is started. 

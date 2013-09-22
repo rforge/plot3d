@@ -8,7 +8,7 @@ importFrom(misc3d, computeContour3d)
 
 export(jet.col, jet2.col, gg.col, gg2.col, ramp.col, alpha.col)
 export(colkey, mesh, trans3D)
-export(scatter2D, text2D)
+export(scatter2D, points2D, lines2D, text2D)
 export(image2D, contour2D, ImageOcean)
 export(persp3D, hist3D, ribbon3D, perspbox)
 export(scatter3D, image3D, contour3D, points3D, lines3D)

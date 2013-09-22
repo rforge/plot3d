@@ -62,7 +62,7 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
   iscontour <- ! is.null(contour)
   if (length(contour) == 0) 
     iscontour <- FALSE
-  else if (is.logical(contour[[1]][1]))
+  else if (is.null(names(contour)) & is.logical(contour[[1]][1]))
     if (contour[[1]][1] == FALSE) 
       iscontour <- FALSE
   else if (! is.list(contour)) 
@@ -383,6 +383,11 @@ ImageNULL <- function(z = NULL,
   dots <- splitpardots(list(...))
   dotimage <- dots$main
   dotother <- dots$points
+
+  if (! is.null(dots$alpha)) {
+    DD <- dim(col)
+    col <- matrix (nrow = DD[1], data = alpha.col(col, dots$alpha))
+  }
 
  # x- and y-values
   if (length(dim(x)) > 2 | length(dim(y)) > 2)

@@ -125,7 +125,8 @@ color3D <- function(poly, scalefac, shade, lighting, hasalpha = NULL) {  # light
   
   shade <- check.shade(shade, lighting)
   
-  if (is.null(hasalpha) & any(!is.na(poly$alpha))) {
+  if (is.null(hasalpha)) 
+   if (any(!is.na(poly$alpha))) {
     shade$alpha <- poly$alpha
     shade$alpha[is.na(shade$alpha)] <- 1
   }

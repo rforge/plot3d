@@ -61,8 +61,9 @@ check.colkey <- function(colkeypar, add = FALSE) {
     colkeypar <- list()
       
   parameter <- list(side = 4, 
-      length = 1, width = 1, dist = 0, shift = 0,
-      col.clab = NULL, cex.clab = par("cex.axis"),
+      length = 1, width = 1, dist = 0, shift = 0, addlines = FALSE,
+      col.clab = NULL, cex.clab = par("cex.lab"), 
+      side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL, 
       at = NULL, labels = TRUE, tick = TRUE, line = NA, 
       pos = NA, outer = FALSE, font = NA, lty = 1, lwd = 1, 
       lwd.ticks = 1, col.box = NULL, col.axis = NULL, 
@@ -95,8 +96,8 @@ key.parleg <- function(colkey, add) {   # the plotting parameters
     
   if (colkey$side == 1) {
     if (! add) 
-      parplt <- par("plt") + c(0, 0, 0.15, 0)
-    dd     <- 0.15 + colkey$dist
+      parplt <- par("plt") + c(0, 0, 0.145, 0)
+    dd     <- 0.145 + colkey$dist
     dp     <- (parplt[2] - parplt[1]) * (1-colkey$length)/2 
     parleg <- c( parplt[1] + dp+rp, parplt[2] - dp+rp, 
                  parplt[3] - dd, parplt[3] - dd + dw)
@@ -144,7 +145,7 @@ plistcolkey <- function (plist, colkeypar, col, zlim, zlab = NULL,
     plist$numkeys <- plist$numkeys + 1
 
   plist$colkey[[plist$numkeys]] <- list(par = colkeypar, col = col, 
-    zlim = zlim, zlab = zlab, zlog = zlog, New = New, type = type)
+    clim = zlim, clab = zlab, clog = zlog, New = New, type = type)
   plist
 } 
                               
@@ -154,14 +155,14 @@ plistcolkey <- function (plist, colkeypar, col, zlim, zlab = NULL,
 
 drawallcols <- function(plist) {
   for (colkey in plist$colkey) 
-    drawcolkey(colkey$par, colkey$col, colkey$zlim, colkey$zlab, 
-                        colkey$zlog, colkey$New)
+    drawcolkey(colkey$par, colkey$col, colkey$clim, colkey$clab, 
+                        colkey$clog, colkey$New)
 }     
 
 ## =============================================================================
 
-drawcolkey <- function (colkeypar, col, zlim, zlab = NULL, 
-                        zlog = FALSE, New = TRUE) {     
+drawcolkey <- function (colkeypar, col, clim, clab = NULL, 
+                        clog = FALSE, New = TRUE) {     
 
   parleg <- check.plt(colkeypar$parleg)
   Plt <- par(plt = parleg)   
@@ -170,15 +171,23 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
     par(new = TRUE)
   
   usr <- par("usr")
-  col.zlab <- colkeypar$col.clab
-  cex.zlab <- colkeypar$cex.clab
-  
+  col.clab <- colkeypar$col.clab
+  cex.clab <- colkeypar$cex.clab
+  side.clab <- colkeypar$side.clab
+  line.clab <- colkeypar$line.clab
+  adj.clab  <- colkeypar$adj.clab
+  font.clab <- colkeypar$font.clab
+  addlines  <- colkeypar$addlines
+
+  if (is.null(cex.clab))
+    cex.clab <- par("cex.lab")
   ix <- 1
-  minz <- min(zlim)
-  maxz <- max(zlim)
-  binwidth <- (maxz - minz)/64
+  minz <- min(clim)
+  maxz <- max(clim)
+  nbins <- length(col) 
+  binwidth <- (maxz - minz)/nbins
   iy <- IY <- seq(minz + binwidth/2, maxz - binwidth/2, by = binwidth)
-  if (zlog) {
+  if (clog) {
     iy <- exp(iy)
     if (colkeypar$side %in% c(2, 4))  {
       Log <- "y"
@@ -188,8 +197,8 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
   } else Log <- ""
   iz <- matrix(IY, nrow = 1, ncol = length(iy))
   
-  if (! is.numeric(cex.zlab)) 
-    cex.zlab <- 1.
+  if (! is.numeric(cex.clab)) 
+    cex.clab <- 1.
   
   # the parameters for the axis
   axispar <- colkeypar
@@ -198,13 +207,16 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
   axispar$side <- axispar$length <- axispar$width <- NULL
   axispar$parleg <- axispar$parplt <- axispar$dist <- NULL
   axispar$shift <-axispar$col.box <- NULL  
-  axispar$col.clab <- axispar$cex.clab <- NULL
-
+  axispar$col.clab <- axispar$cex.clab <- axispar$side.clab <- NULL
+  axispar$line.clab <- axispar$adj.clab <- axispar$font.clab <- NULL
+  axispar$addlines <- NULL
+  
   if (colkeypar$side %in% c(2, 4)) {
   
     image(ix, iy, iz, xaxt = "n", yaxt = "n", xlab = "", log = Log,
-        ylab = "", col = col, main = zlab, cex.main = cex.zlab, 
-        col.main = col.zlab)
+        ylab = "", col = col, main = "")
+    if (addlines)  
+      abline(h = seq(mean(iy[1:2]), mean(iy[(nbins-1):nbins]), length.out = nbins-1))
     do.call("axis", c(list(side = colkeypar$side, mgp = c(3, 1, 0), las = 2), 
             axispar))
                                                     
@@ -212,13 +224,30 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
   
     image(iy, ix, t(iz), xaxt = "n", yaxt = "n", xlab = "", log = Log,
         ylab = "", col = col, main = "")
-    mtext(side = colkeypar$side, text = zlab, line = 2, cex = cex.zlab, 
-        col = col.zlab)
+    if (addlines) 
+      abline(v = seq(mean(iy[1:2]), mean(iy[(nbins-1):nbins]), length.out = nbins-1))
     do.call("axis", c(list(side = colkeypar$side, mgp = c(3, 1, 0), las = 1), 
          axispar))
   }
-  
-  if (zlog) {
+  if (is.null(side.clab))
+    title(main = clab, cex.main = cex.clab, col.main = col.clab, 
+      line = line.clab, adj = adj.clab, font = font.clab)
+  else if (side.clab == 1)
+    title(xlab = clab, cex.lab = cex.clab, col.lab = col.clab, 
+      line = line.clab, adj = adj.clab, font.lab = font.clab)
+  else if (side.clab == 2)
+    title(ylab = clab, cex.lab = cex.clab, col.lab = col.clab, 
+      line = line.clab, adj = adj.clab, font.lab = font.clab)
+  else if (side.clab == 3)
+    title(main = clab, cex.main = cex.clab, col.main = col.clab, 
+      line = line.clab, adj = adj.clab, font = font.clab)
+  else {
+    if (is.null(adj.clab))
+      adj.clab <- NA
+    mtext(side = side.clab, text = clab, cex = cex.clab, 
+        col = col.clab, line = line.clab, adj = adj.clab, font = font.clab)
+  }    
+  if (clog) {
     if (colkeypar$side %in% c(2, 4))  
       par (ylog = FALSE)
     else 
@@ -243,9 +272,11 @@ drawcolkey <- function (colkeypar, col, zlim, zlab = NULL,
 ## =============================================================================
 
 colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE, 
-                   cex.clab = NULL, col.clab = NULL, 
+                   cex.clab = NULL, col.clab = NULL, side.clab = NULL, 
+                   line.clab = NULL, adj.clab = NULL, font.clab = NULL,
                    side = 4, length = 1, width = 1, 
-                   dist = 0, shift = 0, at = NULL, labels = TRUE, 
+                   dist = 0, shift = 0, addlines = FALSE, 
+                   at = NULL, labels = TRUE, 
                    tick = TRUE, line = NA, pos = NA, outer = FALSE,  
                    font = NA, lty = 1, lwd = 1, lwd.ticks = 1, 
                    col.axis = NULL, col.ticks = NULL, col.box = NULL,
@@ -256,7 +287,10 @@ colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
     col <- jet.col(100)
   
   colkey <- list(side = side, length = length, width = width, 
-      dist = dist, shift = shift, cex.clab = cex.clab, col.clab = col.clab,
+      dist = dist, shift = shift, addlines = addlines, 
+      cex.clab = cex.clab, col.clab = col.clab,
+      side.clab = side.clab, line.clab = line.clab, adj.clab = adj.clab,
+      font.clab = font.clab, 
       at = at, labels = labels, tick = tick, line = line, 
       pos = pos, outer = outer, font = font, lty = lty, lwd = lwd, 
       lwd.ticks = lwd.ticks, col.box = col.box, col.axis = col.axis, 
@@ -289,8 +323,8 @@ colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
   if (clog) 
     clim <- log(clim) 
   
-  drawcolkey (colkey, col, zlim = clim, zlab = clab, 
-                        zlog = clog,New = add)
+  drawcolkey (colkey, col, clim = clim, clab = clab, 
+                        clog = clog, New = add)
 
   par(mar = par("mar")) # to prevent R from setting defaultplot = false
 

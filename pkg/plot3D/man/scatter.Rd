@@ -4,19 +4,25 @@
 \alias{points3D}
 \alias{lines3D}
 \alias{scatter2D}
+\alias{points2D}
+\alias{lines2D}
 \alias{text2D}
 \title{
  Colored scatter plots and text in 2-D and 3-D
 }
 \description{
   
-  \code{scatter2D and scatter3D} plot a (2- or 3 dimensional) dataset with a color variable as points.
+  \code{scatter2D and scatter3D} plot a (2- or 3 dimensional) dataset with a color variable as points or lines.
 
   \code{text3D} plot a 3-D dataset with a color variable as text labels.
 
   \code{points3D} is shorthand for \code{\link{scatter3D}(..., type = "p")}
 
   \code{lines3D} is shorthand for \code{\link{scatter3D}(..., type = "l")}
+
+  \code{points2D} is shorthand for \code{\link{scatter2D}(..., type = "p")}
+
+  \code{lines2D} is shorthand for \code{\link{scatter2D}(..., type = "l")}
 
   The 2D functions \code{scatter2D} and \code{text2D} are included
   for their side effect of having a color key.
@@ -181,101 +187,6 @@ text2D (x, y, labels, ..., colvar = NULL,
 # save plotting parameters
  pm <- par("mfrow")
 
-## =======================================================================
-## Scatter2D; bty can also be set = to one of the perspbox alernatives
-## =======================================================================
-
- par(mfrow = c(2, 2))
- x <- seq(0, 2*pi, length.out = 30)
-
- scatter2D(x, sin(x), colvar = cos(x), pch = 16, 
-         ylab = "sin", clab = "cos", cex = 1.5)
-# other box types:
- scatter2D(x, sin(x), colvar = cos(x), type = "l", lwd = 4, bty = "g")
- scatter2D(x, sin(x), colvar = cos(x), type = "b", lwd = 2, bty = "b2")
-# transparent colors and spikes
- scatter2D(x, sin(x), colvar = cos(x), type = "h", lwd = 4, alpha = 0.5)
-  
-## =======================================================================
-## mesh examples and scatter2D
-## =======================================================================
-
- par(mfrow = c(1, 2))
- x <- seq(-1, 1, by = 0.1)
- y <- seq(-2, 2, by = 0.2)
-
- grid <- mesh(x, y)
- z    <- with(grid, cos(x) * sin(y))
- image2D(z, x = x, y = y)
- points(grid)
- scatter2D(grid$x, grid$y, colvar = z, pch = 20, cex = 2)
-
-## =======================================================================
-## scatter plot with confidence intervals
-## =======================================================================
-
- par(mfrow = c(2, 2))
- x  <- sort(rnorm(10)) 
- y  <- runif(10)
- cv <- sqrt(x^2 + y^2)
-
- CI <- list(lwd = 2)
- CI$x <- matrix (nrow = length(x), data = c(rep(0.25, 2*length(x))))
- scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
- scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI, type = "b")
-
- CI$y <- matrix (nrow = length(x), data = c(rep(0.05, 2*length(x))))
- CI$col <- "black"
- scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
-
- CI$y[c(2,4,8,10), ] <- NA  # Some points have no CI
- CI$x[c(2,4,8,10), ] <- NA  # Some points have no CI
- CI$alen <- 0.02            # increase arrow head
- scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
-
-## =======================================================================
-## Scatter on an image
-## =======================================================================
- 
- par(mfrow = c(1, 1))
-# image of oxygen saturation
- oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
- image2D(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
-       contour = TRUE, 
-       xlab = "longitude", ylab = "latitude", 
-       main = "Oxygen saturation", zlim = oxlim, clab = "\%")
-
-# (imaginary) measurements at 5 sites
- lon   <- c( 11.2,   6.0, 0.9,  -4, -8.8)
- lat   <- c(-19.7,-14.45,-9.1,-3.8, -1.5)
- O2sat <- c(   90,    95,  92,  85,  100)
-               
-# add to image; use same zrange; avoid adding  a color key
- scatter2D(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
-         add = TRUE, cex = 2, colkey = FALSE)
-
-## =======================================================================
-## Scatter on a contourplot
-## =======================================================================
-
- par(mfrow = c(1, 1))
-
-# room for colorkey 
- PM <- par(mar = par("mar") + c(0, 0, 0, 4))
-
-# contour plot of the ocean's bathymetry
- Depth <- Hypsometry$z
- Depth[Depth > 0] <- NA
- contour2D(z = Depth, x = Hypsometry$x, y = Hypsometry$y, 
-       xlab = "longitude", ylab = "latitude", 
-       col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
-       main = "Oxygen saturation along ship track", colkey = FALSE)
-
-# add data to image; with  a color key
- scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
-         add = TRUE, cex = 2, colkey = list(dist = 0.1), clab = "\%")
-         
- par(mar = PM)
  
 ## =======================================================================
 ## A sphere 
@@ -518,6 +429,129 @@ text2D (x, y, labels, ..., colvar = NULL,
  text3D(x = rep(1, 4),   y = 1:4, z = rep(0, 4),
        labels  = colnames(VADeaths),
        add = TRUE, adj = 1)
+
+## =======================================================================
+## Scatter2D; bty can also be set = to one of the perspbox alernatives
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ x <- seq(0, 2*pi, length.out = 30)
+
+ scatter2D(x, sin(x), colvar = cos(x), pch = 16, 
+         ylab = "sin", clab = "cos", cex = 1.5)
+# other box types:
+ scatter2D(x, sin(x), colvar = cos(x), type = "l", lwd = 4, bty = "g")
+ scatter2D(x, sin(x), colvar = cos(x), type = "b", lwd = 2, bty = "b2")
+# transparent colors and spikes
+ scatter2D(x, sin(x), colvar = cos(x), type = "h", lwd = 4, alpha = 0.5)
+  
+## =======================================================================
+## mesh examples and scatter2D
+## =======================================================================
+
+ par(mfrow = c(1, 2))
+ x <- seq(-1, 1, by = 0.1)
+ y <- seq(-2, 2, by = 0.2)
+
+ grid <- mesh(x, y)
+ z    <- with(grid, cos(x) * sin(y))
+ image2D(z, x = x, y = y)
+ points(grid)
+ scatter2D(grid$x, grid$y, colvar = z, pch = 20, cex = 2)
+
+## =======================================================================
+## scatter plot with confidence intervals
+## =======================================================================
+
+ par(mfrow = c(2, 2))
+ x  <- sort(rnorm(10)) 
+ y  <- runif(10)
+ cv <- sqrt(x^2 + y^2)
+
+ CI <- list(lwd = 2)
+ CI$x <- matrix (nrow = length(x), data = c(rep(0.25, 2*length(x))))
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI, type = "b")
+
+ CI$y <- matrix (nrow = length(x), data = c(rep(0.05, 2*length(x))))
+ CI$col <- "black"
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+
+ CI$y[c(2,4,8,10), ] <- NA  # Some points have no CI
+ CI$x[c(2,4,8,10), ] <- NA  # Some points have no CI
+ CI$alen <- 0.02            # increase arrow head
+ scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
+
+## =======================================================================
+## Scatter on an image
+## =======================================================================
+ 
+ par(mfrow = c(1, 1))
+# image of oxygen saturation
+ oxlim <- range(Oxsat$val[,,1], na.rm  = TRUE) 
+ image2D(z = Oxsat$val[,,1], x = Oxsat$lon, y = Oxsat$lat,
+       contour = TRUE, 
+       xlab = "longitude", ylab = "latitude", 
+       main = "Oxygen saturation", zlim = oxlim, clab = "\%")
+
+# (imaginary) measurements at 5 sites
+ lon   <- c( 11.2,   6.0, 0.9,  -4, -8.8)
+ lat   <- c(-19.7,-14.45,-9.1,-3.8, -1.5)
+ O2sat <- c(   90,    95,  92,  85,  100)
+               
+# add to image; use same zrange; avoid adding  a color key
+ scatter2D(colvar = O2sat, x = lon, y = lat, clim = oxlim, pch = 16,
+         add = TRUE, cex = 2, colkey = FALSE)
+
+## =======================================================================
+## Scatter on a contourplot
+## =======================================================================
+
+ par(mfrow = c(1, 1))
+
+# room for colorkey 
+ PM <- par(mar = par("mar") + c(0, 0, 0, 4))
+
+# contour plot of the ocean's bathymetry
+ Depth <- Hypsometry$z
+ Depth[Depth > 0] <- NA
+ contour2D(z = Depth, x = Hypsometry$x, y = Hypsometry$y, 
+       xlab = "longitude", ylab = "latitude", 
+       col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
+       main = "Oxygen saturation along ship track", colkey = FALSE)
+
+# add data to image; with  a color key
+ scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
+         add = TRUE, cex = 2, colkey = list(dist = 0.1), clab = "\%")
+         
+ par(mar = PM)
+
+## =======================================================================
+## scatter2D for time-series plots
+## =======================================================================
+
+# Plotting sunspot 'anomalies'
+sunspot <- data.frame(year = time(sunspot.month), 
+  anom = sunspot.month - mean(sunspot.month))
+
+# long-term moving average of anomaly
+ff <- 100
+sunspot$ma <- filter(sunspot$anom, rep(1/ff, ff), sides = 2)
+
+with (sunspot, lines2D(year, anom, 
+  colvar = anom > 0, 
+  col = c("pink", "lightblue"),
+  main = "sunspot anomaly", type = "h", 
+  colkey = FALSE, las = 1, xlab = "year", ylab = ""))
+lines2D(sunspot$year, sunspot$ma, add = TRUE)  
+
+# The same
+#with (sunspot, plot(year, anom, 
+#  col = c("pink", "lightblue")[(anom > 0) + 1],
+#  main = "sunspot", type = "h", las = 1))
+
+# but this does not work due to NAs...  
+# lines(sunspot$year, sunspot$ma)  
 
 ## =======================================================================
 ## text2D

@@ -147,8 +147,6 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
   \item{\dots}{additional arguments passed to the plotting methods \link{image},
     \link{rasterImage}, \link{polygon} and  \link{contour}. 
 
-    \code{shade} and \code{lighting} parameters will have no effect, but will generate a warning.
-    
     \code{alpha} can be given a value inbetween 0 and 1 to make colors transparent.
     
     The arguments after \dots must be matched exactly.

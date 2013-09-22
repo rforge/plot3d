@@ -189,13 +189,13 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
     if (1 %in% ii | length(x) %in% ii)
       stop ("first or last element of 'x', or 'y' cannot be 'NA'")
     di <- diff(sort(c(0, ii, length(x)+1)))-1
-    if (min(di) == 1)
-      stop ("two consecutive elements of 'x' or 'y' cannot be 'NA'")
+#    if (min(di) == 1)
+#      stop ("two consecutive elements of 'x' or 'y' cannot be 'NA'")
     x[ii] <- NA
     y[ii] <- NA
 
     len <- length(ii) + 1  # number of polygons!
-
+    
     xx <- yy <- matrix(nrow = max(di) + 1, ncol = len, data = NA)
     ii <- c(0, ii, length(x)+ 1)
     for (i in 1 : len) {
