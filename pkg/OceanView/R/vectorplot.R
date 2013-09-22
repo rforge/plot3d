@@ -5,6 +5,11 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
   
   dots <- splitpardots(list(...))
  
+  if (add) 
+      plist <- getplist()
+  else plist <- NULL
+  setplist(plist)
+
   if (!is.null(colvar)) {
     varlim <- clim
     if (is.null(varlim)) 
@@ -20,9 +25,9 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
     iscolkey <- is.colkey(colkey, col)
     if (iscolkey) {
       colkey <- check.colkey(colkey, add)
-      if (!add) 
-        plt.or <- par(plt = colkey$parplt)
-    }
+      if (! add) 
+        plist$plt$main <- colkey$parplt
+    }  
     if (length(colvar) != length(u)) 
       stop("length of 'colvar' should be equal to length of 'u' and 'v'")
     if (is.null(clim)) 
@@ -35,6 +40,7 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
       Col <- "black"
       iscolkey <- FALSE
   }
+  par (plt = plist$plt$main)
      
   dm <- dots$main
   dp <- dots$points
@@ -44,20 +50,21 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
   if (is.null(dm$ylab)) 
     dm$ylab <- "y"
   
+  y0 <- rep(y, length.out = length(u))
   ii <- seq(1, length(u), by = by)
+  y0 <- y0[ii]
   ll <- length(ii)
 
 # the plot
-  if (length(y) > 1) 
-    stop ("y should be one number")
-  
+#  if (length(y) > 1) 
+#    stop ("y should be one number")
+
   if (length(x) == 1) {
     if (is.null(dm$ylim)) 
-      dm$ylim <- range(v[ii])
+      dm$ylim <- range(v[ii] + y0)
     if (is.null(dm$xlim)) 
       dm$xlim <- range(u[ii]) + x
     x0 <- rep(x, ll)
-    y0 <- rep(0, ll)
     xe <- u[ii]+x
     ye <- v[ii]
     LL <- c(alist(0, type = "n"), dm)
@@ -65,8 +72,7 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
       do.call("plot",LL)
   } else {
     ii <- seq(1, length(x), by = by)
-    y0 <- rep(0, length(x[ii]))
-    ye <- v[ii]
+    ye <- y0 + v[ii]
     if (is.null(xfac))
       xfac <- diff(range(x))/diff(range(c(y0, ye)))
     x0 <- x[ii]
@@ -96,12 +102,12 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
     do.call("segments", Ls)
     
     if (iscolkey) {
+      colkey$parleg <- colkey$parplt <- NULL
       do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
-        clog = dots$clog, add = TRUE)))
-      if (! add) 
-        par(plt = plt.or)  
-      par(mar = par("mar"))
+        clog = dots$clog, add = TRUE), colkey))
+      par(plt = plist$plt$ori)  
     }    
+    par(mar = par("mar")) 
 }
 
 

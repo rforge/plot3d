@@ -43,8 +43,8 @@ mapsigma.matrix <- function (var = NULL,
       changeres <- TRUE
 
   if (changeres) {
-    var <- map(var, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
-    sigma <- map(sigma, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
+    var <- remap(var, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
+    sigma <- remap(sigma, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
     xy <- (1:2)[-signr]
     x <- changeresvec(x, resfac[xy])
   }
@@ -126,9 +126,9 @@ mapsigma.array <- function (var = NULL,
       changeres <- TRUE
 
   if (changeres) { 
-    var <- map(var, x = 1:Dxy[1], y = 1:Dxy[2], z = 1:DD[signr], 
+    var <- remap(var, x = 1:Dxy[1], y = 1:Dxy[2], z = 1:DD[signr], 
                xto = xto, yto = yto, zto = zto, ...)$var
-    sigma <- map(sigma, x = 1:Dxy[1], y = 1:Dxy[2], z = 1:DD[signr], 
+    sigma <- remap(sigma, x = 1:Dxy[1], y = 1:Dxy[2], z = 1:DD[signr], 
                xto = xto, yto = yto, zto = zto, ...)$var
     xy <- (1:3)[-signr]
     x <- changeresvec(x, resfac[xy[1]])

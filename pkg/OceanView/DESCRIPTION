@@ -1,9 +1,9 @@
 Package: OceanView
 Version: 1.0
-Title: Visualisation of Oceanic Data and Model Output.
+Title: Visualisation of Oceanographic Data and Model Output.
 Author: Karline Soetaert <karline.soetaert@nioz.nl>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
-Depends: plot3D, plot3D.rgl, shape, R (>= 2.10)
+Depends: plot3D, plot3Drgl, shape, R (>= 2.10)
 Description: Functions for transforming, and viewing 2-D and 3-D (oceanic) data.
 License: GPL (>=3.0)
 LazyData: yes

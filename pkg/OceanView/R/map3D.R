@@ -1,7 +1,7 @@
 ## =============================================================================
 ## Mapping, sections, selection
 ## =============================================================================
-map <- function(var, ...) UseMethod ("map")
+remap <- function(var, ...) UseMethod ("remap")
 extract <- function(var, ...) UseMethod ("extract")
 
 ## =============================================================================
@@ -108,7 +108,7 @@ remapxyNA <- function(z, x = x, y = y, xto = x, yto = y) {
 ## 2-D mapping, x, y a vector, var a matrix
 ## =============================================================================
 
-map.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, 
+remap.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, 
   na.rm = TRUE,...) {
 
   if (is.array(x)) {
@@ -291,7 +291,7 @@ remapxyzNA <- function(var, x, y, z, xto, yto, zto) {
 ## 3-D mapping, x, y, z a vector; var a 3-D array.
 ## =============================================================================
 
-map.array <- function(var, x, y, z, xto = NULL, yto = NULL, 
+remap.array <- function(var, x, y, z, xto = NULL, yto = NULL, 
   zto = NULL, resfac = 1, na.rm = TRUE, ...) {
 
   if (is.array(x)) {

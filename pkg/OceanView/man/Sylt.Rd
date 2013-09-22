@@ -134,6 +134,15 @@ data(Sylt3D)
  par(mar = c(3, 3, 3, 3))
  colkey(clim = clim, clab = c("elevation", "m")) 
   
+# can also be done using shaded image2D plots, faster
+ par(mfrow = c(2, 2), mar = c(3, 3, 3, 3))
+ clim <- range(Syltsurf$elev, na.rm = TRUE)
+ for (i in 1:3) 
+   image2D(z = -depth, colvar = Syltsurf$elev[,,i], x = x, y = y, 
+     clim = clim, colkey = FALSE, shade = 0.3, resfac = 2,
+       main = paste(format(Syltsurf$time[i], digits = 3), " hr"))
+ colkey(clim = clim, clab = c("elevation", "m")) 
+
 ## =============================================================================
 ## Data Syltsurf: Surface currents
 ## =============================================================================  
@@ -214,8 +223,8 @@ data(Sylt3D)
  yto <- seq(min(y), max(y), length.out = 30)
 
 # higher resolution 
- Sigma <- map(sigma, x, y, z, xto, yto, zto = z)$var
- Visc  <- map(visc, x, y, z, xto, yto, zto = z)$var
+ Sigma <- remap(sigma, x, y, z, xto, yto, zto = z)$var
+ Visc  <- remap(visc, x, y, z, xto, yto, zto = z)$var
 
 # viscosity in sigma coordinates
  visc_sig <- mapsigma(Visc, sigma = Sigma, depth = depth)

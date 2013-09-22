@@ -21,7 +21,7 @@
 
   \link{flowpath}, plots velocities as trajectory plot.
 
-  \link{map}, \link{transect}, 
+  \link{remap}, \link{transect}, 
   \link{extract}, \link{mapsigma}, \link{transectsigma}, 
   mapping and extracting from 2-D or 3-D data.
 

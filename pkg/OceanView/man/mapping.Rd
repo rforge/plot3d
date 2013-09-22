@@ -1,7 +1,7 @@
 \name{Map and extract data}
-\alias{map}
-\alias{map.matrix}
-\alias{map.array}
+\alias{remap}
+\alias{remap.matrix}
+\alias{remap.array}
 \alias{extract}
 \alias{extract.matrix}
 \alias{extract.array}
@@ -15,7 +15,7 @@
    Functions for remapping and extracting from 2-D or 3D data
 }
 \description{
-  S3 functions \code{map} map a variable ( \code{var}) from a \code{matrix} or array 
+  S3 functions \code{remap} map a variable ( \code{var}) from a \code{matrix} or array 
   with x, y (and z) coordinates 
   to a matrix or array with coordinates given by xto, yto (and zto).
   \code{x, y, z, xto, yto} and \code{zto} are all vectors.
@@ -39,12 +39,12 @@
 
 }
 \usage{
-  map        (var, ...)
+  remap        (var, ...)
   
-  \method{map}{matrix}(var, x, y, xto = NULL, yto = NULL, 
+  \method{remap}{matrix}(var, x, y, xto = NULL, yto = NULL, 
           resfac = 1, na.rm = TRUE, ...)
 
-  \method{map}{array}(var, x, y, z, xto = NULL, yto = NULL, zto = NULL, 
+  \method{remap}{array}(var, x, y, z, xto = NULL, yto = NULL, zto = NULL, 
           resfac = 1, na.rm = TRUE, ...)
 
   extract    (var, ...)
@@ -162,7 +162,7 @@
     }  
 }
 \details{
-  S3-function \code{map} can be used to increase or decrease 
+  S3-function \code{remap} can be used to increase or decrease 
   the resolution of a matrix or array \code{var}, or to zoom in on a certain area. 
   It returns an object of the same class as \code{var} (i.e. a matrix or array).
 
@@ -177,7 +177,7 @@
 }
 
 \value{
-  \code{map.matrix}: 
+  \code{remap.matrix}: 
     \itemize{
      \item{var }{The higher or lower resolution matrix 
           with dimension = c(length(xto), length(yto)).
@@ -190,7 +190,7 @@
           }
     }
 
-  \code{map.array}: 
+  \code{remap.array}: 
     \itemize{
      \item{var }{The higher or lower resolution array, 
           with dimension = c(length(xto), length(yto), length(zto)).
@@ -249,7 +249,7 @@
  pm <- par("mfrow")
 
 ## =======================================================================
-## Use map to add more detail to a slice3D plot
+## Use remap to add more detail to a slice3D plot
 ## =======================================================================
 
  par(mfrow = c(1, 1))
@@ -263,7 +263,7 @@
    colvar = p, pch = ".", clim = range(p))
 
  xto <- yto <- zto <- seq(-1.2, 1.2, 0.2)
- Res <- map (p, x, y, z, xto, yto, zto)
+ Res <- remap (p, x, y, z, xto, yto, zto)
 
 # expand grid for scatterplot
  Mt  <- mesh(Res$x, Res$y, Res$z)
@@ -300,25 +300,25 @@
  x2 <- seq(from = 1, to = nr, by = 0.25)
  y2 <- seq(from = 1, to = nc, by = 0.25)
 
- VOLC1 <- map(volcano, x = x, y = y, xto = x2, yto = y2)$var
+ VOLC1 <- remap(volcano, x = x, y = y, xto = x2, yto = y2)$var
  image2D(x = x2, y = y2, z = VOLC1, main = "high resolution")
 
 # low resolution
  xb <- seq(from = 1, to = nr, by = 2)
  yb <- seq(from = 1, to = nc, by = 3)
- VOLC2 <- map(volcano, x, y, xb, yb)$var
+ VOLC2 <- remap(volcano, x, y, xb, yb)$var
  image2D(VOLC2, main = "low resolution")
 
 # zooming in high resolution
  xc <- seq(10, 40, 0.1)
  yc <- seq(10, 40, 0.1)
 
- VOLC3 <- map(volcano,x, y, xc, yc)$var
+ VOLC3 <- remap(volcano,x, y, xc, yc)$var
  image2D(VOLC3, main = "zoom")
 
 # Get one value or a grid of values
- map(volcano, x, y, xto = 2.5,     yto = 5)
- map(volcano, x, y, xto = c(2, 5), yto = c(5, 10))
+ remap(volcano, x, y, xto = 2.5,     yto = 5)
+ remap(volcano, x, y, xto = c(2, 5), yto = c(5, 10))
 
 # Specific values
  extract(volcano, x, y, xyto = cbind(c(2, 5), c(5, 10)))

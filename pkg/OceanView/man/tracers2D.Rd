@@ -152,7 +152,7 @@ tracers2Drgl(x, y, colvar = NULL, ...,
 ## =======================================================================
 
 # here the image has to be drawn first
- imagergl(x = x, y = y, z = z)
+ image2Drgl(x = x, y = y, z = z)
 
 # set initial conditions 
  xp <- xi; yp <- yi

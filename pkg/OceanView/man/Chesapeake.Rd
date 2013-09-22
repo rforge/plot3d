@@ -136,7 +136,7 @@ data(Ltrans)
 ## Tracer output in 2D, rgl
 ## =============================================================================  
  
- imagergl (x = lon, y = lat, z = depth)
+ image2Drgl (x = lon, y = lat, z = depth)
  for (i in 1:108) {
    tracers2Drgl(Ltrans[, 1, i], Ltrans[, 2, i],  
              colvar = Ltrans[ ,4, i], col = c("green", "orange"))

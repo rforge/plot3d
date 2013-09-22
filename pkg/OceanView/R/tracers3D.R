@@ -1,4 +1,4 @@
- ## CHECK WITH plotrgl!
+
 ## =============================================================================
 ## =============================================================================
 ## 3D tracer distributions
@@ -46,7 +46,7 @@ tracers3D <- function(x, y, z, colvar = NULL, ...,
 }
 
 ## =============================================================================
-## Open GL graphics
+## same in Open GL graphics
 ## =============================================================================
 
 tracers3Drgl <- function(x, y, z, colvar = NULL, ..., 
@@ -87,6 +87,10 @@ tracers3Drgl <- function(x, y, z, colvar = NULL, ...,
   cex <- dots$cex
   if (is.null(cex )) cex <- 1
   
+  alpha <- dots$alpha
+  if (is.null(alpha)) 
+    alpha <- material3d()$alpha
+
  # if main is passed...
   plist <- getplist()
   if (!is.null(dots$main))  {
@@ -106,11 +110,12 @@ tracers3Drgl <- function(x, y, z, colvar = NULL, ...,
 #  spheres3d(x, y, z, radius = cex * 0.0175 * plist$scalefac$expand, col = Col)
   rgl.pop(type = "shapes", id = pp[which(as.character(pp$type) == "points"),1])
   plot3d(x = x, y = y, z = z,
-               size = 6 *cex, col = Col, add = TRUE)
+               size = 6 *cex, col = Col, add = TRUE, alpha = alpha)
                
   plist$pt <- list(x.mid = x, y.mid = y, z.mid = z,
     col = Col, pch = rep(1, length(x)), bg = rep(1, length(x)), 
-    cex = rep(cex, length(x)), proj = rep(NA, length(x)))
+    cex = rep(cex, length(x)), alpha = rep(alpha, length(x)),
+    proj = rep(NA, length(x)))
    
   setplist(plist)
 }

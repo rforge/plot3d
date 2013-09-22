@@ -6,7 +6,7 @@
 ## =============================================================================
 
 checkinput <- function(u, v, x = NULL, y = NULL, scale = 1, by = 1, 
-  xlim = NULL, ylim = NULL) {  
+  xlim = NULL, ylim = NULL, maxspeed = NULL) {  
   
   if (is.null(x)) 
     x <- seq(0, 1, length.out = nrow(u))
@@ -66,7 +66,7 @@ checkinput <- function(u, v, x = NULL, y = NULL, scale = 1, by = 1,
     if (nrow(y) == Dim[1] +1)
       y <- 0.5*(y[-1,] + y[-nrow(y),])
     if (ncol(y) != Dim[2] | nrow(y) != Dim[1])
-      stop ("'x' not compatible with u or v")
+      stop ("'y' not compatible with u or v")
   }
 
   if (is.null(x)) 
@@ -105,7 +105,15 @@ checkinput <- function(u, v, x = NULL, y = NULL, scale = 1, by = 1,
 # size of the arrows
 # ------------------------------------------------------------------------------    
   speed <- sqrt(u^2 + v^2)
-  maxspeed <- max(speed)
+  if (is.null(maxspeed))
+    maxspeed <- max(speed) 
+  else {
+    if (maxspeed <= 0)
+      stop ("'speed.max' should be >= 0")
+    speed <- pmin(speed, maxspeed)
+  }  
+  if (maxspeed == 0) 
+    maxspeed <- 1e-16
   xr <- diff (range(x)) / max(dim(u))
   yr <- diff (range(y)) / max(dim(u))
 
@@ -126,7 +134,7 @@ quiver2D <- function(u, ...) UseMethod ("quiver2D")
 quiver2D.default <- function (u, ...) quiver2D.matrix(u, ...)
 
 quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ..., 
-                    scale = 1, arr.max = 0.2, arr.min = 0, 
+                    scale = 1, arr.max = 0.2, arr.min = 0, speed.max = NULL,
                     by = NULL, type = "triangle", 
                     col = NULL, NAcol = "white", colkey = list(side = 4), 
                     mask = NULL, image = FALSE, contour = FALSE, 
@@ -140,7 +148,12 @@ quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
   dots  <- splitpardots( list(...) )
   dp    <- dots$points
   dm    <- dots$main 
-
+ 
+  if (add) 
+      plist <- getplist()
+  else plist <- NULL
+  setplist(plist)
+ 
   # colors and color variable
   if (! is.null(colvar)) {
     varlim <- clim
@@ -169,8 +182,11 @@ quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
     iscolkey <- is.colkey(colkey, col)    # check if colkey is needed
     if (iscolkey) {
       colkey <- check.colkey(colkey)
-      if (! add) plt.or <- par(plt = colkey$parplt)
+      if (! add) 
+        plist$plt$main <- colkey$parplt
     }  
+    par (plt = plist$plt$main)
+    
 
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
@@ -236,7 +252,8 @@ quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
       add <- TRUE
     }
   } # plot
-  MM <- checkinput(u, v, x, y, scale, by = by, xlim = dm$xlim, ylim = dm$ylim) 
+  MM <- checkinput(u, v, x, y, scale, by = by, xlim = dm$xlim, 
+    ylim = dm$ylim, maxspeed = speed.max) 
 
   x <- MM$x
   y <- MM$y
@@ -259,28 +276,25 @@ quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
         dm$xlab <- "x"
       if (is.null(dm$ylab)) 
         dm$ylab <- "y"
-
-#      do.call("matplot", c(alist(rbind(x, xto), rbind(y, yto)), 
-#                       type = "n", dm))
     }
   
     dp$arr.type <- NULL 
     if (is.null(dp$lwd))   
       dp$lwd <- 1
   
-#    do.call("Arrows", c(alist(x, y, xto, yto, col = Col, arr.type = type),  dp))
     do.call("arrows2D", c(alist(x, y, xto, yto, col = Col, type = type, add = add),  dm, dp))
   
     if (iscolkey) {
-#      drawcolkey(colkey, col, clim, clab, cex.clab, clog) 
+      colkey$parleg <- colkey$parplt <- NULL
       do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
-        clog = dots$clog, add = TRUE)))
-      if (! add) 
-        par(plt = plt.or)  
-      par(mar = par("mar"))
+        clog = dots$clog, add = TRUE), colkey))
+      par(plt = plist$plt$ori)  
     }    
+    par(mar = par("mar")) 
+
   } #plot
-  invisible(list(x0 = x, y0 = y, x1 = xto, y1 = yto, col = Col, length = dp$length))
+  invisible(list(x0 = x, y0 = y, x1 = xto, y1 = yto, col = Col, length = dp$length, 
+    speed.max = MM$maxspeed))
 }
 
 ## =============================================================================
@@ -501,8 +515,8 @@ flowpath <- function (u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ..
 ## QUIVER using rgl graphics
 ## =============================================================================
 
-quiverrgl <- function(u, v, x = NULL, y = NULL, colvar = NULL, ..., 
-                    scale = 1, arr.max = 0.2, arr.min = 0, 
+quiver2Drgl <- function(u, v, x = NULL, y = NULL, colvar = NULL, ..., 
+                    scale = 1, arr.max = 0.2, arr.min = 0, speed.max = NULL, 
                     by = NULL, type = "triangle", 
                     col = NULL, NAcol = "white", 
                     mask = NULL, image = FALSE, contour = FALSE, 
@@ -515,13 +529,13 @@ quiverrgl <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
   ylim <- range(y)
   
   F <- quiver2D(u, v, x, y, colvar, scale = scale, 
-              arr.max = arr.max, arr.min = arr.min, 
+              arr.max = arr.max, arr.min = arr.min, speed.max = speed.max, 
               by = by, plot = FALSE, col = col, NAcol = NAcol, 
               clim = clim)
 
-  arrowsrgl(F$x0, F$y0, F$x1, F$y1, colvar = NULL, type = type, 
+  arrows2Drgl(F$x0, F$y0, F$x1, F$y1, colvar = NULL, type = type, 
     col = F$col, NAcol = NAcol, add = add, code = 2, 
-    length = F$length/3.25, angle = 15, ...)
+    length = F$length/2, angle = 15, ...)
 
   image   <- check.args(image, NULL)
   contour <- check.args(contour, NULL)
@@ -546,31 +560,26 @@ quiverrgl <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
       mask[is.na(mask)]  <- 1
       if (is.null(maskNAcol)) 
         maskNAcol <- "black" 
-      do.call ("image3D", alist(colvar = mask, x = X, y = Y, z = 0.99, colkey = FALSE,
+      do.call ("image2Drgl", alist(z = mask, x = X, y = Y, dz = -0.01, colkey = FALSE,
                  plot = FALSE, add = TRUE, col = c("white", maskNAcol)))
+
       addimage <- TRUE
     }
 
     if (image$add) {
-      image$args$colvar <- image$args$z
-      image$args$z <- 0.99
+      image$args$colvar <- NULL 
       image$args$add <- image$args$plot <- NULL
       if (is.null(image$args$col))
         image$args$col <- jet.col(100)
-    
-      do.call("image3D", c(alist(colkey = FALSE, plot = FALSE, add = TRUE),
+      do.call("image2Drgl", c(alist(colkey = FALSE, plot = FALSE, add = TRUE, dz = -0.01),
           image$args))   
       addimage <- TRUE
     }
 
     if (contour$add) {
       contour$args$add <- contour$args$plot <- NULL
-      contour$args$colvar <- contour$args$z
-      contour$args$z <- 0.995
-
-      do.call("contour3D", c(alist(plot = FALSE, add = TRUE), contour$args))
+      contour$args$colvar <- NULL #contour$args$z
+      do.call("contour2Drgl", c(alist(plot = FALSE, add = TRUE), contour$args, dz = 0.1))
       addimage <- TRUE
     }
-    if (addimage)
-      plotrgl(new = FALSE, add = TRUE)
 }

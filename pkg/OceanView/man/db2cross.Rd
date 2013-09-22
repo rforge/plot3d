@@ -94,7 +94,7 @@ db2cross(Samples, out.row = 1:4)
 \seealso{
   \link{reshape}, the official (slow) R-function
 
-  \link{map} to remap a matrix or array to higher or lower resolution
+  \link{remap} to remap a matrix or array to higher or lower resolution
 }
 \keyword{utility}
 

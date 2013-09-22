@@ -21,7 +21,7 @@ vectorplot(u, v, x = 0, y = 0, colvar = NULL, ...,
   \item{x }{A vector with x-axis values. If \code{0}, everything will 
     be radiating from the origin. Usually \code{x} will be equal to \code{time}.
     }
-  \item{y }{The y-axis value. One number.
+  \item{y }{The y-axis value. One number, or a vector of length = u.
     }
   \item{colvar }{The variable used for coloring. It need
      not be present, but if specified, it should be a vector of 

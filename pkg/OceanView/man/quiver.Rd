@@ -2,7 +2,7 @@
 \alias{quiver2D}
 \alias{quiver2D.matrix}
 \alias{quiver2D.array}
-\alias{quiverrgl}
+\alias{quiver2Drgl}
 \alias{flowpath}
 \title{
   Plots velocities as arrows or as trajectory plots.
@@ -10,7 +10,7 @@
 \description{
   Function \code{quiver2D} displays velocity vectors as arrows, using ordinary graphics.
 
-  Function \code{quiverrgl} displays velocity vectors as arrows using rgl. 
+  Function \code{quiver2Drgl} displays velocity vectors as arrows using rgl. 
     
   Function \code{flowpath} displays the flow paths of particles, based on 
   velocity vectors.
@@ -21,8 +21,8 @@ quiver2D(u, ...)
 
 \method{quiver2D}{matrix}(u, v, x = NULL, y = NULL, 
            colvar = NULL, ..., 
-           scale = 1, arr.max = 0.2, arr.min = 0, by = NULL, 
-           type = "triangle", col = NULL, NAcol = "white", 
+           scale = 1, arr.max = 0.2, arr.min = 0, speed.max = NULL,  
+           by = NULL, type = "triangle", col = NULL, NAcol = "white", 
            colkey = list(side = 4), 
            mask = NULL, image = FALSE, contour = FALSE, 
            clim = NULL, clab = NULL, 
@@ -30,8 +30,8 @@ quiver2D(u, ...)
 
 \method{quiver2D}{array} (u, v, margin = c(1, 2), subset, ask = NULL, ...)
                     
-quiverrgl (u, v, x = NULL, y = NULL, colvar = NULL, ..., 
-           scale = 1, arr.max = 0.2, arr.min = 0, 
+quiver2Drgl (u, v, x = NULL, y = NULL, colvar = NULL, ..., 
+           scale = 1, arr.max = 0.2, arr.min = 0, speed.max = NULL, 
            by = NULL, type = "triangle", 
            col = NULL, NAcol = "white",  
            mask = NULL, image = FALSE, contour = FALSE, 
@@ -94,6 +94,11 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
     }
   \item{arr.min }{Minimal size of the arrowhead, in cm (approximately). 
     Set \code{arr.min} = \code{arr.max} for constant size.
+    }
+  \item{speed.max }{Speed that corresponds to \code{arr.max}. 
+    Everything with speed larger than \code{speed.max} will be depicted with 
+    size equal to \code{arr.max}.
+    If unspecified (\code{max(sqrt(u^2 + v^2))}). 
     }
   \item{by }{Number increment for plotting the vectors; one value or two (x, y) values. 
     For example, setting \code{by = 2} will plot every second velocity value in 
@@ -165,7 +170,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
     }
   \item{maxstep }{Maximum number of steps for calculating the flow paths.  
     } 
-  \item{\dots}{Additional arguments passed to the plotting methods. 
+  \item{\dots}{Additional arguments passed to the plotting methods (\link{arrows2D}),
     The arguments after \dots must be matched exactly.
     }
   \item{subset }{A logical expression indicating over which elements to loop;
@@ -190,8 +195,9 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 
   \code{quiver2D} returns  (as \code{invisible}) a \code{list} containing the 
   coordinates of the arrows (\code{x0}, \code{x1}, \code{y0}, \code{y1}), 
-  the color of each arrow (\code{col}), and the length of the arrowhead
-  (\code{length}). This can be used with function \link{arrows}.
+  the color of each arrow (\code{col}), the length of the arrowhead
+  (\code{length}) and the maximal speed corresponding to \code{arr.max} (\code{speed.max}). 
+   This output can be used e.g. with function \link{arrows}.
 }
 \seealso{
   \link{arrows3D} for an arrows function from package \code{plot3D}.
@@ -214,8 +220,10 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  dx <- outer(x, y , function(x, y) -y)
  dy <- outer(x, y , function(x, y) x)
 
-# velocity plots
- quiver2D(u = dx, v = dy, x = x, y = y)
+# velocity plot, with legend
+ F <- quiver2D(u = dx, v = dy, x = x, y = y)
+ legend("topright", bg = "white", 
+   legend = paste("max = ", format(F$speed.max, digits = 2))) 
 
 # different color for up/downward pointing arrows
  quiver2D(u = dx, v = dy, x = x, y = y, colvar = dx > 0, 
@@ -336,15 +344,15 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 ##  Same in rgl
 ## =======================================================================
 \dontrun{
- quiverrgl(by = c(2, 1), u = u, v = v, mask = mask, NAcol = "black")
+ quiver2Drgl(by = c(2, 1), u = u, v = v, mask = mask, NAcol = "black")
 
- quiverrgl(by = c(2, 1), u = u, v = v,  
+ quiver2Drgl(by = c(2, 1), u = u, v = v,  
         image = list(z = volcano, NAcol = "black"))
 
- quiverrgl(by = c(3, 2), u = u, v = v, scale = 2,
+ quiver2Drgl(by = c(3, 2), u = u, v = v, scale = 2,
         contour = list(z = volcano, lwd = 2))
 
- quiverrgl(by = c(3, 2), u = u, v = v, 
+ quiver2Drgl(by = c(3, 2), u = u, v = v, 
         contour = list(z = volcano, col = "black"), 
         image = list(z = volcano, NAcol = "black"))
  cutrgl()
