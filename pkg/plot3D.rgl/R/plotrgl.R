@@ -38,7 +38,7 @@ plotrgl <- function(lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE,
   invisible(plist)  
 }
 
-clipplist <- function(xlim, ylim, zlim, plist= NULL){  
+clipplist <- function(xlim, ylim, zlim, plist = NULL){  
   SS <- function (x, y, z) {
     val <- rep(TRUE, length(x))
     if (! is.null(xlim)) 
