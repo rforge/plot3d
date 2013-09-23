@@ -1,6 +1,0 @@
-inst/doc/jss.cls
-inst/doc/jss.bst
-inst/doc/.*[.]png
-^Rplots.pdf$
-work
-todo.txt

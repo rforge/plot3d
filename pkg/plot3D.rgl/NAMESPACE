@@ -1,2 +1,0 @@
-export(plotrgl, cutrgl, uncutrgl, croprgl, uncroprgl, image2Drgl, contour2Drgl, 
-  scatter2Drgl, text2Drgl, arrows2Drgl, segments2Drgl)
