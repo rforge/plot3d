@@ -244,6 +244,8 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
   else {
     if (is.null(adj.clab))
       adj.clab <- NA
+    if (is.null(line.clab))
+      line.clab <- 2
     mtext(side = side.clab, text = clab, cex = cex.clab, 
         col = col.clab, line = line.clab, adj = adj.clab, font = font.clab)
   }    

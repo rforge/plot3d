@@ -38,9 +38,9 @@ Hypsometry
 ## Images of the hypsometry
 ## =======================================================================
 
- par(mfrow = c(2, 1))
- image2D(Hypsometry, asp = TRUE, xlab = "dg", ylab = "dg", 
-   contour = TRUE)
+ par(mfrow = c(2, 2))
+ image2D(Hypsometry, asp = TRUE, xlab = expression(degree*E), 
+   ylab =  expression(degree*N), contour = TRUE)
 
 # remove ocean
  zz         <- Hypsometry$z
@@ -51,11 +51,7 @@ Hypsometry
 ## A short version for plotting the Ocean's bathymetry
 ## =======================================================================
 
- par(mfrow = c(2, 2))
- ImageOcean()
- ImageOcean(asp = TRUE, xlab = "dg E", ylab = "dg N", 
-            contour = TRUE)
- ImageOcean(xlim = c(-90, 90), NAcol = grey(0.4), shade = 0.2)
+ ImageOcean(asp = TRUE, contour = TRUE)
  ImageOcean(col = "white", 
    contour = list(levels = seq(-6000, 0, by = 2000)))
 

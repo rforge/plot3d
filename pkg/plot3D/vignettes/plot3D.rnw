@@ -42,7 +42,7 @@ The Netherlands
 \Abstract{
   \R{ }package \p \citep{plot3D} contains functions for plotting multi-dimensional
   data. Many functions are derived from the \code{persp} function, other
-  functions start from the \code{image} function.
+  functions start from the \code{image} or \code{contour} function.
 
   Two related packages are: 
   \begin{itemize}
@@ -86,14 +86,14 @@ options(width=75)
 
 \section{Introduction}
 
-\R{ } package \p provides functions for plotting 2- and 3-D data.
-It contains functions that are either extensions of R's \code{persp} function
-or or R's \code{image} and \code{contour} function.
+\R{ } package \p provides functions for plotting 2-D and 3-D data, and 
+that are either extensions of R's \code{persp} function
+or of R's \code{image} and \code{contour} function.
 
 The main extensions to these functions are:
 \begin{itemize}
- \item In addition to the x, y (and z) values, there an additional data dimension 
- can be represented by a color variable (argument \code{colvar}) which defines the coloration. 
+ \item In addition to the x, y (and z) values, an additional data dimension 
+ can be represented by a color variable (argument \code{colvar}). 
  \item A color key (argument \code{colkey}) can be written next to the figure.  
    It is possible to log-transform the color key, rescale it, adjust its position, ...   
  \item The resolution of a figure can be increased (argument \code{resfac}). 
@@ -102,33 +102,35 @@ The main extensions to these functions are:
 
 Package \p contains:
 \begin{itemize}
- \item Functions that are based on the \code{persp} function:
+ \item Functions that are based on the \code{persp} function, for visualising 3-D data:
    \begin{itemize}
      \item \code{persp3D}: an extended version of the \code{persp} function.
      \item \code{ribbon3D}: perspective plots as ribbons.
      \item \code{hist3D}: 3-D histograms.
-     \item \code{scatter3D}, \code{points3D}, \code{lines3D},  \code{text3D}: 
+     \item \code{scatter3D}, \code{points3D}, \code{lines3D}, \code{text3D}: 
        scatter plots in 3-D, points, lines, labels.
      \item \code{surf3D}: 3-D shapes (or surfaces).
+     \item \code{slice3D}, \code{slicecont3D}, \code{isosurf3D}, \code{voxel3D}: 
+     slices, isosurfaces and voxels from a full 3-D data set.
      \item \code{arrows3D}: arrows in 3D.
      \item \code{contour3D}, \code{image3D}: contours and images in 3D.
      \item \code{segments3D}, \code{polygon3D}, \code{rect3D}, \code{border3D}, \code{box3D}: 
        line segments, polygons, rectangles, boxes in 3D.
-     \item \code{slice3D}, \code{slicecont3D}, \code{isosurf3D}, \code{voxel3D}: slices, isosurfaces and voxels from a full 3-D data set.
    \end{itemize}
  \item Functions defined on the \code{image} or \code{contour} function:
    \begin{itemize}
-     \item \code{image2D}, \code{contour2D}, for an extended version of these functions to visualise 2-D or 3-D data.
+     \item \code{image2D}, \code{contour2D}, for an extended version of these functions to visualise 2-D (or 3-D) data.
      \item \code{ImageOcean}, for an image of the ocean's bathymetry.
    \end{itemize}
  \item Other functions
   \item \code{scatter2D}: colored points, lines, ... in 2-D. 
   \item \code{text2D}, \code{arrows2D}, \code{segments2D}, \code{rect2D}, 
-    \code{polygon2D} for other 2D functions that have a color key.
+    \code{polygon2D} for other 2D functions, comparable to R's base graphics but
+    that have a color key.
  \item Colors and colorkeys:
    \begin{itemize}
-     \item \code{colkey}: color legendS.
-     \item \code{jet.col}, \code{gg.col}, \code{ramp.col}: suitable color palettes.
+     \item \code{colkey}: color legends.
+     \item \code{jet.col}, \code{jet2.col}, \code{gg.col}, \code{ramp.col}: suitable color palettes.
    \end{itemize}
  \item Utility functions:
    \begin{itemize}
@@ -175,10 +177,10 @@ args(persp3D)
 
 Many examples of the use of \code{image2D} and \code{persp3D} are in vignette \code{volcano}. 
 
-Here, a part of the \code{Hypsometry} data set is depicted.
-
-We first plot the data, with the zoomed part. The 0 m contour lines are added.
-Slight shading gives the plot a perspective view.
+The \code{Hypsometry} data set is depicted first as an \code{image}, 
+with 0 m contour lines added. 
+Slight shading gives the plot a perspective view. 
+The zoomed region (used in next figure) is then added.
 <<label=hyps,include=FALSE>>=
 image2D(Hypsometry, xlab = "longitude", ylab = "latitude", 
       contour = list(levels = 0, col = "black", lwd = 2),
@@ -197,23 +199,24 @@ rect(-50, 10, -20, 40, lwd = 3)
 \label{fig:hyps}
 \end{figure}
 
+
 <<>>=
 ii <- which(Hypsometry$x > -50 & Hypsometry$x < -20)
 jj <- which(Hypsometry$y >  10 & Hypsometry$y <  40)
 zlim <- c(-10000, 0)
 @
-The figure is made with black side-panels (\code{bty}). 
+The perspective figure is made with black side-panels (\code{bty}). 
 Grey contour lines are added on the bottom panel (\code{"zmin"}) and on 
 the persp plot itself (\code{"z"}).
 The resolution is increased (\code{resfac}) to make smoother images.
-A color key is added on first margin (\code{side})
+A color key (\code{colkey}) is added on the first margin (\code{side})
 <<label=ocean2,include=FALSE>>=
 par(mfrow = c(1, 1))
 
 # Actual bathymetry, 4 times increased resolution, with contours
 persp3D(z = Hypsometry$z[ii,jj], xlab = "longitude", bty = "bl2",
         ylab = "latitude", zlab = "depth", clab = "depth, m", 
-        expand = 0.5, d = 2, phi = 20, theta = 30, resfac = 3,  
+        expand = 0.5, d = 2, phi = 20, theta = 30, resfac = 2,  
         contour = list(col = "grey", side = c("zmin", "z")),
          zlim = zlim, colkey = list(side = 1, length = 0.5))
 @
@@ -241,6 +244,7 @@ Function \code{mesh} is used to generate a full rectangular 3-D mesh.
 This is used to generate the volumetric data (\code{p}) that defines the coloration.
 The data are visualised by one slice in x (\code{xs}) and 3 slices in y direction
 (\code{ys}).
+Function \code{isosurf3D} plots the data for p-values that are equal to \code{0}.
 
 <<label=slice,include=FALSE>>=
 par(mfrow = c(1, 2))
@@ -268,7 +272,7 @@ isosurf3D(x, y, z, colvar = p, level = 0, col = "red")
 \end{figure}
 
 \section{surf3D}
-\code{surf3D} creates 3-D surface plots.
+Function \code{surf3D} creates 3-D surface plots.
 <<>>=
 args(surf3D)
 @
@@ -277,8 +281,8 @@ Here are 4 applications, showing the different options of coloration.
   par(mfrow = c(2, 2), mar = c(0, 0, 0, 0)) 
 
  # Shape 1
-  M  <- mesh(seq(0,  6*pi, length.out = 100), 
-             seq(pi/3, pi, length.out = 100))
+  M  <- mesh(seq(0,  6*pi, length.out = 80), 
+             seq(pi/3, pi, length.out = 80))
   u  <- M$x ; v <- M$y
 
   x <- u/2 * sin(v) * cos(u)
@@ -289,8 +293,8 @@ Here are 4 applications, showing the different options of coloration.
 
 
  # Shape 2: add border
-  M  <- mesh(seq(0, 2*pi, length.out = 100), 
-             seq(0, 2*pi, length.out = 100))
+  M  <- mesh(seq(0, 2*pi, length.out = 80), 
+             seq(0, 2*pi, length.out = 80))
   u  <- M$x ; v  <- M$y
 
   x  <- sin(u)
@@ -339,7 +343,7 @@ Functions \code{scatter2D} and \code{scatter3D} draw scatterplots.
 args(scatter2D)
 args(scatter3D)
 @
-We plot the dataset \code{quakes}, using function \code{scatter3D}.
+The dataset \code{quakes} is plotted using function \code{scatter3D}.
 Before the 3-D quakes data are drawn, small dots are added on the bottom 
 and on the depth plane (\code{panelfirst}).
 
@@ -381,6 +385,8 @@ par(mfrow = c(1, 1))
 \end{figure}
 
 \subsection{arrows3D, arrows2D}
+Functions \code{arrows2D} and \code{arrows3D} extend R function \code{arrows} with
+a color variable.
 <<label=arrows,include=FALSE>>=
 par (mfrow = c(1, 2))
 arrows2D(x0 = runif(10), y0 = runif(10), 
@@ -390,7 +396,6 @@ arrows2D(x0 = runif(10), y0 = runif(10),
 arrows3D(x0 = runif(10), y0 = runif(10), z0 = runif(10),
          x1 = runif(10), y1 = runif(10), z1 = runif(10),
          colvar = 1:10, code = 1:3, main = "arrows3D", colkey = FALSE)
-
 @
 \setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}
@@ -399,8 +404,8 @@ arrows3D(x0 = runif(10), y0 = runif(10), z0 = runif(10),
 <<arrows>>
 @
 \end{center}
-\caption{Arrows}
-\label{fig:scatter}
+\caption{arrows}
+\label{fig:arrows}
 \end{figure}
 
 
@@ -424,15 +429,16 @@ horizontal resolution, and for 33 depth intervals.
 names(Oxsat)
 dim(Oxsat$val)
 @
-We use \code{image2D.array} to plot several depth intervals at once, looping over
-the first and second margin:
+Function \code{image2D.array} plots several depth intervals at once, looping over
+the first and second margin. The color key is added in a separate figure.
 <<label=image2D,include=FALSE>>=
-image2D(z = Oxsat$val, subset = 1:8, 
+sub <- c(1, 5, 9) 
+image2D(z = Oxsat$val, subset = sub, 
         x = Oxsat$lon, y = Oxsat$lat,
         margin = c(1, 2), NAcol = "black", colkey = FALSE,
         xlab = "longitude", ylab = "latitude", 
-        main = paste("depth ", Oxsat$depth[1:9], " m"),
-        zlim = c(0, 115), mfrow = c(3, 3))
+        main = paste("depth ", Oxsat$depth[sub], " m"),
+        clim = c(0, 115), mfrow = c(2, 2))
 colkey(clim = c(0, 115), clab = c("O2 saturation", "percent"))        
 @
 

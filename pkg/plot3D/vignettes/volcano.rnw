@@ -38,7 +38,7 @@ The Netherlands
 \Plainauthor{Karline Soetaert}
 
 \Abstract{
-  There must be more than 50 ways to .. draw the volcano data set from R,
+  There must be more than 50 ways to draw the volcano data set from R,
   using R-package plot3D \citep{plot3D}.
 }
 
@@ -74,7 +74,7 @@ options(width=75)
 \maketitle
 
 \section{Intro}
-To make this vignette smaller, I reduce the size of \code{volcano}:
+To make this vignette smaller, the size of \code{volcano} is reduced:
 <<>>=
 # Reduce the resolution
 Volcano <- volcano[seq(1, nrow(volcano), by = 3), 
@@ -92,7 +92,7 @@ image2D(Volcano, facets = FALSE)
 image2D(Volcano, contour = TRUE)
 image2D(Volcano, rasterImage = TRUE, contour = list(lwd = 2, col = jet.col(11)))
 image2D(Volcano, theta = 30, NAcol = "black")
-image2D(volcano, lighting = TRUE, rasterImage = TRUE,
+image2D(Volcano, lighting = TRUE, rasterImage = TRUE,
    contour = list(col = "white", labcex = 0.8, lwd = 3, alpha = 0.5))
 @
 
@@ -103,7 +103,7 @@ image2D(volcano, lighting = TRUE, rasterImage = TRUE,
 <<imagecontour>>
 @
 \end{center}
-\caption{The image2D and contour function}
+\caption{The image2D and contour2D function}
 \label{fig:imagecontour}
 \end{figure}
 \clearpage
@@ -236,13 +236,13 @@ persp3D(z = Volcano/1000, log = "c", clab = c("km (logscale)"))
 persp3D(z = Volcano, clab = "m",
       colkey = list(side = 3, length = 0.5, width = 0.5, cex.axis = 0.8))
 persp3D(z = Volcano, clab = c("height", "m"),
-      colkey = list(length = 0.5, dist = -0.1, shift = -0.1))
+      colkey = list(length = 0.5, shift = -0.1))
 par(mar = c(4, 4, 2, 2))
 image2D(z = Volcano, clab = "height, m",
       colkey = list(dist = -0.20, shift = 0.15,
       side = 3, length = 0.5, width = 0.5,
-      cex.clab = 1.2, col.clab = "white", col.axis = "white",
-      col.ticks = "white", cex.axis = 0.8))
+      cex.clab = 1.2, col.clab = "white", line.clab = 2, 
+      col.axis = "white", col.ticks = "white", cex.axis = 0.8))
 @
 
 \setkeys{Gin}{width=1.0\textwidth}
@@ -288,28 +288,24 @@ persp3D(z = Volcano, contour = list(side = c("zmax", "z")), zlim= c(90, 300),
 <<label=panel,include=FALSE>>=
 
 par(mfrow = c(2, 1), mar = c(2, 2, 2, 2))
-
 ## ======================================================================
 ##  A composite figure
 ## ======================================================================
-# The volcano
- x <- 1:nrow(volcano)
- y <- 1:ncol(volcano)
+ x <- 1:nrow(Volcano)
+ y <- 1:ncol(Volcano)
   
 # draw the volcano, with contours at bottom 
- persp3D (x, y, z = volcano, theta = 10, phi = 20, 
-          box = FALSE, scale = FALSE, expand = 0.3, 
-          contour = TRUE, zlim = c(0, 200), 
-          clim = range(volcano), plot = FALSE)
+ persp3D (x, y, z = Volcano, theta = 10, phi = 20, box = FALSE, 
+          scale = FALSE, expand = 0.3, contour = TRUE, 
+          zlim = c(50, 200), clim = range(volcano), plot = FALSE)
 
 # add a plane (image) at z = 170; jetcolored, transparant: only border
  image3D(x, y, z = 170, add = TRUE, clim = range(volcano),
-         colvar = volcano, colkey = FALSE, 
-         facets = NA, plot = FALSE)
+         colvar = Volcano, colkey = FALSE, facets = NA, plot = FALSE)
 
 # add a contour (image) at z = 170; jetcolored, 
  contour3D(x, y, z = 170, add = TRUE, clim = range(volcano), lwd = 3,
-           colvar = volcano, colkey = FALSE, plot = TRUE)
+           colvar = Volcano, colkey = FALSE, plot = TRUE)
 
 ## ======================================================================
 ## Drawing on panels
@@ -340,7 +336,6 @@ lines(XY, lwd = 2, lty = 3)
 XY <- trans3D(x = x, y = rep(10, nrow(Volcano)), z = Volcano[,10], 
   pmat = pmat)
 lines(XY, lwd = 2, lty = 3)
-
 @
 
 \setkeys{Gin}{width=1.0\textwidth}

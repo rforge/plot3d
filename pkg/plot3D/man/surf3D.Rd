@@ -183,8 +183,8 @@ This means that the x- y- and z- axes range from [-1, 1].
 
  par(mfrow = c(2, 2))
 # create grid matrices
- X       <- seq(0, pi, length.out = 100)
- Y       <- seq(0, 2*pi, length.out = 100)
+ X       <- seq(0, pi, length.out = 50)
+ Y       <- seq(0, 2*pi, length.out = 50)
  M       <- mesh(X, Y)
  phi     <- M$x
  theta   <- M$y
@@ -226,8 +226,8 @@ This means that the x- y- and z- axes range from [-1, 1].
 
  par(mfrow = c(2, 2)) 
  # Shape 1
- M  <- mesh(seq(0,  6*pi, length.out = 100), 
-            seq(pi/3, pi, length.out = 100))
+ M  <- mesh(seq(0,  6*pi, length.out = 50), 
+            seq(pi/3, pi, length.out = 50))
  u  <- M$x ; v <- M$y
 
  x <- u/2 * sin(v) * cos(u)
@@ -237,8 +237,8 @@ This means that the x- y- and z- axes range from [-1, 1].
  surf3D(x, y, z, colvar = z, colkey = FALSE, box = FALSE, phi = 50)
 
 # Shape 2: add border
- M  <- mesh(seq(0, 2*pi, length.out = 100), 
-            seq(0, 2*pi, length.out = 100))
+ M  <- mesh(seq(0, 2*pi, length.out = 50), 
+            seq(0, 2*pi, length.out = 50))
  u  <- M$x ; v  <- M$y
 
  x  <- sin(u)
@@ -277,8 +277,8 @@ This means that the x- y- and z- axes range from [-1, 1].
 
  par(mar = c(2, 2, 2, 2))
  par(mfrow = c(1, 1))
- M  <- mesh(seq(0, 2*pi, length.out = 100), 
-            seq(0,   pi, length.out = 100))
+ M  <- mesh(seq(0, 2*pi, length.out = 50), 
+            seq(0,   pi, length.out = 50))
  u  <- M$x ; v  <- M$y
 
  x <- cos(u)*sin(v)

@@ -317,8 +317,8 @@ The New S Language. Wadsworth & Brooks/Cole.
 ## =======================================================================
 
  par(mfrow = c(2, 2))
- x <- seq(1, nrow(volcano), by = 2)
- y <- seq(1, ncol(volcano), by = 2) 
+ x <- seq(1, nrow(volcano), by = 3)
+ y <- seq(1, ncol(volcano), by = 3) 
 
  Volcano <- volcano [x, y]
  ribbon3D(z = Volcano, contour = TRUE, zlim= c(-100, 200), 
