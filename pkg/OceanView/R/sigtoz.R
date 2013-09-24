@@ -43,8 +43,10 @@ mapsigma.matrix <- function (var = NULL,
       changeres <- TRUE
 
   if (changeres) {
-    var <- remap(var, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
-    sigma <- remap(sigma, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto, ...)$var
+  dots <- list(...)
+  dots$x <- dots$y <- NULL
+    var <- do.call("remap", c(alist(var, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto), dots))$var
+    sigma <- do.call("remap", c(alist(sigma, x = 1:Dxy, y = 1:DD[signr], xto = xto, yto = yto), ...))$var
     xy <- (1:2)[-signr]
     x <- changeresvec(x, resfac[xy])
   }
