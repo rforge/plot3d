@@ -22,12 +22,12 @@
 \Plaintitle{plot3D}
 
 \Keywords{
-  plot,  persp, image, 2-D, 3-D, scatter plots, surface plots, slice plots, 
+  plot,  persp, image, 2-D, 3-D, scatter plots, surface plots, slice plots,
   openGL, \proglang{R}
 }
 
 \Plainkeywords{
-  plot,  persp, image, 2-D, 3-D, scatter plots, surface plots, slice plots, 
+  plot,  persp, image, 2-D, 3-D, scatter plots, surface plots, slice plots,
   openGL, R
 }
 
@@ -43,8 +43,8 @@ The Netherlands
   \R{ }package \p \citep{plot3Drgl} contains functions for plotting multi-dimensional
   data in openGl, starting from functions as in \pkg{plot3D} \citep{plot3D}.
 
-  A related package that depends on \pkg{plot3Drgl}is \pkg{OceanView} \citep{OceanView} 
-  which contains functions for visualing oceanographic data.  
+  A related package that depends on \pkg{plot3Drgl}is \pkg{OceanView} \citep{OceanView}
+  which contains functions for visualing oceanographic data.
 }
 
 %% The address of (at least) one author should be given
@@ -85,13 +85,13 @@ Package \p allows to plot these functions also in openGL, as made available by p
 
 One first creates a plot in base R-graphics, and then uses function \code{plotrgl}
 to depict the same figure in rgl. The main advantage of rgl over base graphics is
-that it allows to interactively rotate, zoom, and shift the graphics, 
-and even select regions. However, in contrast to the base R functions, 
+that it allows to interactively rotate, zoom, and shift the graphics,
+and even select regions. However, in contrast to the base R functions,
 it does not allow to plot a colorkey.
 
 \section{Function plotrgl}
 Typically we start by making a 3D plot using functions from package \pkg{plot3D}.
-Although not necessary, we can postpone plotting by setting argument \code{plot = FALSE} 
+Although not necessary, we can postpone plotting by setting argument \code{plot = FALSE}
 <<>>=
 persp3D(z = volcano, plot = FALSE)
 @
@@ -108,7 +108,7 @@ plotrgl(smooth = TRUE, lighting = TRUE, new = FALSE)
 @
 
 Now you can use the left mouse key to rotate the plot, the middle key to move it,
-and the right key to zoom. You may also want to try function \code{cutrgl}, 
+and the right key to zoom. You may also want to try function \code{cutrgl},
 which allows you to cut parts of the plot.
 
 \setkeys{Gin}{width=0.6\textwidth}
@@ -117,13 +117,13 @@ which allows you to cut parts of the plot.
 \includegraphics{volcanocut.png}
 \end{center}
 \label{fig:volcano}
-\legen{The volcano, after a region has been cutted}
+\caption{The volcano, after a region has been cutted}
 \end{figure}
 
 Function \code{croprgl} can be used to adapt the ranges (not shown)
 
 \begin{verbatim}
-cutrgl()                      # requires selection using left mouse 
+cutrgl()                      # requires selection using left mouse
 croprgl(xlim = c(0.2, 0.8))
 uncutrgl()                    # restores original plot
 \end{verbatim}
@@ -141,35 +141,35 @@ plotdev(shade = 0.1)
 <<volcano>>
 @
 \end{center}
+\caption{The volcano, using base R graphics}
 \label{fig:volcano}
 \end{figure}
-\legend{The volcano, using base R graphics}
 
 \section{scatter plot example}
 A linear regression of the mtcars data:
 <<>>=
-attach(mtcars)  
+attach(mtcars)
 fit <- lm(mpg ~ wt + disp)
 
 # predict values on regular xy grid
 wt.pred <- seq(1.5, 5.5, length.out = 30)
 disp.pred <- seq(71, 472, length.out = 30)
-xy <- expand.grid(wt = wt.pred, 
+xy <- expand.grid(wt = wt.pred,
                   disp = disp.pred)
 
-mpg.pred <- matrix (nrow = 30, ncol = 30, 
-    data = predict(fit, newdata = data.frame(xy), 
+mpg.pred <- matrix (nrow = 30, ncol = 30,
+    data = predict(fit, newdata = data.frame(xy),
     interval = "prediction"))
 
 # fitted points for droplines to surface
-fitpoints <- predict(fit) 
+fitpoints <- predict(fit)
 @
 <<label=fit,include=FALSE>>=
-scatter3D(z = mpg, x = wt, y = disp, colvar = abs(mpg - fitpoints), 
+scatter3D(z = mpg, x = wt, y = disp, colvar = abs(mpg - fitpoints),
       pch = 18, cex = 2, theta = 20, phi = 20, ticktype = "detailed",
       xlab = "wt", ylab = "disp", zlab = "mpg", main = "mtcars",
-      clab = "error", zlim = c(5, 35), 
-      surf = list(x = wt.pred, y = disp.pred, z = mpg.pred,  
+      clab = "error", zlim = c(5, 35),
+      surf = list(x = wt.pred, y = disp.pred, z = mpg.pred,
                   facets = NA, border = "black", fit = fitpoints)
       )
 @
@@ -196,18 +196,18 @@ Function \code{isosurf3D} from \pkg{plot3D} creates surfaces of equal scalar
 value from a volumetric data set. It makes use of a function from package \pkg{misc3d} \citep{misc3d}.
 
 If we depict several isosurfaces, it is best to use transparent colors by setting
-argument \code{alpha} smaller than 1. Plotting transparent surfaces is very slow in 
+argument \code{alpha} smaller than 1. Plotting transparent surfaces is very slow in
 base graphics, but not so in openGL.
 <<>>=
  x <- y <- z <- seq(-2, 2, length.out = 15)
  xyz <- mesh(x, y, z)
- F <- with(xyz, log(x^2 + y^2 + z^2 + 
+ F <- with(xyz, log(x^2 + y^2 + z^2 +
                 10*(x^2 + y^2) * (y^2 + z^2) ^2))
 
 # three levels, transparency added
- isosurf3D(x, y, z, F, level = seq(0, 4, by = 2), 
-   col = c("red", "blue", "yellow"), 
-   clab = "F", alpha = 0.2, plot = FALSE)  
+ isosurf3D(x, y, z, F, level = seq(0, 4, by = 2),
+   col = c("red", "blue", "yellow"),
+   clab = "F", alpha = 0.2, plot = FALSE)
 @
 <<label=iso,include=FALSE>>=
 plotdev()
@@ -233,8 +233,8 @@ plotrgl(new = FALSE, lighting = TRUE)
 \begin{verbatim}
 decorate3d()
 \end{verbatim}
-  \item I created a function to visualise arrows in rgl as cones. 
-  But it has a flaw, as the arrows are distorted, 
+  \item I created a function to visualise arrows in rgl as cones.
+  But it has a flaw, as the arrows are distorted,
   if not perpendicular to the z-axis. Use with care
 
 \end{itemize}
