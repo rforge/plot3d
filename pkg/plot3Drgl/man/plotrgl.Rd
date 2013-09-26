@@ -1,4 +1,4 @@
-\name{Plot in rgl window}
+\name{plotrgl}
 \alias{plotrgl}
 \title{
   Plot 3D graphs in rgl window. 

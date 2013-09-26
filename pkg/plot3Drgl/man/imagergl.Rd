@@ -1,4 +1,4 @@
-\name{2D plots in rgl}
+\name{image2Drgl}
 \alias{image2Drgl}
 \alias{contour2Drgl}
 \alias{scatter2Drgl}

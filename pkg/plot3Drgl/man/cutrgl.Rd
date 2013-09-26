@@ -1,4 +1,4 @@
-\name{cutting in rgl plots}
+\name{cutrgl}
 \alias{cutrgl}
 \alias{croprgl}
 \alias{uncutrgl}
