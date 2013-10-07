@@ -14,26 +14,20 @@ is.colkey <- function(colkey, col) {
   if (is.logical(colkey))
     return(colkey)
     
-  iscolkey <- ! is.null(colkey)
+  if (is.list(colkey))
+    return(TRUE)
+    
+  if (! is.null(colkey))
+    stop("'colkey' should be a list, a logical or NULL")
  
-  iscol <- ispresent(col) 
+  iscolkey <- ispresent(col) 
   
-  if (iscol) {
+  if (iscolkey) {
     if (length(col) == 1) 
-      iscol <- FALSE
+      iscolkey <- FALSE
     else if (length(col) == 2 & col[1] == col[2]) 
-      iscol <- FALSE
+      iscolkey <- FALSE
   }
-  
-  if (!iscol) 
-    return(FALSE)
- 
-  else if (length(colkey) == 0) 
-    iscolkey <- FALSE
-  else if (! is.logical(colkey)) 
-    iscolkey <- TRUE
-  else if (colkey[[1]][1] == FALSE) 
-    iscolkey <- FALSE
   
   return(iscolkey)
 }
@@ -60,7 +54,7 @@ check.colkey <- function(colkeypar, add = FALSE) {
   if (!is.list(colkeypar))
     colkeypar <- list()
       
-  parameter <- list(side = 4, 
+  parameter <- list(side = 4, plot = TRUE,
       length = 1, width = 1, dist = 0, shift = 0, addlines = FALSE,
       col.clab = NULL, cex.clab = par("cex.lab"), 
       side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL, 
@@ -164,12 +158,14 @@ drawallcols <- function(plist) {
 drawcolkey <- function (colkeypar, col, clim, clab = NULL, 
                         clog = FALSE, New = TRUE) {     
 
+  if (!colkeypar$plot) return()
   parleg <- check.plt(colkeypar$parleg)
+
   Plt <- par(plt = parleg)   
   PP  <- par()
   if (New) 
     par(new = TRUE)
-  
+
   usr <- par("usr")
   col.clab <- colkeypar$col.clab
   cex.clab <- colkeypar$cex.clab
@@ -187,6 +183,8 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
   nbins <- length(col) 
   binwidth <- (maxz - minz)/nbins
   iy <- IY <- seq(minz + binwidth/2, maxz - binwidth/2, by = binwidth)
+  if (clim[1] > clim[2])
+    col <- rev(col)
   if (clog) {
     iy <- exp(iy)
     if (colkeypar$side %in% c(2, 4))  {
@@ -196,15 +194,15 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
     }  
   } else Log <- ""
   iz <- matrix(IY, nrow = 1, ncol = length(iy))
-  
+
   if (! is.numeric(cex.clab)) 
     cex.clab <- 1.
-  
-  # the parameters for the axis
+
+# the parameters for the axis
   axispar <- colkeypar
-  
-  # remove arguments not in axis function
-  axispar$side <- axispar$length <- axispar$width <- NULL
+
+# remove arguments not in axis function
+  axispar$side <- axispar$length <- axispar$width <- axispar$plot <- NULL
   axispar$parleg <- axispar$parplt <- axispar$dist <- NULL
   axispar$shift <-axispar$col.box <- NULL  
   axispar$col.clab <- axispar$cex.clab <- axispar$side.clab <- NULL
@@ -212,18 +210,22 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
   axispar$addlines <- NULL
   
   if (colkeypar$side %in% c(2, 4)) {
-  
+    ylim <- clim
+    if (Log == "y") ylim <- exp(ylim)
+
     image(ix, iy, iz, xaxt = "n", yaxt = "n", xlab = "", log = Log,
-        ylab = "", col = col, main = "")
+        ylab = "", col = col, main = "", ylim = ylim)
     if (addlines)  
       abline(h = seq(mean(iy[1:2]), mean(iy[(nbins-1):nbins]), length.out = nbins-1))
     do.call("axis", c(list(side = colkeypar$side, mgp = c(3, 1, 0), las = 2), 
             axispar))
-                                                    
+                                                  
   } else {
-  
+
+    xlim <- clim
+    if (Log == "x") xlim <- exp(xlim)
     image(iy, ix, t(iz), xaxt = "n", yaxt = "n", xlab = "", log = Log,
-        ylab = "", col = col, main = "")
+        ylab = "", col = col, main = "", xlim = xlim)
     if (addlines) 
       abline(v = seq(mean(iy[1:2]), mean(iy[(nbins-1):nbins]), length.out = nbins-1))
     do.call("axis", c(list(side = colkeypar$side, mgp = c(3, 1, 0), las = 1), 
@@ -255,9 +257,8 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
     else 
       par (xlog = FALSE)      
   }
-  
-  box(col = colkeypar$col.box) 
 
+  box(col = colkeypar$col.box) 
   par(plt = Plt)
   par(usr = usr)
   par(xlog = PP$xlog)
@@ -288,7 +289,7 @@ colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
   if (is.null(col)) 
     col <- jet.col(100)
   
-  colkey <- list(side = side, length = length, width = width, 
+  colkey <- list(side = side, plot = TRUE, length = length, width = width, 
       dist = dist, shift = shift, addlines = addlines, 
       cex.clab = cex.clab, col.clab = col.clab,
       side.clab = side.clab, line.clab = line.clab, adj.clab = adj.clab,
@@ -310,7 +311,7 @@ colkey <- function(col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
   
   if (! add & colkey$side %in% c(1, 3)) {
       py <- 0.5*(parplt[3] + parplt[4])
-      dp     <- (parplt[2] - parplt[1]) * (1-colkey$length)/2
+      dp <- (parplt[2] - parplt[1]) * (1-colkey$length)/2
       colkey$parleg <- c( parplt[1]+dp, parplt[2]-dp, py - dw/2, py+dw/2)
 
   } else if (! add & colkey$side %in% c(2, 4)) {

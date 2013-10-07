@@ -10,7 +10,7 @@
 border3D  <- function(x0, y0, z0, x1, y1, z1,
                    ..., colvar = NULL, phi = 40, theta = 40,
                    col = NULL, NAcol = "white",
-                   colkey = list(side = 4), 
+                   colkey = NULL, 
                    panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
@@ -139,7 +139,7 @@ rect3D  <- function(x0, y0, z0, x1 = NULL, y1 = NULL, z1 = NULL,
                    ..., colvar = NULL, phi = 40, theta = 40,
                    col = NULL, NAcol = "white",
                    border = NA, facets = TRUE,
-                   colkey = list(side = 4), panel.first = NULL,
+                   colkey = NULL, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
 
@@ -283,7 +283,7 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
                    ...,  colvar = NULL, phi = 40, theta = 40,
                    col = NULL, NAcol = "white",
                    border = NA, facets = TRUE,
-                   colkey = list(side = 4), panel.first = NULL,
+                   colkey = NULL, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
                    add = FALSE, plot = TRUE)  {
 

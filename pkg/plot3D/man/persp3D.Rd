@@ -17,7 +17,7 @@ persp3D (x = seq(0, 1, length.out = nrow(z)),
        y = seq(0, 1, length.out = ncol(z)), z, ..., 
        colvar = z, phi = 40, theta = 40,
        col = NULL,  NAcol = "white", border = NA, facets = TRUE,
-       colkey = list(side = 4), resfac = 1,
+       colkey = NULL, resfac = 1,
        image = FALSE, contour = FALSE, panel.first = NULL,
        clim = NULL, clab = NULL, bty = "b", 
        lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
@@ -27,7 +27,7 @@ ribbon3D (x = seq(0, 1, length.out = nrow(z)),
       y = seq(0, 1, length.out = ncol(z)), z, ..., 
       colvar = z, phi = 40, theta = 40, 
       col = NULL,  NAcol = "white", border = NA, facets = TRUE,
-      colkey = list(side = 4), resfac = 1, 
+      colkey = NULL, resfac = 1, 
       image = FALSE, contour = FALSE, panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",
       lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
@@ -38,7 +38,7 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
       y = seq(0, 1, length.out = ncol(z)), z, ..., 
       colvar = z, phi = 40, theta = 40, 
       col = NULL, NAcol = "white", border = NA, facets = TRUE,
-      colkey = list(side = 4), image = FALSE, contour = FALSE, 
+      colkey = NULL, image = FALSE, contour = FALSE, 
       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
       lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
       space = 0, add = FALSE, plot = TRUE)  
@@ -70,14 +70,22 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     }
   \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
-  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
-    Parameters should be one of 
-    \code{side, length, width, dist, shift, col.clab, cex.clab},
+ \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters 
+    for the color key (legend). List parameters should be one of 
+    \code{side, plot, length, width, dist, shift, addlines, col.clab, cex.clab,
+      side.clab, line.clab, adj.clab, font.clab}
     and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
     lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    The defaults for the parameters are \code{side = 4, plot = TRUE, length = 1, width = 1, 
+      dist = 0, shift = 0, addlines = FALSE, col.clab = NULL, cex.clab = par("cex.lab"), 
+      side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL})
     See \link{colkey}.
+    
     The default is to draw the color key on side = 4, i.e. in the right margin.
-    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
+    If \code{colkey} = \code{NULL} then a color key will be added only if \code{col} is a vector.
+    Setting \code{colkey = list(plot = FALSE)} will create room for the color key 
+    without drawing it.
+    if \code{colkey = FALSE}, no color key legend will be added.
     } 
   \item{clab }{Only if \code{colkey = TRUE}, the label to be written on top of the
     color key. The label will be written at the same level as the main title.

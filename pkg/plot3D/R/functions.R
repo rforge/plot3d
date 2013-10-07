@@ -375,6 +375,14 @@ trans3D <- function(x, y, z, pmat) {
 
 changeres <- function(resfac, x, y, z, colvar = NULL, na.rm = FALSE) { 
 
+  if (is.matrix(x)) 
+    return(changeres_mat(resfac, x, y, z, colvar, na.rm))
+  else 
+    return(changeres_vec(resfac, x, y, z, colvar, na.rm))
+}
+
+changeres_vec <- function(resfac, x, y, z, colvar = NULL, na.rm = FALSE) { 
+    
   resfac <- abs(rep(resfac, length.out = 2))
   diffx <- diff(x)
   diffy <- diff(y)
@@ -403,14 +411,27 @@ changeres <- function(resfac, x, y, z, colvar = NULL, na.rm = FALSE) {
   list(x = XX, y = YY, z = z, colvar = colvar)
 }
 
+changeres_mat <- function(resfac, x, y, z, colvar = NULL, na.rm = FALSE) { 
+
+  resfac <- abs(rep(resfac, length.out = 2))
+  xx <- 1:nrow(z)
+  yy <- 1:ncol(z)
+  XX <- changeres(resfac, xx, yy, x)$z
+  YY <- changeres(resfac, xx, yy, y)$z
+  RR  <- changeres(resfac, xx, yy, z, colvar)
+  
+  list(x = XX, y = YY, z = RR$z, colvar = RR$colvar)
+}
+
 ## =============================================================================
 ## Maps a matrix 'z' from (x, y) to (xto, yto) by linear 2-D interpolation
 ## =============================================================================
 
-remapxy <- function(z, x, y, xto, yto, na.rm = FALSE) {    # cannot set na.rm yet-to be decided
+remapxy <- function(z, x, y, xto, yto, na.rm = FALSE) {     
 
   if (na.rm & any(is.na(z)))
     return(remapxyNA (z, x = x, y = y, xto = xto, yto = yto))
+
 # a simple function with linear interpolation - only for x and y a vector
   Nx <- length(x)
   Ny <- length(y)

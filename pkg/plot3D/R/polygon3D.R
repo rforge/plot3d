@@ -6,7 +6,7 @@ polygon3D  <- function(x, y, z,
                     ..., colvar = NULL, phi = 40, theta = 40,
                     col = NULL, NAcol = "white", 
                     border = NA, facets = TRUE,
-                    colkey = list(side = 4), panel.first = NULL,
+                    colkey = NULL, panel.first = NULL,
                     clim = NULL, clab = NULL, bty = "b", 
                     add = FALSE, plot = TRUE)  {
 
@@ -152,7 +152,7 @@ polygon3D  <- function(x, y, z,
 polygon2D  <- function(x, y, ..., colvar = NULL, 
                     col = NULL, NAcol = "white", 
                     border = NA, facets = TRUE,
-                    colkey = list(side = 4), 
+                    colkey = NULL, 
                     clim = NULL, clab = NULL, add = FALSE, plot = TRUE)  {
 
   plist <- initplist(add)

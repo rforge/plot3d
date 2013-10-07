@@ -16,7 +16,7 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    y = seq(0, 1, length.out = ncol(z)), colvar = z, ..., 
                    col = jet.col(100), NAcol = "white", 
                    border = NA, facets = TRUE, contour = FALSE, 
-                   colkey = list(side = 4), resfac = 1, clab = NULL, 
+                   colkey = NULL, resfac = 1, clab = NULL, 
                    lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
                    theta = 0, rasterImage = FALSE,
                    add = FALSE, plot = TRUE) {
@@ -259,12 +259,13 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     if (!add) {
       do.call("plot", c(alist(x = range(x), y = range(y)), dotimage))
     
-      plotrect <- !is.null(NAcol)
-      if (plotrect) 
-        if (NAcol != "white") {
-          usr <- par("usr") 
-          rect(usr[1], usr[3], usr[2], usr[4], col = NAcol)
-        }    
+# This used to make the background = NAcol - removed...
+#      plotrect <- !is.null(NAcol)
+#      if (plotrect) 
+#        if (NAcol != "white") {
+#          usr <- par("usr") 
+#          rect(usr[1], usr[3], usr[2], usr[4], col = NAcol)
+#        }    
     }
   }
   

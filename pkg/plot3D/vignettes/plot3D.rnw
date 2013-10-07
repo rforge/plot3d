@@ -417,7 +417,7 @@ image2D(z =, ...)
 
 image2D.matrix(z, x = NULL, y = NULL, ...,
              col = jet.col(100), NAcol = "white", facets = TRUE, 
-             contour = FALSE, colkey = list(side = 4), resfac = 1, 
+             contour = FALSE, colkey = NULL, resfac = 1, 
              clab = NULL, theta = 0, border = NA) 
 image2D.array(z, margin = c(1, 2), subset, ask = NULL, ...) 
 

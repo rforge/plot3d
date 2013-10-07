@@ -200,7 +200,7 @@ add2Dplist <- function(plist, method, ...) {
 
 plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
-                    colkey = list(side = 4),
+                    colkey = NULL,
                     clim = NULL, clab = NULL, add = FALSE,
                     plot = TRUE, method = "arrows") {
 
@@ -271,7 +271,7 @@ plot2D <- function(x0, y0, x1, y1, ..., colvar = NULL,
 ## =============================================================================
 arrows2D <- function(x0, y0, x1 = x0, y1 = y0,..., colvar = NULL,
                     col = NULL, NAcol = "white", 
-                    colkey = list(side = 4),
+                    colkey = NULL,
                     clim = NULL, clab = NULL, 
                     type = "triangle", add = FALSE, plot = TRUE)  
   plot2D (x0, y0, x1, y1, ..., colvar = colvar,
@@ -283,7 +283,7 @@ arrows2D <- function(x0, y0, x1 = x0, y1 = y0,..., colvar = NULL,
 ## =============================================================================
 segments2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
-                    colkey = list(side = 4),
+                    colkey = NULL,
                     clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
   plot2D (x0, y0, x1, y1, ..., colvar = colvar,
                     col = col, NAcol = NAcol,
@@ -294,7 +294,7 @@ segments2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
 ## =============================================================================
 rect2D <- function(x0, y0, x1 = x0, y1 = y0, ..., colvar = NULL,
                     col = NULL, NAcol = "white",
-                    colkey = list(side = 4),
+                    colkey = NULL,
                     clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
   plot2D (x0, y0, x1, y1, ..., colvar = colvar,
                     col = col, NAcol = NAcol,

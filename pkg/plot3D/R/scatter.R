@@ -19,7 +19,7 @@ points2D <- function(x, y,  ...) {
 
 scatter2D <- function(x, y, ..., colvar = NULL, 
                     col = NULL, NAcol = "white", 
-                    colkey = list(side = 4), 
+                    colkey = NULL, 
                     clim = NULL, clab = NULL, CI = NULL, 
                     add = FALSE, plot = TRUE) {
 

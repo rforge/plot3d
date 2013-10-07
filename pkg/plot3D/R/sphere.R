@@ -5,7 +5,7 @@
 spheresurf3D <- function(colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
      ..., phi = 0, theta = 0,
      col = jet.col(100), NAcol = "white", border = NA, facets = TRUE,
-     contour = FALSE, colkey = list(side = 4), resfac = 1,
+     contour = FALSE, colkey = NULL, resfac = 1,
      panel.first = NULL, clim = NULL, clab = NULL,
      bty = "n", lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
      inttype = 1, full = FALSE, add = FALSE, plot = TRUE) {

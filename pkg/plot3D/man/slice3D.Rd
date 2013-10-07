@@ -29,7 +29,7 @@
 slice3D (x, y, z, colvar, ..., phi = 40, theta = 40,
          xs = min(x), ys = max(y), zs = min(z),
          col = jet.col(100), NAcol = "white", 
-         border = NA, facets = TRUE, colkey = list(side = 4), 
+         border = NA, facets = TRUE, colkey = NULL, 
          panel.first = NULL, clim = NULL, 
          clab = NULL, bty = "b", 
          lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,  
@@ -39,14 +39,14 @@ slicecont3D (x, y, z, colvar, ..., phi = 40, theta = 40,
          xs = NULL, ys = NULL, zs = NULL, level = NULL,
          col = jet.col(100), NAcol = "white", 
          border = NA, facets = TRUE, 
-         colkey = list(side = 4), panel.first = NULL,
+         colkey = NULL, panel.first = NULL,
          clim = NULL, clab = NULL, bty = "b", 
          dDepth = 0, add = FALSE, plot = TRUE) 
 
 isosurf3D (x, y, z, colvar, ..., phi = 40, theta = 40, 
          level = mean(colvar, na.rm = TRUE), isofunc = createisosurf,
          col = NULL, border = NA, facets = TRUE, 
-         colkey = list(side = 4), panel.first = NULL, 
+         colkey = NULL, panel.first = NULL, 
          clab = NULL, bty = "b", 
          lighting = FALSE, shade = 0.5, ltheta = -135, lphi = 0, 
          add = FALSE, plot = TRUE) 
@@ -59,7 +59,7 @@ voxel3D (x, y, z, colvar, ..., phi = 40, theta = 40,
 triangle3D (tri, colvar = NULL, ..., phi = 40, theta = 40,
            col = NULL, NAcol = "white", 
            border = NA, facets = TRUE,
-           colkey = list(side = 4), panel.first = NULL,
+           colkey = NULL, panel.first = NULL,
            lighting = FALSE, shade = 0.5, ltheta = -135, lphi = 0, 
            clim = NULL, clab = NULL,
            bty = "b", add = FALSE, plot = TRUE)  
@@ -107,14 +107,22 @@ createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
     If \code{NA} then the facets will be transparent. 
     It is usually faster to draw with \code{facets = FALSE}.
     }
-  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
-    Parameters should be one of 
-    \code{side, length, width, dist, shift, col.clab, cex.clab},
+ \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters 
+    for the color key (legend). List parameters should be one of 
+    \code{side, plot, length, width, dist, shift, addlines, col.clab, cex.clab,
+      side.clab, line.clab, adj.clab, font.clab}
     and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
     lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    The defaults for the parameters are \code{side = 4, plot = TRUE, length = 1, width = 1, 
+      dist = 0, shift = 0, addlines = FALSE, col.clab = NULL, cex.clab = par("cex.lab"), 
+      side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL})
     See \link{colkey}.
+    
     The default is to draw the color key on side = 4, i.e. in the right margin.
-    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
+    If \code{colkey} = \code{NULL} then a color key will be added only if \code{col} is a vector.
+    Setting \code{colkey = list(plot = FALSE)} will create room for the color key 
+    without drawing it.
+    if \code{colkey = FALSE}, no color key legend will be added.
     } 
   \item{panel.first }{A \code{function} to be evaluated after the plot axes are 
     set up but before any plotting takes place. 

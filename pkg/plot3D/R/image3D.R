@@ -77,7 +77,7 @@ image3D <- function(x = NULL, y = NULL, z = NULL, ...,
                   colvar = NULL, phi = 40, theta = 40,
                   col = jet.col(100),  NAcol = "white", 
                   border = NA, facets = TRUE,
-                  colkey = list(side = 4), resfac = 1,
+                  colkey = NULL, resfac = 1,
                   panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",
                   inttype = 1, add = FALSE, plot = TRUE){

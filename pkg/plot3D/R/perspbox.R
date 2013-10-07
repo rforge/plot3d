@@ -19,7 +19,7 @@ perspbox <- function(x = seq(0, 1, length.out = nrow(z)),
                      col.panel = NULL, lwd.panel = 1,
                      col.grid = NULL, lwd.grid = 1,
                      phi = 40, theta = 40, col = NULL,
-                     colkey = list(side = 4), plot = TRUE){
+                     colkey = NULL, plot = TRUE){
 
   dot <- list(...)
   plist <- list(type = "3D", plt = NULL, persp = NULL, alpha = dot$alpha)

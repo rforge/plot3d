@@ -9,7 +9,7 @@
 \usage{
 contour3D (x = NULL, y = NULL, z = NULL, 
        ..., colvar = NULL, phi = 40, theta = 40,
-       col = NULL, colkey = list(side = 4), 
+       col = NULL, colkey = NULL, 
        panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
        dDepth = 1e-1, addbox = TRUE, add = FALSE, plot = TRUE)
 }
@@ -36,15 +36,23 @@ contour3D (x = NULL, y = NULL, z = NULL,
     If \code{col} is \code{NULL} and \code{colvar} is not specified, then 
     \code{col} will be "black". 
     }
-  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
-    Parameters should be one of 
-    \code{side, length, width, dist, shift, col.clab, cex.clab},
+ \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters 
+    for the color key (legend). List parameters should be one of 
+    \code{side, plot, length, width, dist, shift, addlines, col.clab, cex.clab,
+      side.clab, line.clab, adj.clab, font.clab}
     and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
     lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    The defaults for the parameters are \code{side = 4, plot = TRUE, length = 1, width = 1, 
+      dist = 0, shift = 0, addlines = FALSE, col.clab = NULL, cex.clab = par("cex.lab"), 
+      side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL})
     See \link{colkey}.
+    
     The default is to draw the color key on side = 4, i.e. in the right margin.
-    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
-    } 
+    If \code{colkey} = \code{NULL} then a color key will be added only if \code{col} is a vector.
+    Setting \code{colkey = list(plot = FALSE)} will create room for the color key 
+    without drawing it.
+    if \code{colkey = FALSE}, no color key legend will be added.
+    }  
   \item{clab }{Only if \code{colkey = TRUE}, the label to be written on top of the
     color key. The label will be written at the same level as the main title.
     to lower it, \code{clab} can be made a vector, with the first values empty 

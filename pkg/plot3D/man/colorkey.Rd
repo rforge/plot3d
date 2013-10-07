@@ -93,6 +93,23 @@ colkey (col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
  pmar <- par(mar = c(5.1, 4.1, 4.1, 2.1))
 
 ## =======================================================================
+##  colorkey as argument of a plot3D function
+## =======================================================================
+# default, colkey = NULL: adds colkey because multiple colors
+ image2D(z = volcano)  
+
+# default, colkey = NULL: no colkey because only one color
+ image2D(z = volcano, col = "grey", shade = 0.2, contour = TRUE)  
+
+# colkey = FALSE: no color key, no extra space foreseen
+ image2D(z = volcano, colkey = FALSE)
+ 
+# colkey = list(plot = FALSE): no color key, extra space foreseen
+ image2D(z = volcano, colkey = list(plot = FALSE, side = 3))
+ colkey (side = 3, add = TRUE, clim = range(volcano))
+ 
+ 
+## =======================================================================
 ##  colorkey in new plot
 ## =======================================================================
  
@@ -174,7 +191,7 @@ colkey (col = NULL, clim, clab = NULL, clog = FALSE, add = FALSE,
    clab = c("gradient","m/m"), plot = TRUE)
 
 ## =======================================================================
-## categorical colors:
+## categorical colors; use addlines = TRUE to separate colors
 ## =======================================================================
 
  with(iris, scatter3D(x = Sepal.Length, y = Sepal.Width, 

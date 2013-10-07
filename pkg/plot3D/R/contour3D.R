@@ -67,7 +67,7 @@ createsegms <- function (x, y, z, colvar, names = c("x", "y", "z"),
 
 contour3D <- function(x = NULL, y = NULL, z = NULL, ..., 
                   colvar = NULL, phi = 40, theta = 40,
-                  col = NULL, colkey = list(side = 4), 
+                  col = NULL, colkey = NULL, 
                   panel.first = NULL,
                   clim = NULL, clab = NULL, bty = "b",
                   dDepth = 1e-1, addbox = TRUE,

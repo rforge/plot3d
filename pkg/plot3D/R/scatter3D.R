@@ -21,7 +21,7 @@ points3D <- function(x, y, z,  ...) {
 scatter3D <- function(x, y, z, ..., colvar = z, 
                       phi = 40, theta = 40,
                       col = NULL, NAcol = "white", 
-                      colkey = list(side = 4), 
+                      colkey = NULL, 
                       panel.first = NULL, clim = NULL, clab = NULL, 
                       bty = "b", CI = NULL, surf = NULL, 
                       add = FALSE, plot = TRUE) {

@@ -110,7 +110,7 @@ slice3D <- function(x, y, z, colvar, ...,
                     zs = min(z),
                     col = jet.col(100), NAcol = "white", 
                     border = NA, facets = TRUE, 
-                    colkey = list(side = 4), panel.first = NULL,
+                    colkey = NULL, panel.first = NULL,
                     clim = NULL, clab = NULL, bty = "b",
                     lighting = FALSE, shade = NA, ltheta = -135, lphi = 0, 
                     add = FALSE, plot = TRUE) {

@@ -7,7 +7,7 @@
 text3D <- function(x, y, z, labels, ..., colvar = NULL, 
                    phi = 40, theta = 40,
                    col = NULL, NAcol = "white", 
-                   colkey = list(side = 4), 
+                   colkey = NULL, 
                    panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b",
                    add = FALSE, plot = TRUE) {
@@ -118,7 +118,7 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
     
 text2D <- function(x, y, labels, ..., colvar = NULL, 
                    col = NULL, NAcol = "white", 
-                   colkey = list(side = 4), 
+                   colkey = NULL, 
                    clim = NULL, clab = NULL, add = FALSE, plot = TRUE) {
 
   if (add) 

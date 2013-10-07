@@ -28,7 +28,7 @@ slicecont3D <- function(x, y, z, colvar, ...,
                    zs = NULL, level = NULL,
                    col = jet.col(100), NAcol = "white", 
                    border = NA, facets = TRUE, 
-                   colkey = list(side = 4), panel.first = NULL,
+                   colkey = NULL, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b", 
                    dDepth = 0., add = FALSE, plot = TRUE) {
 

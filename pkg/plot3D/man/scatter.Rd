@@ -31,15 +31,15 @@
 \usage{
 scatter3D (x, y, z, ..., colvar = z, phi = 40, theta = 40,
            col = NULL, NAcol = "white",  
-           colkey = list(side = 4), panel.first = NULL, 
+           colkey = NULL, panel.first = NULL, 
            clim = NULL, clab = NULL, 
            bty = "b", CI = NULL, surf = NULL, 
            add = FALSE, plot = TRUE)
           
 text3D (x, y, z, labels, ..., 
         colvar = NULL, phi = 40, theta = 40, col = NULL, NAcol = "white",  
-        colkey = list(side = 4),
-        panel.first = NULL, clim = NULL, clab = NULL, 
+        colkey = NULL, panel.first = NULL, 
+        clim = NULL, clab = NULL, 
         bty = "b", add = FALSE, plot = TRUE)
 
 points3D (x, y, z, ...)
@@ -47,12 +47,11 @@ points3D (x, y, z, ...)
 lines3D (x, y, z, ...)
 
 scatter2D (x, y, ..., colvar = NULL, col = NULL, NAcol = "white", 
-         colkey = list(side = 4), clim = NULL, clab = NULL, 
+         colkey = NULL, clim = NULL, clab = NULL, 
          CI = NULL, add = FALSE, plot = TRUE)
 
 text2D (x, y, labels, ..., colvar = NULL, 
-         col = NULL, NAcol = "white", 
-         colkey = list(side = 4), 
+         col = NULL, NAcol = "white", colkey = NULL, 
          clim = NULL, clab = NULL, add = FALSE, plot = TRUE) 
 }
 
@@ -75,14 +74,22 @@ text2D (x, y, labels, ..., colvar = NULL,
     }
   \item{NAcol }{Colors to be used for \code{colvar} values that are \code{NA}.
     }
-  \item{colkey }{A logical, or a \code{list} with parameters for the color key (legend). 
-    Parameters should be one of 
-    \code{side, length, width, dist, shift, col.clab, cex.clab},
+  \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters 
+    for the color key (legend). List parameters should be one of 
+    \code{side, plot, length, width, dist, shift, addlines, col.clab, cex.clab,
+      side.clab, line.clab, adj.clab, font.clab}
     and the axis parameters \code{at, labels, tick, line, pos, outer, font, lty, lwd,
     lwd.ticks, col.box, col.axis, col.ticks, hadj, padj, cex.axis, mgp, tck, tcl, las}.
+    The defaults for the parameters are \code{side = 4, plot = TRUE, length = 1, width = 1, 
+      dist = 0, shift = 0, addlines = FALSE, col.clab = NULL, cex.clab = par("cex.lab"), 
+      side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL})
     See \link{colkey}.
+    
     The default is to draw the color key on side = 4, i.e. in the right margin.
-    If \code{colkey} = \code{NULL} or \code{FALSE}, no color key legend will be added.
+    If \code{colkey} = \code{NULL} then a color key will be added only if \code{col} is a vector.
+    Setting \code{colkey = list(plot = FALSE)} will create room for the color key 
+    without drawing it.
+    if \code{colkey = FALSE}, no color key legend will be added.
     } 
   \item{CI }{A \code{list} with parameters and values for the confidence 
     intervals or \code{NULL}.
@@ -509,8 +516,7 @@ text2D (x, y, labels, ..., colvar = NULL,
 
  par(mfrow = c(1, 1))
 
-# room for colorkey 
- PM <- par(mar = par("mar") + c(0, 0, 0, 4))
+# room for colorkey by setting colkey = list(plot = FALSE)
 
 # contour plot of the ocean's bathymetry
  Depth <- Hypsometry$z
@@ -518,13 +524,12 @@ text2D (x, y, labels, ..., colvar = NULL,
  contour2D(z = Depth, x = Hypsometry$x, y = Hypsometry$y, 
        xlab = "longitude", ylab = "latitude", 
        col = "black", NAcol = "grey", levels = seq(-6000, 0, by = 2000),
-       main = "Oxygen saturation along ship track", colkey = FALSE)
+       main = "Oxygen saturation along ship track", 
+       colkey = list(plot = FALSE))
 
 # add data to image; with  a color key
  scatter2D(colvar = O2sat, x = lon, y = lat, pch = 16,
-         add = TRUE, cex = 2, colkey = list(dist = 0.1), clab = "\%")
-         
- par(mar = PM)
+         add = TRUE, cex = 2, clab = "\%")
 
 ## =======================================================================
 ## scatter2D for time-series plots

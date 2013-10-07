@@ -1,7 +1,7 @@
 contour2D <- function (z, x = seq(0, 1, length.out = nrow(z)),
                    y = seq(0, 1, length.out = ncol(z)), ...,
                    col = NULL, NAcol = NULL, 
-                   colkey = list(side = 4), resfac = 1,
+                   colkey = NULL, resfac = 1,
                    clab = NULL, add = FALSE, plot = TRUE) {
 
   if (length(col) == 1)
