@@ -295,8 +295,10 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
     D <- decorate3d(xlim = xlim, ylim = ylim, zlim = zlim, 
 	     xlab = plist$dot$xlab, ylab = plist$dot$ylab, zlab =  plist$dot$zlab, 
 	     main = plist$dot$main, sub = plist$dot$sub, axes = axes)
+	  if (!axes)
+      box3d()   
   } else if (!add)
-    D <- title3d(xlab = plist$dot$xlab, ylab = plist$dot$ylab, zlab = plist$dot$zlab, 
+    D <- title3d(xlab = "", ylab = "", zlab = "", 
 	     main = plist$dot$main, sub = plist$dot$sub)	
 
   pp <- getplist()
