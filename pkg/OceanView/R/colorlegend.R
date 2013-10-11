@@ -9,33 +9,31 @@
 ## Is it necessary to draw a color key?
 ## =============================================================================
 
+## =============================================================================
+## Check if necessary to draw a color key
+## =============================================================================
+
 is.colkey <- function(colkey, col) {
   
   if (is.logical(colkey))
     return(colkey)
     
-  iscolkey <- ! is.null(colkey)
+  if (is.list(colkey))
+    return(TRUE)
+    
+  if (! is.null(colkey))
+    stop("'colkey' should be a list, a logical or NULL")
  
   iscol <- ispresent(col) 
   
   if (iscol) {
-    if ( length(col) == 1) 
+    if (length(col) == 1) 
       iscol <- FALSE
     else if (length(col) == 2 & col[1] == col[2]) 
       iscol <- FALSE
   }
   
-  if (!iscol) 
-    return(FALSE)
- 
-  else if (length(colkey) == 0) 
-    iscolkey <- FALSE
-  else if (! is.logical(colkey)) 
-    iscolkey <- TRUE
-  else if (colkey[[1]][1] == FALSE) 
-    iscolkey <- FALSE
-  
-  return(iscolkey)
+  return(iscol)
 }
 
 ## =============================================================================
@@ -60,13 +58,17 @@ check.colkey <- function(colkeypar, add = FALSE) {
   if (!is.list(colkeypar))
     colkeypar <- list()
       
-  parameter <- list(side = 4, length = 1, width = 1, dist = 0, shift = 0,
-      col.clab = NULL, cex.clab = par("cex.axis"),
+  parameter <- list(side = 4, #plot = TRUE,
+      length = 1, width = 1, dist = 0, shift = 0, addlines = FALSE,
+      col.clab = NULL, cex.clab = par("cex.lab"), 
+      side.clab = NULL, line.clab = NULL, adj.clab = NULL, font.clab = NULL, 
       at = NULL, labels = TRUE, tick = TRUE, line = NA, 
       pos = NA, outer = FALSE, font = NA, lty = 1, lwd = 1, 
-      lwd.ticks = 1, col.box = NULL, col.axis = NULL, col.ticks = NULL, hadj = NA, 
-      padj = NA, cex.axis = par("cex.axis"), mgp = NULL, tck = NULL, tcl = NULL, las = NULL)
-                             
+      lwd.ticks = 1, col.box = NULL, col.axis = NULL, 
+      col.ticks = NULL, hadj = NA, padj = NA, 
+      cex.axis = par("cex.axis"), mgp = NULL, 
+      tck = NULL, tcl = NULL, las = NULL)
+                                   
   colkey <- overrulepar(parameter, colkeypar)
   if (is.numeric(colkey$labels))
     colkey$labels <- as.logical(colkey$labels)

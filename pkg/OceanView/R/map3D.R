@@ -3,10 +3,78 @@
 ## =============================================================================
 remap <- function(var, ...) UseMethod ("remap")
 extract <- function(var, ...) UseMethod ("extract")
+changeres <- function(var, ...) UseMethod("changeres")
 
 ## =============================================================================
-## change resolution of a vector
+## Increase resolution from a matrix by a factor - x can be a matrix or a vector
 ## =============================================================================
+changeres.matrix <- function(var, x, y, resfac, na.rm = TRUE, ...) { 
+
+  resfac <- abs(rep(resfac, length.out = 2))
+  if (is.matrix(x) | is.matrix(y)) 
+    return(changeres_xmat(resfac, x, y, var, na.rm))
+  else 
+    return(changeres_xvec(resfac, x, y, var, na.rm))
+}
+
+changeres.array <- function(var, x, y, z, resfac, na.rm = TRUE, ...) { 
+
+  if (! is.vector(x) | ! is.vector(y) | ! is.vector(z))
+    stop ("'x', 'y', and 'z' should be a vector")
+
+  resfac <- abs(rep(resfac, length.out = 3))
+  xto <- changeresvec(x, resfac[1])
+  yto <- changeresvec(y, resfac[2])
+  zto <- changeresvec(z, resfac[3])
+  
+  return(remap.array (var, x, y, z, xto, yto, zto, na.rm, ...))
+}
+
+changeres_xvec <- function(resfac, x, y, z, na.rm) { 
+    
+  diffx <- diff(x)
+  diffy <- diff(y)
+  XX <- x
+  YY <- y 
+  RX <- 1/resfac[1]
+  RY <- 1/resfac[2]
+  if (resfac[1] > 1)
+    for (i in 1: (resfac[1]-1))  
+      XX <- c(XX, x[-length(x)] + diffx * i*RX)
+  else if (resfac[1] < 0.99) 
+    XX <- x[as.integer(seq(1, nrow(z), length.out = nrow(z)*resfac[1]))]
+  if (resfac[2] > 1)
+    for (i in 1: (resfac[2]-1))  
+      YY <- c(YY, y[-length(y)] + diffy * i*RY)
+  else if (resfac[2] < 0.99) 
+    YY <- y[as.integer(seq(1, ncol(z), length.out = ncol(z)*resfac[2]))]
+
+  XX <- unique(sort(XX))
+  YY <- unique(sort(YY))
+  if (na.rm & any(is.na(z)))
+    z <- remapxyNA(z, x, y, XX, YY)
+  else
+    z <- remapxy(z, x, y, XX, YY)
+  
+  list(var = z, x = XX, y = YY)
+}
+
+changeres_xmat <- function(resfac, x, y, z, na.rm) { 
+
+  xx <- 1:nrow(z)
+  yy <- 1:ncol(z)
+  XX <- changeres_xvec(resfac, xx, yy, x, na.rm)$var 
+  YY <- changeres_xvec(resfac, xx, yy, y, na.rm)$var
+  ZZ <- changeres_xvec(resfac, xx, yy, z, na.rm)$var
+  
+  list(var = ZZ, x = XX, y = YY)
+}
+
+
+## =============================================================================
+## change resolution to arbitrary set of x, y (z) values
+## =============================================================================
+
 changeresvec <- function(x, resfac) {
   resfac[is.na(resfac)] <- 1
 
@@ -24,7 +92,8 @@ changeresvec <- function(x, resfac) {
   xto <- sort(xto)
   return(xto)
 }
-# same as from plot3D....
+
+# same as from package plot3D....
 remapxy <- function (z, x, y, xto, yto) {
     Nx <- length(x)    
     Ny <- length(y)
@@ -108,8 +177,7 @@ remapxyNA <- function(z, x = x, y = y, xto = x, yto = y) {
 ## 2-D mapping, x, y a vector, var a matrix
 ## =============================================================================
 
-remap.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1, 
-  na.rm = TRUE,...) {
+remap.matrix <- function(var, x, y, xto = NULL, yto = NULL, na.rm = TRUE,...) {
 
   if (is.array(x)) {
     if (length(dim(x)) !=  1)
@@ -135,19 +203,10 @@ remap.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1,
 
   DD <- dim(var)
   
-  resfac <- abs(rep(resfac, length.out = 2))
-  if (any (resfac != 1)) {
-    if (is.null(xto))
-      xto <- changeresvec(x, resfac[1])
-    if (is.null(yto))
-      yto <- changeresvec(y, resfac[2])
-
-  } else {
-    if (is.null(xto))
-      xto <- seq(min(x), max(x), length.out = Nx)
-    if (is.null(yto))
-      yto <- seq(min(y), max(y), length.out = Ny)
-  } 
+  if (is.null(xto))
+    xto <- seq(min(x), max(x), length.out = Nx)
+  if (is.null(yto))
+    yto <- seq(min(y), max(y), length.out = Ny)
 
   if (min(xto) < min(x) | max(xto) > max(x))
     stop("'x' should embrace 'xto'")
@@ -168,7 +227,7 @@ remap.matrix <- function(var, x, y, xto = NULL, yto = NULL, resfac = 1,
   else
     M <- remapxy(var, x, y, xto, yto)
 
-  list (var = M, x = xto, y = yto)
+  list (var = M, x = as.vector(xto), y = as.vector(yto))
 }
 
 ## =============================================================================
@@ -292,7 +351,7 @@ remapxyzNA <- function(var, x, y, z, xto, yto, zto) {
 ## =============================================================================
 
 remap.array <- function(var, x, y, z, xto = NULL, yto = NULL, 
-  zto = NULL, resfac = 1, na.rm = TRUE, ...) {
+  zto = NULL, na.rm = TRUE, ...) {
 
   if (is.array(x)) {
     if (length(dim(x)) !=  1)
@@ -318,24 +377,12 @@ remap.array <- function(var, x, y, z, xto = NULL, yto = NULL,
   Nz <- length(z)
   DD <- dim(var)
   
-  resfac <- abs(rep(resfac, length.out = 3))
-
-  if (any(resfac != 1)) {
-    if (is.null(xto))
-      xto <- changeresvec(x, resfac[1])
-    if (is.null(yto))
-      yto <- changeresvec(y, resfac[2])
-    if (is.null(zto))
-      zto <- changeresvec(z, resfac[3])
-
-   } else {
-    if (is.null(xto))
-      xto <- seq(min(x), max(x), length.out = Nx)
-    if (is.null(yto))
-      yto <- seq(min(y), max(y), length.out = Ny)
-    if (is.null(zto))
-      zto <- seq(min(z), max(z), length.out = Nz)
-  } 
+  if (is.null(xto))
+    xto <- seq(min(x), max(x), length.out = Nx)
+  if (is.null(yto))
+    yto <- seq(min(y), max(y), length.out = Ny)
+  if (is.null(zto))
+    zto <- seq(min(z), max(z), length.out = Nz)
 
   if (min(xto) < min(x) | max(xto) > max(x))
     stop("'x' should embrace 'xto'")
@@ -360,7 +407,7 @@ remap.array <- function(var, x, y, z, xto = NULL, yto = NULL,
   else
     M <- remapxyz(var, x, y, z, xto, yto, zto)
   
-  list (var = M, x = xto, y = yto, z = zto)
+  list (var = M, x = as.vector(xto), y = as.vector(yto), z = as.vector(zto))
 }
 
 ## =============================================================================

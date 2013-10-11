@@ -11,7 +11,7 @@
 
 Mcommon <- function (M, ..., verbose = FALSE) {     
 
-# creates a list with subsets of matrices that have only common elements
+# creates a list with subsets of matrices that have only common variables
 
   Colnames <- function(M) 
     if (is.null (cn <- colnames(M))) return (1:ncol(M)) else return(cn)
@@ -106,12 +106,58 @@ Mplot <- function (M, ...,
                    x = 1, 
                    select = NULL, which = select, 
                    subset = NULL, ask = NULL, 
-                   legend = list(x = "top")) {
+                   legend = list(x = "center"),
+                   pos.legend = NULL,
+                   xyswap = FALSE, rev = "") {
 
   getnames <- function(x) {
     if (is.null (cn <- colnames(x))) return (1:ncol(x)) else return(cn)
   }
-                   
+
+  plotlegend <- function () {   
+    # Add legend, if legend not equal to NULL or not equal to FALSE
+    if (! is.list(legend)) {
+      if (legend[1] == FALSE) 
+        legend <- list()
+        else if (legend[1] == TRUE)  
+          legend <- list(x = "top")
+    }
+  
+    if (length(legend) > 0) {
+      if (!is.list(legend)) 
+        stop ("'legend' should be a list or NULL")
+
+      if (is.null(legend$col))
+        legend$col <- Dotpoints$col
+
+      if (is.null(legend$pt.bg))
+        legend$pt.bg <- Dotpoints$pt.bg
+
+      if (is.null(legend$lwd))
+        legend$lwd <- Dotpoints$lwd
+
+      if (is.null(legend$pch)) {
+        legend$pch <- Dotpoints$pch
+        legend$pch[Dotpoints$type == "l"] <- NA
+      }
+    
+      if (is.null(legend$lty)) {
+        legend$lty <- Dotpoints$lty
+        legend$lty[Dotpoints$type == "p"] <- NA
+        if (all(is.na(legend$lty)))
+          legend$lty <- NULL
+      }
+
+      if (is.null(legend$legend))
+        legend$legend <- names(x2)
+      if (is.null(legend$x))
+        legend$x <- "center"
+    
+      do.call("legend", legend)
+    }
+  }
+
+                  
   # The ellipsis
   ldots   <- list(...)
   
@@ -140,6 +186,13 @@ Mplot <- function (M, ...,
   }
 
   np      <- length(Which)  
+  if (!is.null(pos.legend)) {
+    if (is.character(pos.legend)) 
+      pos.legend <- which(pos.legend == Which)
+    if (pos.legend > np)
+      stop("'pos.legend' should be referring to a variable name or number to plot")
+  } else
+    pos.legend <- np
   
  # Position of variables to be plotted in "M" and other matrices
   xWhich <- list()
@@ -151,7 +204,7 @@ Mplot <- function (M, ...,
     Which <- varnames[xWhich[[1]]]
 
   # number of figures in a row and interactively wait if remaining figures
-  ask <- setplotpar(ldots, np, ask)                   
+  ask <- setplotpar(ldots, np + (pos.legend == 0), ask)                   
   if (ask) {
     oask <- devAskNewPage(TRUE)
     on.exit(devAskNewPage(oask))
@@ -188,6 +241,9 @@ Mplot <- function (M, ...,
     }  
   } else isub <- rep(TRUE, nx)
 
+  xyswap <- rep(xyswap, length = np)
+  rev <- rep(rev, length = np)
+
  # LOOP for each output variable (plot)
   for (ip in 1 : np) {
 
@@ -200,77 +256,73 @@ Mplot <- function (M, ...,
       Ylog  <- length(grep("y",dotmain$log))
       Xlog  <- length(grep("x",dotmain$log))
     }
-                                                           
+
    # first object plotted (new plot created)
     ix <- xWhich[[1]][[ip]]      # position of variable in 'x'
 
-    if (is.null(yylim[[ip]]))
-      dotmain$ylim <- SetRange(yylim[[ip]], x2, isub, xWhich, ip, Ylog)
-    else
-      dotmain$ylim <- yylim[[ip]]
+    if (! xyswap[ip]) {
+      if (is.null(yylim[[ip]]))
+        dotmain$ylim <- SetRange(yylim[[ip]], x2, isub, xWhich, ip, Ylog)
+      else
+        dotmain$ylim <- yylim[[ip]]
 
-    if (is.null(xxlim[[ip]])) {
-      dotmain$xlim <- SetRange(xxlim[[ip]], x2, isub, xPos, 1, Xlog)
-      if (xisfactor) 
-        dotmain$xlim <- dotmain$xlim + c(-0.5, 0.5)
-    } else
-      dotmain$xlim <- xxlim[[ip]]
+      if (is.null(xxlim[[ip]])) {
+        dotmain$xlim <- SetRange(xxlim[[ip]], x2, isub, xPos, 1, Xlog)
+        if (xisfactor) 
+          dotmain$xlim <- dotmain$xlim + c(-0.5, 0.5)
+      } else
+        dotmain$xlim <- xxlim[[ip]]
+    } else {
+      if (is.null(xxlim[[ip]]))
+        dotmain$xlim <- SetRange(NULL, x2, isub, xWhich, ip, Ylog)
+      else
+        dotmain$xlim <- xxlim[[ip]]
+
+      if (is.null(yylim[[ip]])) {
+        dotmain$ylim <- SetRange(NULL, x2, isub, xPos, 1, Xlog)
+        if (xisfactor) 
+          dotmain$ylim <- dotmain$ylim + c(-0.5, 0.5)
+      } else
+        dotmain$ylim <- yylim[[ip]]
+    }
+    if (length(grep("x",rev[ip])))
+      dotmain$xlim <- rev(dotmain$xlim)
+    if (length(grep("y",rev[ip])))
+      dotmain$ylim <- rev(dotmain$ylim)
     
-    do.call("plot", c(alist(x2[[1]][isub[[1]], xPos[1]], x2[[1]][isub[[1]], ix]), dotmain, dotpoints))
+    if (xyswap[ip]) {
+      do.call("plot", c(alist(y = x2[[1]][isub[[1]], xPos[1]], 
+        x = x2[[1]][isub[[1]], ix]), dotmain, dotpoints))
+    } else
+      do.call("plot", c(alist(x = x2[[1]][isub[[1]], xPos[1]], 
+        y = x2[[1]][isub[[1]], ix]), dotmain, dotpoints))
 
     if (nother > 0)        # if other outputs
       for (j in 2:nx) {
         ix <- xWhich[[j]][[ip]]      # position of variable in 'x2'
-        if (!is.na(ix))
-          do.call("lines", c(alist(x2[[j]][isub[[j]], xPos[j]], x2[[j]][isub[[j]], ix]),
-                extractdots(Dotpoints, j)) )
+        if (!is.na(ix)) {
+         if (xyswap[ip]) 
+          do.call("lines", c(alist(y = x2[[j]][isub[[j]], xPos[j]], 
+                x = x2[[j]][isub[[j]], ix]), extractdots(Dotpoints, j)) )
+
+         else
+          do.call("lines", c(alist(x = x2[[j]][isub[[j]], xPos[j]], 
+                y = x2[[j]][isub[[j]], ix]), extractdots(Dotpoints, j)) )
+        }
       }
+     if (pos.legend == i)
+       plotlegend()
+     
   }
   
   if (! is.null(mtext))
     mtext(outer = TRUE, side = 3, mtext, line = par()$oma[3]-1, 
           cex = par()$cex*1.2)
-     
-  # Add legend, if legend not equal to NULL or not equal to FALSE
-  if (! is.list(legend)) {
-    if (legend[1] == FALSE) 
-      legend <- list()
-    else if (legend[1] == TRUE)  
-      legend <- list(x = "top")
-  }
-  
-  if (length(legend) > 0) {
-    if (!is.list(legend)) 
-      stop ("'legend' should be a list or NULL")
+  if (pos.legend == 0) {
+    plot.new()
+    plotlegend()
+  }   
 
-    if (is.null(legend$col))
-      legend$col <- Dotpoints$col
-
-    if (is.null(legend$pt.bg))
-      legend$pt.bg <- Dotpoints$pt.bg
-
-    if (is.null(legend$lwd))
-      legend$lwd <- Dotpoints$lwd
-
-    if (is.null(legend$pch)) {
-      legend$pch <- Dotpoints$pch
-      legend$pch[Dotpoints$type == "l"] <- NA
-    }
-    
-    if (is.null(legend$lty)) {
-      legend$lty <- Dotpoints$lty
-      legend$lty[Dotpoints$type == "p"] <- NA
-      if (all(is.na(legend$lty)))
-        legend$lty <- NULL
-    }
-
-    if (is.null(legend$legend))
-      legend$legend <- names(x2)
-    if (is.null(legend$x))
-      legend$x <- "top"
-    
-    do.call("legend", legend)
-  }
 }
 
 ## =============================================================================

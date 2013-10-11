@@ -136,7 +136,7 @@ quiver2D.default <- function (u, ...) quiver2D.matrix(u, ...)
 quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ..., 
                     scale = 1, arr.max = 0.2, arr.min = 0, speed.max = NULL,
                     by = NULL, type = "triangle", 
-                    col = NULL, NAcol = "white", colkey = list(side = 4), 
+                    col = NULL, NAcol = "white", colkey = NULL, 
                     mask = NULL, image = FALSE, contour = FALSE, 
                     clim = NULL, clab = NULL, add = FALSE, plot = TRUE)  {
 # ------------------------------------------------------------------------------

@@ -2,6 +2,9 @@
 \alias{remap}
 \alias{remap.matrix}
 \alias{remap.array}
+\alias{changeres}
+\alias{changeres.matrix}
+\alias{changeres.array}
 \alias{extract}
 \alias{extract.matrix}
 \alias{extract.array}
@@ -12,17 +15,24 @@
 \alias{transectsigma}
 
 \title{
-   Functions for remapping and extracting from 2-D or 3D data
+   Functions for remapping, changing the resolution, and extracting from 2-D or 3-D data.
 }
 \description{
-  S3 functions \code{remap} map a variable ( \code{var}) from a \code{matrix} or array 
-  with x, y (and z) coordinates 
-  to a matrix or array with coordinates given by xto, yto (and zto).
+  S3 functions \code{remap} maps a variable (\code{var}) (a \code{matrix} or \code{array})
+  with \code{x}, \code{y} (and \code{z}) coordinates 
+  to a \code{matrix} or \code{array} with coordinates given by \code{xto}, \code{yto} (and \code{zto}).
   \code{x, y, z, xto, yto} and \code{zto} are all vectors.
-  The functions extrapolate to all combinations of xto, yto and zto. 
+  The functions interpolate to all combinations of \code{xto, yto} and \code{zto}. 
   Simple 2-D linear interpolation is used. 
-  Result is a matrix or array.
+  Result is a \code{matrix} or \code{array}.
 
+  Function \code{changeres} changes the resolution of a variable (\code{var}) (a \code{matrix} or \code{array})
+  with \code{x}, \code{y} (and \code{z}) coordinates.
+  If \code{var} is a matrix, then \code{x, y} can be either a vector or a matrix; if 
+  \code{var} is an array, then \code{x, y, z} should all be vectors.
+  Simple 2-D linear interpolation is used. 
+  Result is a \code{matrix} or \code{array}.
+  
   S3-functions \code{extract} map a variable (\code{var}) from a matrix with (x, y) coordinates
    or from an array with (x, y, z) coordinates to the xy 
    coordinate \emph{pair} \code{xyto} or xyz coordinate \emph{triplets} \code{xyzto}
@@ -39,40 +49,47 @@
 
 }
 \usage{
-  remap        (var, ...)
+remap        (var, ...)
   
-  \method{remap}{matrix}(var, x, y, xto = NULL, yto = NULL, 
-          resfac = 1, na.rm = TRUE, ...)
+\method{remap}{matrix}(var, x, y, xto = NULL, yto = NULL, 
+          na.rm = TRUE, ...)
 
-  \method{remap}{array}(var, x, y, z, xto = NULL, yto = NULL, zto = NULL, 
-          resfac = 1, na.rm = TRUE, ...)
+\method{remap}{array}(var, x, y, z, xto = NULL, yto = NULL, zto = NULL, 
+          na.rm = TRUE, ...)
 
-  extract    (var, ...)
-
-  \method{extract}{matrix}(var, x, y, xyto, ...)
-
-  \method{extract}{array}(var, x, y, z, xyzto, ...)
-
-  transect(var, x, y, z, to, margin = "xy", ...)
-
-  mapsigma   (var, ...)
+changeres    (var, ...)
   
-  \method{mapsigma}{matrix}(var = NULL, sigma, signr = 2, x = NULL,  
+\method{changeres}{matrix}(var, x, y, resfac, na.rm = TRUE, ...)
+
+\method{changeres}{array}(var, x, y, z, resfac, na.rm = TRUE, ...)
+
+extract    (var, ...)
+
+\method{extract}{matrix}(var, x, y, xyto, ...)
+
+\method{extract}{array}(var, x, y, z, xyzto, ...)
+
+transect(var, x, y, z, to, margin = "xy", ...)
+
+mapsigma   (var, ...)
+  
+\method{mapsigma}{matrix}(var = NULL, sigma, signr = 2, x = NULL,  
     depth = NULL, numdepth = NULL, xto = NULL, resfac = 1, ...)
     
-  \method{mapsigma}{array}(var = NULL, sigma, signr = 3, x = NULL, y = NULL, 
+\method{mapsigma}{array}(var = NULL, sigma, signr = 3, x = NULL, y = NULL, 
     depth = NULL, numdepth = NULL, xto = NULL, yto = NULL, 
     resfac = 1, ...)
 
-  transectsigma(var = NULL, sigma, x, y, to, depth = NULL, 
+transectsigma(var = NULL, sigma, x, y, to, depth = NULL, 
                 numdepth = NULL, resfac = 1, ...)
 
 }
 
 \arguments{
-  \item{var }{Matrix or array with values to be mapped to lower or higher resolution (\code{map}), 
-    whose values have to be extracted (\code{extract}, \code{transect}),
-    or which has to be mapped to the depth coordinates (\code{mapsigma}).
+  \item{var }{Matrix or array with values to be mapped to other coordinates (\code{remap}),
+    or to lower or higher resolution (\code{changeres}), 
+    or whose values have to be extracted (\code{extract}, \code{transect}),
+    or which has to be mapped from sigma to depth coordinates (\code{mapsigma}).
     For \code{transect} and \code{transectsigma}, \code{var} has to be an array.
     }
   \item{x }{Vector with original x-coordinates of the matrix or array \code{var} to be mapped.
@@ -99,7 +116,6 @@
     (it is not allowed to extrapolate outside of the region).
     If \code{NULL} then the range of \code{z} is covered, with the same number of points.
     }
-    
   \item{xyto }{Two-columned matrix, with first and second column specifying the 
     x- respectively y-coordinates to which the matrix \code{var} should be mapped. 
     The elements should be embraced by the elements in \code{x} (first column)
@@ -150,7 +166,7 @@
     This uses simple linear interpolation. 
     If \code{resfac} is one number then the resolution will be increased similarly 
     in x, y- and z-direction. 
-    \code{resfac} is overruled if \code{xto}, \code{yto} or \code{zto} is specified.
+    In case of \code{mapsigma}, \code{resfac} is overruled if \code{xto}, \code{yto} or \code{zto} is specified.
     }
   \item{na.rm }{How to treat \code{NA}s in the matrix or array \code{var}.
     If \code{TRUE}, they are ignored while interpolating; this will make the 
@@ -248,6 +264,23 @@
 # save plotting parameters
  pm <- par("mfrow")
 
+## =======================================================================
+## Simple examples
+## =======================================================================
+ M <- matrix(nrow = 2, data = 1:4)
+ remap(M, x = 1:2, y = 1:2, 
+   xto = seq(1, 2, length.out = 3), yto = 1:2) 
+ 
+ changeres(M, x = 1:2, y = 1:2, resfac = c(2, 1))
+ changeres(M, x = 1:2, y = 1:2, resfac = 2)
+
+# x and or y are a matrix.
+ changeres(var = M, x = M, y = 1:2, resfac = c(2, 1))
+ changeres(M, x = M, y = 1:2, resfac = 2)
+
+# not so simple for remap:
+
+  
 ## =======================================================================
 ## Use remap to add more detail to a slice3D plot
 ## =======================================================================

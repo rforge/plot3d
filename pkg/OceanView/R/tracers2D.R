@@ -6,7 +6,7 @@
 ## =============================================================================
 
 tracers2D <- function(x, y, colvar = NULL, ..., 
-                    col = NULL, NAcol = "white", colkey = list(side = 4), 
+                    col = NULL, NAcol = "white", colkey = NULL, 
                     mask = NULL, image = FALSE, contour = FALSE, 
                     clim = NULL, clab = NULL)  {
 # ------------------------------------------------------------------------------

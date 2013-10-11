@@ -1,5 +1,5 @@
 vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ..., 
-                       col = NULL, NAcol = "white", colkey = list(side = 4), 
+                       col = NULL, NAcol = "white", colkey = NULL, 
                        by = 1, arr = FALSE, xfac = NULL, 
                        clim = NULL, clab = NULL, add = FALSE) {
   

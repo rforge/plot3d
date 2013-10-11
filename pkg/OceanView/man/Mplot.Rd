@@ -14,7 +14,9 @@
 }
 \usage{
   Mplot (M, ..., x = 1, select = NULL, which = select, 
-         subset = NULL, ask = NULL, legend = list(x = "top")) 
+         subset = NULL, ask = NULL, 
+         legend = list(x = "center"), pos.legend = NULL,
+         xyswap = FALSE, rev = "") 
 
   Msplit (M, split = 1, subset = NULL) 
 
@@ -44,7 +46,18 @@
     \code{\link{dev.interactive}}.
     }
   \item{legend }{A \code{list} with parameters for the legend 
-    to be added.
+    to be added. If \code{FALSE}, then no legend will be drawn.
+    } 
+  \item{pos.legend }{The position of the legend, a number. The default
+    is to put the legend in the last figure. 
+    Also allowed is \code{pos.legend = 0}, 
+    which will create a new figure with only the legend.
+    } 
+  \item{xyswap }{If \code{TRUE}, then the x- and y-values will be swapped.
+    } 
+  \item{rev }{a character string which contains "x" if the x axis is to be 
+    reversed, "y" if the y axis is to be reversed and "xy" or "yx" 
+    if both axes are to be reversed.
     } 
   \item{split }{The name or number of the column with the factor 
     according to which the matrix will be split. 
