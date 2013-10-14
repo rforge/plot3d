@@ -102,7 +102,9 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   else {
     if (! add)
       rgl.clear()
-    do.call("material3d", dots[names(dots) %in% par3dpars]) #dots[!names(dots) %in% materialnames])
+    dotmat <- dots[names(dots) %in% par3dpars]  
+    if (length(dotmat) > 0)
+      do.call("material3d", dotmat) #dots[!names(dots) %in% materialnames])
   }
   if (! is.null(material))
     do.call("material3d", material)
@@ -160,7 +162,10 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
 
  # two types of polygons
   if (length(poly$x) > 0) {
-    poly$alpha[is.na(poly$alpha)] <- material3d()$alpha  
+    if (is.null(poly$alpha))
+      poly$alpha <- material3d()$alpha 
+    else  
+      poly$alpha[is.na(poly$alpha)] <- material3d()$alpha  
     if (nrow(poly$x) > 5)
       stop ("cannot handle polygons with more than 4 nodes in plotrgl")
 

@@ -40,6 +40,8 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
 
   Any function of package \code{plot3D}: see e.g. help files of
   \link{persp3D}, \link{scatter3D}, \link{arrows3D}, \link{slice3D}, \link{surf3D}.
+  
+  Direct rgl functions, see \link{persp3Drgl}, \code{scatter3Drgl}, etc....
 }
 
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
@@ -54,7 +56,7 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  (when \code{scale = TRUE} and \code{expand = 1}).
 
  The translation of \link{scatter3D} ignores the \code{pch} argument but displays
- all symbols as squares (if pch = ".") or as filled circles.  
+ all symbols as squares (if \code{pch = "."}) or as filled circles.  
 
  The color key is not (cannot be) plotted in rgl.
  
@@ -62,8 +64,8 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  For \code{lwd}, this has been overruled, i.e. line widths can be a vector. 
  It is still not possible to use different line types in one type of object. 
 
-  The actions of the mouse on the plots is to rotate (left), to move (middle), 
-  and to zoom it (right).
+ The actions of the mouse on the plots is to rotate (left), to move (middle), 
+ and to zoom it (right).
 }
 
 \examples{
@@ -78,20 +80,13 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
  persp3D(z = volcano, contour = list(side = "zmax"))
 
  plotrgl(new = TRUE) # new window
- plotrgl(new = FALSE, lighting = TRUE) 
- plotrgl(new = FALSE, lighting = TRUE, smooth = TRUE)
+ plotrgl(new = FALSE, lighting = TRUE, 
+   xlim = c(0.2, 0.8), smooth = TRUE)
+
+# same:
+# persp3Drgl(z = volcano, contour = list(side = "zmax"), 
+#  lighting = TRUE, xlim = c(0.2, 0.8), smooth = TRUE)
   
-## =======================================================================
-## hist3D
-## =======================================================================
-
- VV   <- volcano[seq(1, 87, 10), seq(1, 61, 10)]
-
-# transparent colors
- hist3D(z = VV, scale = FALSE, expand = 0.01,
-   col = jet.col(100, alpha = 0.3),  border = "black")
- plotrgl(alpha = 0.5)
-
 ## =======================================================================
 ## scatters with fitted surface and droplines (see ?scatter3D)
 ## =======================================================================
@@ -144,47 +139,7 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
 
  plotrgl()
 
-## =======================================================================
-## slices from 3D full data set
-## =======================================================================
 
- par(mfrow = c(1, 1))
- x <- y <- z <- seq(-4, 4, by = 0.1)
- M <- mesh(x, y, z)
-
- R <- with (M, sqrt(x^2 + y^2 + z^2))
- p <- sin(2*R) /(R+1e-3)
-
- slice3D(x, y, z, colvar = p, d = 2, theta = 60,
-         xs = c(-4, 0), ys = c(-4, 0, 4), zs = c(-4, 0))
- plotrgl(smooth =  TRUE)
- 
-## =======================================================================
-## 3D surfaces
-## =======================================================================
-
- # create grid matrices
- X       <- seq(0, pi, length.out = 100)
- Y       <- seq(0, 2*pi, length.out = 100)
- M       <- mesh(X, Y)
- phi     <- M$x
- theta   <- M$y
-
-# x, y and z grids
- r <- sin(4*phi)^3 + cos(2*phi)^3 + sin(6*theta)^2 + cos(6*theta)^4
- x <- r * sin(phi) * cos(theta)
- y <- r * cos(phi)
- z <- r * sin(phi) * sin(theta)
-
-# no shading or lighting in oridinary device
- surf3D(x, y, z, box = FALSE, theta = 60, col = "lightblue", plot = FALSE)
-
-# add lighting afterwards in R graphics
- plotdev(lighting = TRUE, lphi = 0) 
-
-# add light and smooth in rgl
- plotrgl(lighting = TRUE, smooth = TRUE)
- 
 ## =======================================================================
 ## spheresurf3D
 ## =======================================================================
