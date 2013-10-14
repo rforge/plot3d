@@ -252,7 +252,6 @@ This means that the x- y- and z- axes range from [-1, 1].
  y  <- sin(v)
  z  <- sin(u + v)
 
-# with default box type that has only back panels (bty)
  surf3D(x, y, z, colvar = z, border = "black", 
         colkey = FALSE)
 
