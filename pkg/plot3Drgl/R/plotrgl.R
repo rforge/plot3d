@@ -106,7 +106,7 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
     if (length(dotmat) > 0)
       do.call("material3d", dotmat) #dots[!names(dots) %in% materialnames])
   }
-  if (! is.null(material))
+  if (length(material) > 0)
     do.call("material3d", material)
 
   if (length(plist) == 0)

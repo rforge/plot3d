@@ -1,5 +1,5 @@
 namespersp <- c("xlim", "ylim", "zlim", "xlab", "ylab", "zlab",
-        "main", "sub", "r", "d", "scale", "box", "axes", 
+        "main", "sub", "r", "d", "scale", "expand", "box", "axes", 
         "cex", "pch", "lwd", "lty", "type",
         "nticks", "col.ticks", "lwd.ticks", "ticktype",
         "cex.axis", "col.axis", "font.axis", "col.panel",
@@ -9,16 +9,24 @@ namespersp <- c("xlim", "ylim", "zlim", "xlab", "ylab", "zlab",
 plot3Dfunrgl <- function(funcname, ...)  {
   form <- c(names(formals(funcname)), namespersp, "")
   dots <- list(...)
-  nd <- names(dots)
-  irgl <- unique(c(which(!nd %in% form ), 
-            which(nd %in% c("lighting", "add", "smooth"))))
-  rgldots <- dots[irgl]
-  dots[irgl] <- NULL
+  nd <- names(dots)   
+  plot <- dots$plot
+  if (is.null(plot))
+    plot <- TRUE
   dots$plot <- FALSE
+  if (is.null(dots$add))
+    dots$add <- FALSE
+  irgl <- unique(c(which(!nd %in% form ), 
+            which(nd %in% c("lighting", "smooth"))))
+  rgldots <- c(dots[irgl], add = dots$add)
+  dots[irgl] <- NULL
+  if(dots$add)
+    rgldots$new <- FALSE
   plot3D:::refresh(FALSE)
   do.call(funcname, dots)
   plot3D:::refresh(TRUE)
-  do.call ("plotrgl", rgldots) 
+  if (plot) 
+    do.call ("plotrgl", rgldots) 
 }
 
 persp3Drgl <- function(...)
