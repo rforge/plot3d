@@ -334,13 +334,13 @@ addraster <- function (x, y, col, xlim, ylim, angle, dots) {
   if (any(dx == 0) | max(sign(dx)) != min(sign(dx)))
     stop("'x'-values should be increasing or decreasing, not constant")
     
-  if (max(dx)/min(dx) > 1.01)
+  if (max(dx)/min(dx) > 1.1)
     stop("'x' should be quasi-equally spaced if  rasterImage is used")
   dy <- diff(y)
   if (any(dy == 0) | max(sign(dy)) != min(sign(dy)))
     stop("'y'-values should be increasing or decreasing, not constant")
-  if (max(dy)/min(dy) > 1.01)
-    stop("'y' should be equally spaced if  rasterImage is used")
+  if (max(dy)/min(dy) > 1.1)
+    stop("'y' should be quasi-equally spaced if  rasterImage is used")
 
   if (is.null(xlim)) xlim <- range(x)
   if (is.null(ylim)) ylim <- range(y)
