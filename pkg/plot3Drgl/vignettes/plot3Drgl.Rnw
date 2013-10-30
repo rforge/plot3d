@@ -83,11 +83,13 @@ options(width=75)
 The \R{ } package \pkg{plot3D} \citep{plot3D} provides functions for plotting 2- and 3-D data.
 Package \p allows to plot these functions also in openGL, as made available by package \pkg{rgl} \citep{rgl}.
 
-One first creates a plot in base R-graphics, and then uses function \code{plotrgl}
-to depict the same figure in rgl. The main advantage of rgl over base graphics is
+One possibility is to first create a plot in base R-graphics, and then uses function \code{plotrgl}
+to depict the same figure in rgl. 
+
+The main advantage of rgl over base graphics is
 that it allows to interactively rotate, zoom, and shift the graphics,
 and even select regions. However, in contrast to the base R functions,
-it does not allow to plot a colorkey.
+it does not plot a colorkey.
 
 \section{Function plotrgl}
 Typically we start by making a 3D plot using functions from package \pkg{plot3D}.
@@ -111,6 +113,11 @@ Now you can use the left mouse key to rotate the plot, the middle key to move it
 and the right key to zoom. You may also want to try function \code{cutrgl},
 which allows you to cut parts of the plot.
 
+An alternative, shorter version to do the same is:
+\begin{verbatim}
+persp3Drgl(z = volcano, smooth = TRUE, lighting = TRUE)
+
+\end{verbatim}
 \setkeys{Gin}{width=0.6\textwidth}
 \begin{figure}[ht]
 \begin{center}

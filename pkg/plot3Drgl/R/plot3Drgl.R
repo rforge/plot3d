@@ -63,4 +63,8 @@ rect3Drgl <- function(...)
   plot3Dfunrgl("rect3D", ...)
 text3Drgl <- function(...)
   plot3Dfunrgl("text3D", ...)
+image3Drgl <- function(...)
+  plot3Dfunrgl("image3D", ...)
+contour3Drgl <- function(...)
+  plot3Dfunrgl("contour3D", ...)
   

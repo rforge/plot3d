@@ -12,6 +12,8 @@
 \alias{surf3Drgl}
 \alias{spheresurf3Drgl}
 \alias{segments3Drgl}
+\alias{image3Drgl}
+\alias{contour3Drgl}
 \alias{box3Drgl}
 \alias{border3Drgl}
 \alias{rect3Drgl}
@@ -54,7 +56,9 @@ voxel3Drgl(...)
 surf3Drgl(...)
 spheresurf3Drgl(...)
 segments3Drgl(...)
-box3Drgl(...)
+image3Drgl(...)
+contour3Drgl(...)
+box3Drgl(...
 border3Drgl(...)
 rect3Drgl(...)
 text3Drgl(...)
