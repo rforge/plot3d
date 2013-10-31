@@ -106,7 +106,7 @@ Here the \code{...} are any parameter that would be passed to \pkg{rgl} function
 
 Argument \code{smooth} adds Gouraud shading, while \code{lighting} adds a light source.
 <<fig=true, grdevice=rgl.Sweave, pdf=false, width = 6, height = 6, resolution = 50>>=
-plotrgl(smooth = TRUE, lighting = TRUE, new = FALSE)
+plotrgl(smooth = TRUE, lighting = TRUE)
 @
 
 Now you can use the left mouse key to rotate the plot, the middle key to move it,
