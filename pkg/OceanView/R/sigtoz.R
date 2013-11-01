@@ -30,7 +30,13 @@ mapsigma.matrix <- function (var = NULL,
   if (is.null(x))
     x <- seq(0, 1, length.out = Dxy[1])
 
+  if (length(x) != Dxy[1])
+    stop("dimensions of 'var' and 'x' not compatible: ", Dxy[1], " not = ", length(x))
+
   yto <- y <- seq(0, 1, length.out = DD[signr] )
+  if (length(y) != DD[signr])
+    stop("dimensions of 'var' and 'y' not compatible: ", DD[signr], " not = ", length(y))
+
   resfac <- abs(rep(resfac, length.out = 2))
   changeres <- FALSE
   if (any(resfac > 1)) {

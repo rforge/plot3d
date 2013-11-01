@@ -243,6 +243,20 @@ data(Sylt3D)
 # visualise it in rgl window
  plotrgl()
 
+## the same, as a movie
+
+ persp3Drgl(x = x, y = y, z = -Sylt3D$depth, smooth = TRUE, 
+   col = "grey", lighting = TRUE)
+
+ movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, add = TRUE, 
+   ys = yto)
+
+# in order to wait inbetween slice drawings until a key is hit:
+\dontrun{
+ movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, add = TRUE, 
+   ask = TRUE, ys = yto)
+}
+
 ## =============================================================================
 ## The 3-D data set - plotted as isosurfaces
 ## =============================================================================

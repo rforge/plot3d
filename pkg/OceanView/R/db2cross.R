@@ -6,7 +6,7 @@
 createfactor <- function(var, df = 0) {
   if (df == 0 | is.na(df)) {
     var.unique <- sort(unique(var))
-    return(list(var = var.unique, factor = 1 : length(var.unique), mean = var.unique))
+    return(list(var.input = var.unique, factor = 1 : length(var.unique), var.output = var.unique))
   } else {  
     var.unique <- sort(unique(var))
     var.diff   <- c(df+1, diff(var.unique)) # df+1 to make sure first value is selected
@@ -15,7 +15,7 @@ createfactor <- function(var, df = 0) {
       FUN = function(x) which.min(abs(x-var.min)))
     var.mean   <- sapply(X = 1:length(var.min), 
       FUN = function(x) mean(var.unique[which(var.factor == x)]))
-    return(list(var = var.unique, factor = var.factor, mean = var.mean))
+    return(list(var.input = var.unique, factor = var.factor, var.output = var.mean))
   }
 }
 
@@ -24,12 +24,13 @@ closestfactor <- function(var, out) {
     var.unique <- sort(unique(var))
     var.factor <- sapply(X = var.unique, 
       FUN = function(x) which.min(abs(x-out)))
-    return(list(var = var.unique, factor = var.factor, mean = out))
+    return(list(var.input = var.unique, factor = var.factor, var.output = out))
 }
 
                                                
-db2cross <- function(input, row = 1, col = 2, value = 3, 
-  df.row = NA, df.col = NA, out.row = NA, out.col = NA) {
+db2cross <- function(input, row = 1, col = 2, value = 3, subset = NULL, 
+  df.row = NA, df.col = NA, out.row = NA, out.col = NA, 
+  full.out = FALSE) {
 
   if (is.character(value))
     value <- which(colnames(input) == value)
@@ -37,6 +38,16 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
     row <- which(colnames(input) == row)
   if (is.character(col))
     col <- which(colnames(input) == col)
+
+  # quick and dirty
+  if (!missing(subset)){
+    e <- substitute(subset)
+    r <- eval(e, as.data.frame(input), parent.frame())
+    if (!is.logical(r))
+      stop("'subset' must evaluate to logical")
+    isub <- r & !is.na(r)
+    input <- input[isub, ]
+  }  
 
 # Row can point to more than one column?
   if (is.character(input[, col]))
@@ -48,10 +59,13 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
   if (is.character(input[, value]))
     stop(" cannot expand input; value should point to a numeric column") 
 
+  notna <- which(!is.na(input[ , value]))
+  input <- input[notna, ]
   # Check if input has only 3 columns
-  dim.input <- dim(IN <- cbind(as.double(input[, col]), 
-                               as.double(input[, row]), 
-                               as.double(input[, value])))
+  IN <- cbind(as.double(input[, col]), 
+              as.double(input[, row]), 
+              as.double(input[, value]))
+  dim.input <- dim(IN)
   if (ncol(IN) != 3)
     stop ("'input' should have three columns")
 
@@ -63,7 +77,7 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
 
 # which fortran function to use depends on df.row and df.col
   use2 <- ifelse (!is.na(df.row) | !is.na(df.col) | 
-                  !is.na(out.row) | !is.na(out.col) , TRUE, FALSE)
+                  !all(is.na(out.row)) | !all(is.na(out.col)) , TRUE, FALSE)
   
   if (length(out.row) == 1 & is.na(out.row[1]))
     rowfac <- createfactor(input[, row], df.row)
@@ -76,8 +90,8 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
     colfac <- closestfactor(input[, col], out.col)
 
 # values or names of rows and columns in crosstable
-  rows <- rowfac$mean
-  cols <- colfac$mean
+  rows <- rowfac$var.output
+  cols <- colfac$var.output
 
   nr <- as.integer(length(rows))
   nc <- as.integer(length(cols))
@@ -103,7 +117,7 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
     ncol <- as.integer(length(indcol))
     out <- .Fortran("crosstab2", t(IN), as.integer(nrow(input)),
              as.integer(1), as.integer(2), as.integer(3),
-             as.double(colfac$var), as.double(rowfac$var), 
+             as.double(colfac$var.input), as.double(rowfac$var.input), 
              nr = nr, nc = nc,
              nrow = nrow, ncol = ncol, indrow = as.integer(indrow),
              indcol = as.integer(indcol),  
@@ -118,5 +132,9 @@ db2cross <- function(input, row = 1, col = 2, value = 3,
   
   colnames(z) <- cols
   rownames(z) <- rows            
-  list(x = rows, y = cols, z = z)             
+  out <- list(x = rows, y = cols, z = z)             
+  if (full.out)
+    out$map <- list(x = rowfac, y = colfac)  
+    
+  return(out)  
 }

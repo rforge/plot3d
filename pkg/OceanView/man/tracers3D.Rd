@@ -1,6 +1,7 @@
 \name{Tracers in 3D}
 \alias{tracers3D}
 \alias{tracers3Drgl}
+\alias{moviepoints}
 \title{
  Plotting tracer distributions in 3D
 }
@@ -11,6 +12,12 @@
   
   \code{tracers3Drgl} plots 3D tracer distributions in open-GL graphics. 
   A suitable topography has to be created before calling this function.
+  It does not create a movie.  
+
+  \code{moviepoints} creates a movie of tracer distributions
+    in open-GL graphics. 
+  
+  It is based on the \code{plot3Drgl} function \link{points3Drgl}.
 }
 \usage{
   tracers3D (x, y, z, colvar = NULL, ..., 
@@ -20,6 +27,10 @@
   tracers3Drgl (x, y, z, colvar = NULL, ..., 
       col = NULL, NAcol = "white", clim = NULL) 
 
+  moviepoints (x, y, z, colvar, t,
+    col = jet.col(100), NAcol = "white", clim = NULL, 
+    wait  = NULL, ask = FALSE, add = FALSE, 
+    basename = NULL, ...) 
 }
 
 \arguments{
@@ -31,6 +42,9 @@
      dimension equal to \code{x, y, z}.
      Values of \code{NULL}, \code{NA}, or \code{FALSE}
      will toggle off coloration according to \code{colvar}. 
+    }
+  \item{t }{Vectors with time points of tracers. 
+    Should be of length equal to length of \code{x, y ,z, colvar}.
     }
   \item{col }{Colors to be used for coloring each individual point (if colvar not
     specified) or that define the colors as specified by the 
@@ -75,6 +89,16 @@
     lwd, resfac, clim, ltheta, lphi, shade, lighting}. Note that the default is 
     that \code{colvar} is not specified.
     }
+  \item{add }{Logical. If \code{TRUE}, then the points will be added to the current plot.
+    If \code{FALSE} a new plot is started. 
+    }     
+  \item{ask }{Logical. If \code{TRUE}, then new points will only be drawn after a key has been struck. If \code{FALSE}, redrawing will depend on \code{wait} 
+    }     
+  \item{wait }{The time interval inbetween drawing of a set of new points, in seconds. 
+    If \code{NULL}, the drawing will not be suspended. 
+    }     
+  \item{basename }{The base name of a \code{png} file to be produced for each movieframe. 
+    }     
   \item{\dots}{additional arguments passed to \link{scatter3D} from package 
     \code{plot3D}.  Typical arguments are \code{cex, main} (both functions), 
     and \code{pch, ...} for \code{tracers3D}.

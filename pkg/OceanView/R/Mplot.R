@@ -85,7 +85,7 @@ Msplit <- function(M,
     for (j in 1:length(split))
       Sel <- Sel[Sel[ ,split[j]] == ux[i,j], ]
  
-    LL[[i]] <- Sel[isel] 
+    LL[[i]] <- Sel[,isel] 
   }  
 
   lnames <- ux[,1]
@@ -141,6 +141,9 @@ Mplot <- function (M, ...,
         legend$pch[Dotpoints$type == "l"] <- NA
       }
     
+      if (is.null(legend$pt.cex))
+        legend$pt.cex <- Dotpoints$cex
+
       if (is.null(legend$lty)) {
         legend$lty <- Dotpoints$lty
         legend$lty[Dotpoints$type == "p"] <- NA
@@ -289,8 +292,12 @@ Mplot <- function (M, ...,
       dotmain$xlim <- rev(dotmain$xlim)
     if (length(grep("y",rev[ip])))
       dotmain$ylim <- rev(dotmain$ylim)
-    
-    if (xyswap[ip]) {
+
+    if (all(is.na(x2[[1]][isub[[1]], ix]))) {
+      dotpoints$type <- dotmain$axes <- dotmain$xlab <- dotmain$ylab <-  NULL
+      plot(x = 0.5, y = 0.5, type = "n", main = dotmain$main)
+      text (0.5, 0.5, labels = "No data")  
+    } else if (xyswap[ip]) {
       do.call("plot", c(alist(y = x2[[1]][isub[[1]], xPos[1]], 
         x = x2[[1]][isub[[1]], ix]), dotmain, dotpoints))
     } else
@@ -310,14 +317,14 @@ Mplot <- function (M, ...,
                 y = x2[[j]][isub[[j]], ix]), extractdots(Dotpoints, j)) )
         }
       }
-     if (pos.legend == i)
+     if (pos.legend == ip)
        plotlegend()
      
   }
   
   if (! is.null(mtext))
     mtext(outer = TRUE, side = 3, mtext, line = par()$oma[3]-1, 
-          cex = par()$cex*1.2)
+          cex = par()$cex*1.5)
   if (pos.legend == 0) {
     plot.new()
     plotlegend()
@@ -349,7 +356,8 @@ SetRange <- function(lim, x2, isub, xWhich, ip, Log) {
     yrange <- NULL
       for (j in 1:nx){
         ix <- xWhich[[j]][ip]
-        yrange <- Range(yrange, x2[[j]][isub[[j]],ix], Log)
+        if (! all(is.na(x2[[j]][isub[[j]],ix])))
+          yrange <- Range(yrange, x2[[j]][isub[[j]],ix], Log)
       }  
   } else
     yrange  <- lim
@@ -439,7 +447,7 @@ splitdots <- function(ldots, x){
     
   if (length(ldots) > 0)
     for ( i in 1:length(ldots))
-      if ("matrix" %in% class(ldots[[i]]) | "data.frame" %in% class(ldots[[i]])) { # a deSolve object
+      if ("matrix" %in% class(ldots[[i]]) | "data.frame" %in% class(ldots[[i]])) { 
         nother <- nother + 1        
         x2[[nother + 1]] <- ldots[[i]]
         if (is.null(ndots[i]))

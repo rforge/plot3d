@@ -8,8 +8,9 @@
 }
 
 \usage{
-db2cross (input, row = 1, col = 2, value = 3,
-  df.row = NA, df.col = NA, out.row = NA, out.col = NA) 
+db2cross (input, row = 1, col = 2, value = 3, subset = NULL,
+  df.row = NA, df.col = NA, out.row = NA, out.col = NA, 
+  full.out = FALSE) 
 }
 
 \arguments{
@@ -24,6 +25,9 @@ db2cross (input, row = 1, col = 2, value = 3,
   \item{value }{Number or name of the column in \code{input}, to be used as 
     values in the result.
   }
+  \item{subset }{Logical expression indicating elements or rows to keep; 
+    missing values are taken as \code{FALSE}
+  }
   \item{df.row, df.col }{Maximal distance in row and column values that should 
     be considered the same. The default is to use each unique row or column 
     value in \code{input} as a row or column value in the crosstable.
@@ -35,12 +39,21 @@ db2cross (input, row = 1, col = 2, value = 3,
     \code{out.row} and \code{out.col} to which it is closest.
     Overrrules \code{df.row} or \code{df.col}.
   }
+  \item{full.out }{If \code{TRUE}, will also output how the input values were
+    mapped to the output values. This is only relevant if either of \code{df.row}, 
+    \code{df.col}, \code{out.row} or \code{out.col} is not \code{NULL}.
+  }
 }
 \value{
   a list containing:
-  \item{x }{ The values of the \emph{rows}    }
-  \item{y }{ The values of the \emph{columns} }
-  \item{z }{ The crosstable, a matrix} 
+  \item{x }{ The values of the \emph{rows}.    }
+  \item{y }{ The values of the \emph{columns}. }
+  \item{z }{ The crosstable, a matrix.} 
+  
+  and if \code{full.out = TRUE} also 
+  \item{map }{ The mapping of the \emph{x}  and \emph{y} values, consisting of 
+    \code{var.input}, \code{factor}, \code{var.output}, with the original values, 
+    how they are mapped, and the resulting values respectively.}
 }
 \author{
   Karline Soetaert <karline.soetaert@nioz.nl>
