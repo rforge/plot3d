@@ -1,5 +1,9 @@
 useDynLib(OceanView)
 
+import (plot3D)
+import (plot3Drgl)
+importFrom(shape, Arrows)
+
 S3method("quiver2D", "default")
 S3method("quiver2D", "matrix")
 S3method("quiver2D", "array")

@@ -1,16 +1,26 @@
        INTEGER FUNCTION Checkit(val, old, ipos)
-       DOUBLE PRECISION val, old(*)
+       DOUBLE PRECISION val, old(*), MV, NewV
        INTEGER I
 
        Checkit = 0
        if (ipos .eq. 0) return 
+
        DO I = 1, ipos
-         if (val .eq. old(I)) THEN
-         Checkit = I
-         return
+         if (val .EQ. old(I)) THEN
+           Checkit = I
+           return
          endif
        ENDDO
-
+       Checkit = 1
+       MV = abs(val - old(1))
+         DO I = 2, ipos
+           NewV = abs(val - old(I))
+           IF (NewV .LT. MV) THEN
+             MV = NewV
+             Checkit = I
+           ENDIF
+         ENDDO  
+       
        END FUNCTION
 
 

@@ -3,8 +3,9 @@ Version: 1.0
 Title: Visualisation of Oceanographic Data and Model Output.
 Author: Karline Soetaert <karline.soetaert@nioz.nl>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
-Depends: plot3D, plot3Drgl, shape, R (>= 2.10)
-Description: Functions for transforming, and viewing 2-D and 3-D (oceanic) data.
+Depends: plot3D, plot3Drgl, R (>= 2.10)
+Imports: shape
+Description: Functions for transforming and viewing 2-D and 3-D (oceanographic) data and model output.
 License: GPL (>=3.0)
 LazyData: yes
 

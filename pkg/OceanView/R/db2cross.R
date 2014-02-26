@@ -108,7 +108,7 @@ db2cross <- function(input, row = 1, col = 2, value = 3, subset = NULL,
              as.double(cols), as.double(rows), nr = nr, nc = nc, 
              cross = matrix(nrow = nr, ncol = nc, data = as.double(0)),
              count = matrix(nrow = nr, ncol = nc, data = as.integer(0)),
-             NAnum = as.double(NAnum), package = "OceanView") 
+             NAnum = as.double(NAnum), PACKAGE = "OceanView") 
   } else {        # Need also index of each unique rowvalue/columnvalue to used row and column
     indrow <- rowfac$factor
     indcol <- colfac$factor
@@ -123,7 +123,7 @@ db2cross <- function(input, row = 1, col = 2, value = 3, subset = NULL,
              indcol = as.integer(indcol),  
              cross = matrix(nrow = nr, ncol = nc, data = as.double(0)),
              count = matrix(nrow = nr, ncol = nc, data = as.integer(0)),
-             NAnum = as.double(NAnum), package = "OceanView") 
+             NAnum = as.double(NAnum), PACKAGE = "OceanView") 
     
   }
   
