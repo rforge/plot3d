@@ -1,3 +1,5 @@
+import(plot3D)
+import(rgl)
 export(plotrgl, cutrgl, uncutrgl, croprgl, uncroprgl, image2Drgl, contour2Drgl, 
   scatter2Drgl, text2Drgl, arrows2Drgl, segments2Drgl)
 export(persp3Drgl, ribbon3Drgl, hist3Drgl, scatter3Drgl, points3Drgl,
