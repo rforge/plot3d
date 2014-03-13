@@ -76,10 +76,13 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
 ## =======================================================================
 ## Composite image and contour in 3D
 ## =======================================================================
-# plot it to traditional window: 
- persp3D(z = volcano, contour = list(side = "zmax"))
+# plot reduced resolution (for speed) volcano to traditional window: 
+ VV <- volcano[seq(1, nrow(volcano), by = 3), seq(1, ncol(volcano), by = 3)]
+ persp3D(z = VV, contour = list(side = "zmax"))
 
  plotrgl(new = TRUE) # new window
+
+# add light, smooth surface change x-axis limits 
  plotrgl(new = FALSE, lighting = TRUE, 
    xlim = c(0.2, 0.8), smooth = TRUE)
 
