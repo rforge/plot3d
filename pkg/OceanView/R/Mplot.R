@@ -28,6 +28,14 @@ Mcommon <- function (M, ..., verbose = FALSE) {
     if (! class(M) %in% c("matrix", "data.frame"))
       stop ("'M' should be either a 'matrix' or 'data.frame' or a 'list'")
     LL <- c(list(M), LL)
+   #dirty trick to get ALL names of ellipsis 
+    NN <- deparse(substitute(x(...)))
+    NN <- gsub("x(","",NN,fixed=TRUE)
+    NN <- gsub(")","",NN)
+    NN <- gsub(" ","",NN)    
+    dotnames <- unlist(strsplit(NN, ","))
+    names(LL) <- c(deparse(substitute(M)), dotnames)                
+    
   }
   cn <- Colnames(LL[[1]])
   for (i in 2:length(LL))  {
@@ -85,7 +93,7 @@ Msplit <- function(M,
     for (j in 1:length(split))
       Sel <- Sel[Sel[ ,split[j]] == ux[i,j], ]
  
-    LL[[i]] <- Sel[,isel] 
+    LL[[i]] <- as.matrix(Sel[,isel] )
   }  
 
   lnames <- ux[,1]
@@ -188,7 +196,9 @@ Mplot <- function (M, ...,
     Which <- unique(Which)
   }
 
-  np      <- length(Which)  
+  np      <- length(Which)
+  if (np == 0)  
+    stop ("M cannot be a (list of) vector(s)")
   if (!is.null(pos.legend)) {
     if (is.character(pos.legend)) 
       pos.legend <- which(pos.legend == Which)
@@ -451,9 +461,9 @@ splitdots <- function(ldots, x){
         nother <- nother + 1        
         x2[[nother + 1]] <- ldots[[i]]
         if (is.null(ndots[i]))
-          names(x2)[nother] <- nother 
+          names(x2)[nother+1] <- nother 
         else 
-          names(x2)[nother] <- ndots[i]
+          names(x2)[nother+1] <- ndots[i]
         # a list of matrix objects
       } else if (is.list(ldots[[i]]) & 
         ("matrix" %in% class(ldots[[i]][[1]]) | 
@@ -464,7 +474,7 @@ splitdots <- function(ldots, x){
           nn <- names(ldots[[i]])[[j]]
           if (is.null(nn)) 
             nn <- nother
-          names(x2)[nother] <- nn
+          names(x2)[nother+1] <- nn
         }
       } else if (! is.null(ldots[[i]])) {  # a graphical parameter
         dots[[nd <- nd+1]] <- ldots[[i]]

@@ -2,15 +2,21 @@
 \alias{Mplot}
 \alias{Msplit}
 \alias{Mcommon}
+\alias{Msummary}
+\alias{Mdescribe}
+
 \title{
- Functions for plotting matrices
+ Functions for plotting matrices, or for splitting them and for maing suitable summaries
 }
 \description{
   \code{Mplot} plots data from (a list of) matrices. 
   
-  \code{Msplit} splits a matrix in a list according to factors.
+  \code{Msplit} splits a matrix in a list according to factors (or unique values).
   
   \code{Mcommon} creates a list of matrices that have only common variables.
+  
+  \code{Msummary} and \code{Mdescribe} create suitable summaries of all columns of a matrix or list.
+  
 }
 \usage{
   Mplot (M, ..., x = 1, select = NULL, which = select, 
@@ -18,14 +24,23 @@
          legend = list(x = "center"), pos.legend = NULL,
          xyswap = FALSE, rev = "") 
 
+  Msummary (M, ..., 
+         select = NULL, which = select, 
+         subset = NULL) 
+
+  Mdescribe (M, ..., 
+         select = NULL, which = select, 
+         subset = NULL) 
+
   Msplit (M, split = 1, subset = NULL) 
 
   Mcommon (M, ..., verbose = FALSE)      
 
+
 }
 
 \arguments{
-  \item{M }{Matrix or data.frame to be plotted. For \code{Mplot}, \code{M} can be
+  \item{M }{Matrix or data.frame to be plotted, or treated. For \code{Mplot}, \code{M} can be
     a list with matrices or data.frames. 
     }
   \item{x }{Name or number of the column to be used as the x-values. 
@@ -72,10 +87,22 @@
 
 \value{
   Function \code{Msplit} returns a list with the matrices, split according to 
-  the factors; the names of the elements is set by the factor's name.
+  the factors; the names of the elements is set by the factor's name. 
+  It is similar to the R-function \link{split}.
 
   Function \code{Mcommon} returns a list with the matrices, which only have
   the common variables.
+
+  Function \code{Msummary} returns a data.frame with summary values (minimum,
+  first quantile, median, mean, 3rd quantile, maximum) for each 
+  column of the input (variable). If there are more than one object to be summarised, or
+  if M is a list of objects, the name of the object is in the second column.
+
+  Function \code{Mdescribe} returns a data.frame with summary values (number of data, 
+  number of missing values, number of unique values, mean value, the standard deviation,
+  the minimum, the p = 0.05, 0.1, 0.5, 0.9, 0.95 quantiles, and the maximum) for each 
+  column of the input (variable). If there are more than one object to be summarised, or
+  if M is a list of objects, the name of the object is in the second column.
 }
 
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
@@ -99,7 +126,10 @@
  M3[,1] <- sort(M3[,1])
  colnames(M3) <- colnames(M1)[-3]
 
+# show them
  head(M1); head(M2); head(M3)
+ Msummary(M1)
+ Msummary(M1, M2, M3)
 
 # plot results -  will change mfrow 
  Mplot(M1, M2, M3, lwd = 2, mtext = "All variables versus 1st column",
@@ -116,6 +146,8 @@
  Mplot(Mcommon(M1, M2, M3), lwd = 2, mtext = "common variables", 
        legend = list(x = "top", legend = c("M1", "M2", "M3")))
 
+ Mdescribe(Mcommon(M1, M2, M3))
+ 
 ## =======================================================================
 ## The iris and Orange data set
 ## =======================================================================
@@ -123,12 +155,16 @@
 # Split the matrix according to the species
  Irislist <- Msplit(iris, split = "Species")
  names(Irislist)
+ 
+ Mdescribe(Irislist, which = "Sepal.Length")
+ Mdescribe(iris, which = "Sepal.Length", subset = Species == "setosa")
 
  Mplot(Irislist, type = "p", 
        legend = list(x = "bottomright", title = "species"))
 
  Mplot(Msplit(Orange,1), lwd = 2,
        legend = list(x = "topleft", title = "tree nr"))
+ Msummary(Msplit(Orange,1))
 
 # reset plotting parameters
  par(mfrow = pm)
