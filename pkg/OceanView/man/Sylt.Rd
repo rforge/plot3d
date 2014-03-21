@@ -99,10 +99,14 @@ data(Sylt3D)
  matplot(Sylttran$x, Sylttran$sigma[,,10], type = "l", 
          main = "sigma", ylim = c(25, -2), col = "black", lty = 1)
 
-# perspective view
+# perspective view - reduce resolution for speed
+ ix <- seq(1, length(x), by = 3)
+ iy <- seq(1, length(y), by = 3)
+ 
  par(mar = c(1, 1, 1, 2))
- persp3D(z = -depth, x = x, y = y, scale = FALSE, expand = 0.2, 
-   ticktype = "detailed", col = "grey", shade = 0.6, bty = "f",
+ persp3D(z = -depth[ix, iy], x = x[ix], y = y[iy], 
+   scale = FALSE, expand = 0.2, ticktype = "detailed", 
+   col = "grey", shade = 0.6, bty = "f",
    plot = FALSE)
 
 # add 3-D region; small amount added to z so that it is visible in rgl   
@@ -124,11 +128,14 @@ data(Sylt3D)
 ## =============================================================================  
 
  par(mfrow = c(2, 2), mar = c(0, 0, 1, 0))
+# reduce resolution for speed
+ ix <- seq(1, length(x), by = 3)
+ iy <- seq(1, length(y), by = 3)
 
  clim <- range(Syltsurf$elev, na.rm = TRUE)
  for (i in 1:3) 
-   persp3D(z = -depth, colvar = Syltsurf$elev[,,i], x = x, y = y, 
-     clim = clim, inttype = 2,  d = 2, 
+   persp3D(z = -depth[ix, iy], colvar = Syltsurf$elev[ix,iy,i], 
+     x = x[ix], y = y[iy], clim = clim, inttype = 2,  d = 2, 
      scale = FALSE, expand = 0.1, colkey = FALSE, shade = 0.5, 
        main = paste(format(Syltsurf$time[i], digits = 3), " hr"))
  par(mar = c(3, 3, 3, 3))
@@ -138,8 +145,9 @@ data(Sylt3D)
  par(mfrow = c(2, 2), mar = c(3, 3, 3, 3))
  clim <- range(Syltsurf$elev, na.rm = TRUE)
  for (i in 1:3) 
-   image2D(z = -depth, colvar = Syltsurf$elev[,,i], x = x, y = y, 
-     clim = clim, colkey = FALSE, shade = 0.3, resfac = 2,
+   image2D(z = -depth[ix, iy], colvar = Syltsurf$elev[ix,iy,i], 
+     x = x[ix], y = y[iy], clim = clim, 
+     colkey = FALSE, shade = 0.3, resfac = 2,
        main = paste(format(Syltsurf$time[i], digits = 3), " hr"))
  colkey(clim = clim, clab = c("elevation", "m")) 
 
@@ -155,9 +163,9 @@ data(Sylt3D)
      xlim = c(5, 20), ylim = c(10, 25), by = 2, 
      colvar = Speed, clab = c("speed", "m/s"), 
      main = paste(formatC(time[1]), " hr"), scale = 1.5, 
-     image = list(z = depth, x = x, y = y, col = "white",   # background
+     image = list(z = depth, x = x, y = y, col = "white",  #background
        NAcol = "darkblue"),
-     contour = list(z = depth, x = x, y = y, col = "black", # depth 
+     contour = list(z = depth, x = x, y = y, col = "black",#depth 
        lwd = 2)
      )
   )
@@ -170,7 +178,7 @@ data(Sylt3D)
  D   <- seq(-1, 20, by = 0.01)
 
  visc <- mapsigma (Sylttran$visc [ , ,1], x = Sylttran$x, 
-     sigma = Sylttran$sigma[ , ,1], depth = D, resfac = 3)
+     sigma = Sylttran$sigma[ , ,1], depth = D, resfac = 2)
 
  image2D(visc$var, x = visc$x, y = -visc$depth, ylim = c(-20, 1),
      main = "eddy viscosity", ylab = "m", xlab = "hour", 
@@ -194,9 +202,9 @@ data(Sylt3D)
    x = Sylttran$time, numdepth = 100, resfac = 3)
  D    <- -visc$depth
 
- image2D(t(visc$var), x = visc$x, y = D, NAcol = "black", ylim = range(D),
-   main = "eddy viscosity", ylab = "m", xlab = "hour",     
-   clab = "m2/s")
+ image2D(t(visc$var), x = visc$x, y = D, NAcol = "black", 
+   ylim = range(D), main = "eddy viscosity", 
+   ylab = "m", xlab = "hour", clab = "m2/s")
 
 ## =============================================================================
 ## Data Sylt3D: increase resolution and map from sigma to depth
@@ -253,6 +261,8 @@ data(Sylt3D)
 
 # in order to wait inbetween slice drawings until a key is hit:
 \dontrun{
+ persp3Drgl(x = x, y = y, z = -Sylt3D$depth, smooth = TRUE, 
+   col = "grey", lighting = TRUE)
  movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, add = TRUE, 
    ask = TRUE, ys = yto)
 }
@@ -268,10 +278,10 @@ data(Sylt3D)
    plot = FALSE, colkey = list(side = 1))
  persp3D(x = x, y = y, z = -Sylt3D$depth, border = "black", 
    col = "white", add = TRUE, plot = FALSE)
-# this is slow
+
 
 \dontrun{
- plotdev(alpha = 0.3, phi = 30)
+ plotdev(alpha = 0.3, phi = 30)         # this is slow
 }
  plotrgl(alpha = 0.3)
 

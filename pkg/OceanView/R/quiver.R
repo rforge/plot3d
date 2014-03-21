@@ -186,7 +186,6 @@ quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
         plist$plt$main <- colkey$parplt
     }  
     par (plt = plist$plt$main)
-    
 
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
@@ -285,9 +284,9 @@ quiver2D.matrix  <- function(u, v, x = NULL, y = NULL, colvar = NULL, ...,
     do.call("arrows2D", c(alist(x, y, xto, yto, col = Col, type = type, add = add),  dm, dp))
   
     if (iscolkey) {
-      colkey$parleg <- colkey$parplt <- NULL
+      colkey$parleg <- colkey$parplt <- NULL    
       do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
-        clog = dots$clog, add = TRUE), colkey))
+        clog = dots$clog,  add = TRUE), colkey))
       par(plt = plist$plt$ori)  
     }    
     par(mar = par("mar")) 

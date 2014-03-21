@@ -75,6 +75,13 @@ check.colkey <- function(colkeypar, add = FALSE) {
   if (is.null(colkey$side)) 
     colkey$side <- 4
 
+ # impose the distance of the legend
+  if (is.null(colkeypar$dist)) {
+    colkey$dist <- -0.075     
+    if (colkey$side == 3)
+      colkey$dist <- 0     
+  }
+  
  # plt parameters of legend
   colkey <- key.parleg(colkey, add)
   return(colkey)

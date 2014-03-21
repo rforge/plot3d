@@ -90,7 +90,7 @@ data(Ltrans)
 ## =============================================================================
 ## Tracer output in 3D, traditional device
 ## =============================================================================  
-
+\dontrun{
  par(mfrow = c(2, 1), mar = c(2, 2, 2, 2)) 
  for (i in c(50, 100))
    tracers3D(Ltrans[, 1, i], Ltrans[, 2, i], Ltrans[, 3, i], 
@@ -100,6 +100,7 @@ data(Ltrans)
                expand = 0.02, colkey = FALSE, shade = 0.3, 
                colvar = depth), colkey = FALSE,
              main = paste("time ", i))
+}
 
 ## =============================================================================
 ## Tracer output in 3D, using rgl
@@ -112,7 +113,7 @@ data(Ltrans)
  
 # you may zoom to the relevant region, or cut a region
 # cutrgl()  
- for (i in 1:108) {
+ for (i in seq(1, 108, by = 2)) {
    tracers3Drgl(Ltrans[, 1, i], Ltrans[, 2, i], Ltrans[, 3, i], 
              colvar = Ltrans[ ,4, i], col = c("green", "orange"),
              main = paste("time ", i))
@@ -137,7 +138,7 @@ data(Ltrans)
 ## =============================================================================  
  
  image2Drgl (x = lon, y = lat, z = depth)
- for (i in 1:108) {
+ for (i in seq(1, 108, by = 2)) {
    tracers2Drgl(Ltrans[, 1, i], Ltrans[, 2, i],  
              colvar = Ltrans[ ,4, i], col = c("green", "orange"))
 # remove # to slow down

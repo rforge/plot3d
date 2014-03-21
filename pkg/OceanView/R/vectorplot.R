@@ -1,3 +1,5 @@
+# this code is not very efficient...
+
 vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ..., 
                        col = NULL, NAcol = "white", colkey = NULL, 
                        by = 1, arr = FALSE, xfac = NULL, 
@@ -24,12 +26,14 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
     }
     iscolkey <- is.colkey(colkey, col)
     if (iscolkey) {
-      colkey <- check.colkey(colkey, add)
+      colkey <- check.colkey(colkey)
       if (! add) 
         plist$plt$main <- colkey$parplt
     }  
+
     if (length(colvar) != length(u)) 
       stop("length of 'colvar' should be equal to length of 'u' and 'v'")
+    par (plt = plist$plt$main)
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     Col <- variablecol(colvar, col, NAcol, clim)
@@ -40,7 +44,6 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
       Col <- "black"
       iscolkey <- FALSE
   }
-  par (plt = plist$plt$main)
      
   dm <- dots$main
   dp <- dots$points
@@ -67,9 +70,9 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
     x0 <- rep(x, ll)
     xe <- u[ii]+x
     ye <- v[ii]
-    LL <- c(alist(0, type = "n"), dm)
+    LL <- c(alist(0, 0, type = "n"), dm)
     if (! add) 
-      do.call("plot",LL)
+      do.call("points2D",LL)
   } else {
     ii <- seq(1, length(x), by = by)
     ye <- y0 + v[ii]
@@ -81,9 +84,9 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
       dm$ylim <- range(c(y0, ye))
     if (is.null(dm$xlim)) 
       dm$xlim <- range(c(x0, xe))
-    LL <- c(alist(0, type = "n"), dm)
+    LL <- c(alist(0, 0, type = "n"), dm)
     if (! add) 
-      do.call("plot",LL)
+      do.call("points2D",LL)
     pusr <- par("usr")
     if (is.null(xfac))
       xfac <- diff(pusr[1:2])/diff(pusr[3:4])

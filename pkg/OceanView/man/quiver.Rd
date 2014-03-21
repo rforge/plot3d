@@ -376,7 +376,8 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
    quiver2D(x = x, y = y, u = u[ , ,2], v = v[ , ,2], 
      xlim = c(5, 20), ylim = c(10, 25), by = 2, 
      main = paste(formatC(time[1]), " hr"), scale = 1.5, 
-     image = list(z = depth, x = x, y = y, NAcol = "black", colkey = TRUE), 
+     image = list(z = depth, x = x, y = y, NAcol = "black", 
+                  colkey = TRUE), 
      contour = list(z = depth, x = x, y = y, col = "black",
        drawlabels = FALSE)
      )
