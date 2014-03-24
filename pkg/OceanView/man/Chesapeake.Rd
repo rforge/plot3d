@@ -84,7 +84,9 @@ data(Ltrans)
   pch = 16, cex = 0.5, 
   add = TRUE, colkey = FALSE, plot = FALSE)
 
- plotdev(lighting = TRUE, lphi = 45)
+\dontrun{
+   plotdev(lighting = TRUE, lphi = 45)
+} 
  plotrgl(lighting = TRUE, smooth = TRUE)
 
 ## =============================================================================
@@ -113,7 +115,7 @@ data(Ltrans)
  
 # you may zoom to the relevant region, or cut a region
 # cutrgl()  
- for (i in seq(1, 108, by = 2)) {
+ for (i in seq(1, 108, by = 4)) {
    tracers3Drgl(Ltrans[, 1, i], Ltrans[, 2, i], Ltrans[, 3, i], 
              colvar = Ltrans[ ,4, i], col = c("green", "orange"),
              main = paste("time ", i))
@@ -125,8 +127,8 @@ data(Ltrans)
 ## Tracer output in 2D, traditional device
 ## =============================================================================  
 
- par(mfrow = c(3, 3)) 
- for (i in seq(10, 106, length.out = 9)) 
+ par(mfrow = c(2, 2)) 
+ for (i in seq(10, 106, length.out = 4)) 
    tracers2D(Ltrans[, 1, i], Ltrans[, 2, i],  
              colvar = Ltrans[ ,4, i], col = c("green", "orange"),
              pch = 16, cex = 0.5, 
@@ -138,7 +140,7 @@ data(Ltrans)
 ## =============================================================================  
  
  image2Drgl (x = lon, y = lat, z = depth)
- for (i in seq(1, 108, by = 2)) {
+ for (i in seq(1, 108, by = 3)) {
    tracers2Drgl(Ltrans[, 1, i], Ltrans[, 2, i],  
              colvar = Ltrans[ ,4, i], col = c("green", "orange"))
 # remove # to slow down

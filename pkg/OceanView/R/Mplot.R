@@ -93,7 +93,7 @@ Msplit <- function(M,
     for (j in 1:length(split))
       Sel <- Sel[Sel[ ,split[j]] == ux[i,j], ]
  
-    LL[[i]] <- as.matrix(Sel[,isel] )
+    LL[[i]] <- as.data.frame(Sel[,isel] )
   }  
 
   lnames <- ux[,1]
