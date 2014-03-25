@@ -295,7 +295,7 @@ transectsigma(var = NULL, sigma, x, y, to, depth = NULL,
  slice3D(x, y, z, ys = seq(-4, 4, by = 2), theta = 85, 
    colvar = p, pch = ".", clim = range(p))
 
- xto <- yto <- zto <- seq(-1.2, 1.2, 0.2)
+ xto <- yto <- zto <- seq(-1.2, 1.2, 0.3)
  Res <- remap (p, x, y, z, xto, yto, zto)
 
 # expand grid for scatterplot
@@ -330,8 +330,8 @@ transectsigma(var = NULL, sigma, x, y, to, depth = NULL,
  image2D(x = x, y = y, volcano, main = "original")
 
 # increasing the resolution
- x2 <- seq(from = 1, to = nr, by = 0.25)
- y2 <- seq(from = 1, to = nc, by = 0.25)
+ x2 <- seq(from = 1, to = nr, by = 0.5)
+ y2 <- seq(from = 1, to = nc, by = 0.5)
 
  VOLC1 <- remap(volcano, x = x, y = y, xto = x2, yto = y2)$var
  image2D(x = x2, y = y2, z = VOLC1, main = "high resolution")

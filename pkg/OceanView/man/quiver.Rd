@@ -336,15 +336,15 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  par (mfrow = c(2, 2))
  
  mask <- volcano; mask[volcano < 120]  <- NA
- quiver2D(by = c(2, 1), u = u, v = v, mask = mask)
+ quiver2D(by = c(3, 2), u = u, v = v, mask = mask)
 
- quiver2D(by = c(2, 1), u = u, v = v,  
+ quiver2D(by = c(3, 2), u = u, v = v,  
         image = list(z = mask, NAcol = "black"))
 
- quiver2D(by = c(3, 2), u = u, v = v,
+ quiver2D(by = c(4, 3), u = u, v = v,
         contour = list(z = volcano, lwd = 2))
 
- quiver2D(by = c(3, 2), u = u, v = v, 
+ quiver2D(by = c(4, 3), u = u, v = v, 
         contour = list(z = volcano, col = "black"), 
         image = list(z = volcano, NAcol = "black"))
 
@@ -352,15 +352,15 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 ##  Same in rgl
 ## =======================================================================
 \dontrun{
- quiver2Drgl(by = c(2, 1), u = u, v = v, mask = mask, NAcol = "black")
+ quiver2Drgl(by = c(3, 2), u = u, v = v, mask = mask, NAcol = "black")
 
- quiver2Drgl(by = c(2, 1), u = u, v = v,  
+ quiver2Drgl(by = c(3, 2), u = u, v = v,  
         image = list(z = volcano, NAcol = "black"))
 
- quiver2Drgl(by = c(3, 2), u = u, v = v, scale = 2,
+ quiver2Drgl(by = c(4, 3), u = u, v = v, scale = 2,
         contour = list(z = volcano, lwd = 2))
 
- quiver2Drgl(by = c(3, 2), u = u, v = v, 
+ quiver2Drgl(by = c(4, 3), u = u, v = v, 
         contour = list(z = volcano, col = "black"), 
         image = list(z = volcano, NAcol = "black"))
  cutrgl()
@@ -374,7 +374,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  par(mfrow = c(1, 1))
  with (Syltsurf,
    quiver2D(x = x, y = y, u = u[ , ,2], v = v[ , ,2], 
-     xlim = c(5, 20), ylim = c(10, 25), by = 2, 
+     xlim = c(5, 20), ylim = c(10, 25), by = 3, 
      main = paste(formatC(time[1]), " hr"), scale = 1.5, 
      image = list(z = depth, x = x, y = y, NAcol = "black", 
                   colkey = TRUE), 
@@ -391,7 +391,7 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
  ii <- c(1, 4)
  with (Syltsurf,
    quiver2D(x = x, y = y, u = u[ ,,ii], v = v[ ,,ii], 
-     xlim = c(5, 20), ylim = c(10, 25), by = 3, 
+     xlim = c(5, 20), ylim = c(10, 25), by = 4, 
      mask = list(z = depth, x = x, y = y, NAcol = "blue"),
      main = paste(formatC(time[ii]), " hr"), scale = 1.5,
      contour = list(z = depth, x = x, y = y, drawlabels = FALSE)

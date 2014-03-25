@@ -160,7 +160,7 @@ data(Sylt3D)
 
  with (Syltsurf,
    quiver2D(x = x, y = y, u = u[,,2], v = v[,,2], col = gg.col(100),
-     xlim = c(5, 20), ylim = c(10, 25), by = 2, 
+     xlim = c(5, 20), ylim = c(10, 25), by = 3, 
      colvar = Speed, clab = c("speed", "m/s"), 
      main = paste(formatC(time[1]), " hr"), scale = 1.5, 
      image = list(z = depth, x = x, y = y, col = "white",  #background
@@ -175,7 +175,7 @@ data(Sylt3D)
 ## =============================================================================
 
  par(mfrow = c(1, 1), mar = c(4, 4, 4, 2))
- D   <- seq(-1, 20, by = 0.01)
+ D   <- seq(-1, 20, by = 0.02)
 
  visc <- mapsigma (Sylttran$visc [ , ,1], x = Sylttran$x, 
      sigma = Sylttran$sigma[ , ,1], depth = D, resfac = 2)
@@ -220,7 +220,7 @@ data(Sylt3D)
 # remap the data from sigma coordinates to depth coordinates
 # depth from max in first box to max in last box
  depth <- seq(max(sigma[,,D[3]], na.rm = TRUE), 
-              max(sigma[,,1   ], na.rm = TRUE), length.out = 30)
+              max(sigma[,,1   ], na.rm = TRUE), length.out = 20)
 
 # Step-bystep mapping, increasing the resolution
  z    <- 1:21
@@ -256,8 +256,8 @@ data(Sylt3D)
  persp3Drgl(x = x, y = y, z = -Sylt3D$depth, smooth = TRUE, 
    col = "grey", lighting = TRUE)
 
- movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, add = TRUE, 
-   ys = yto)
+ movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, 
+   add = TRUE, ys = yto)
 
 # in order to wait inbetween slice drawings until a key is hit:
 \dontrun{

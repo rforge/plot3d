@@ -318,13 +318,21 @@ Mplot <- function (M, ...,
       for (j in 2:nx) {
         ix <- xWhich[[j]][[ip]]      # position of variable in 'x2'
         if (!is.na(ix)) {
+          xx <- x2[[j]][isub[[j]], xPos[j]]
+          yy <- x2[[j]][isub[[j]], ix]
+          ii <- c(which(is.na(yy)), which(is.na(xx)))
+          if (length(ii) > 0) {
+            xx <- xx[-ii]
+            yy <- yy[-ii]
+          }
+            
          if (xyswap[ip]) 
-          do.call("lines", c(alist(y = x2[[j]][isub[[j]], xPos[j]], 
-                x = x2[[j]][isub[[j]], ix]), extractdots(Dotpoints, j)) )
+          do.call("lines", c(alist(y = xx, 
+                x = yy), extractdots(Dotpoints, j)) )
 
          else
-          do.call("lines", c(alist(x = x2[[j]][isub[[j]], xPos[j]], 
-                y = x2[[j]][isub[[j]], ix]), extractdots(Dotpoints, j)) )
+          do.call("lines", c(alist(x = xx, 
+                y = yy), extractdots(Dotpoints, j)) )
         }
       }
      if (pos.legend == ip)
