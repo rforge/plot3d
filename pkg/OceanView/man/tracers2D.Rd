@@ -89,7 +89,12 @@ tracers2Drgl(x, y, colvar = NULL, ...,
 \value{
   returns nothing
 }
+\seealso{
+  \link{tracers3D} for plotting time series of tracer distributions in 3D
 
+  \link{Ltrans} for the output of a particle tracking model
+  
+}
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
 
 \examples{

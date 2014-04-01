@@ -123,6 +123,22 @@ data(Ltrans)
 #   Sys.sleep(0.1)  
  }  
 
+# using function moviepoints3D
+\dontrun{
+ persp3Drgl(x = lon, y = lat, z = -depth, colvar = depth, scale = FALSE, 
+   expand = 0.02, main = "particle distribution", 
+   lighting = TRUE, smooth = TRUE) 
+
+ nt <- dim(Ltrans)[3]  # number of time points
+ np <- dim(Ltrans)[1]  # number of particles
+ 
+ times <- rep(1:nt, each = np)
+ 
+ moviepoints3D(x = Ltrans[, 1, ], y = Ltrans[, 2, ], z = Ltrans[, 3, ], 
+               t = times, colvar = Ltrans[ ,4, ], col = c("green", "orange"),
+               cex = 5, ask = TRUE)
+
+}
 ## =============================================================================
 ## Tracer output in 2D, traditional device
 ## =============================================================================  
@@ -167,6 +183,10 @@ AGU Book Series: Monitoring and Modeling the Deepwater Horizon Oil Spill: A Reco
   \link{Sylt3D} for output of a 3-D hydrodynamical model, GETM.
 
   \link{Oxsat} for a 3-D data set, package \code{plot3D}.
+  
+  \link{tracers2D} for plotting time series of tracer distributions in 2D
+
+  \link{tracers3D} for plotting time series of tracer distributions in 3D
 }
 
 \keyword{datasets}

@@ -1,17 +1,17 @@
 \name{Moving slices in 3D}
-\alias{movieslice}
-\alias{movieslice}
+\alias{movieslice3D}
+\alias{movieslice3D}
 \title{
  Plotting volumetric data as moving slices in 3D using rgl
 }
 \description{
-  \code{movieslice} plots 3D volumetric data as slices moving in one direction
+  \code{movieslice3D} plots 3D volumetric data as slices moving in one direction
     in open-GL graphics. 
   
   It is based on the \code{plot3Drgl} function \link{slice3Drgl}.
 }
 \usage{
-movieslice (x, y, z, colvar = NULL, xs = NULL,
+movieslice3D (x, y, z, colvar = NULL, xs = NULL,
   ys = NULL, zs = NULL, along = NULL,
   col = jet.col(100), NAcol = "white", clim = NULL, 
   wait  = NULL, ask = FALSE, add = FALSE, 
@@ -64,7 +64,9 @@ movieslice (x, y, z, colvar = NULL, xs = NULL,
   returns nothing
 }
 \seealso{
-  \link{Sylt3D}
+  \link{Sylt3D} for a data set that can be displayed with \code{movieslice3D}
+  
+  \link{moviepoints3D} for plotting moving points in 3D
 }
 
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
@@ -74,7 +76,7 @@ movieslice (x, y, z, colvar = NULL, xs = NULL,
  grid   <- mesh(x, y, z)
  colvar <- with(grid, x*exp(-x^2 - y^2 - z^2))
 
- movieslice  (x, y, z, colvar = colvar, ticktype = "detailed")
+ movieslice3D  (x, y, z, colvar = colvar, ticktype = "detailed")
 
 }
 \keyword{ hplot }

@@ -1,6 +1,7 @@
 \name{NIOZ Westerschelde monitoring}
 \docType{data}
 \alias{WSnioz}
+\alias{WSnioz.table}
 \title{
   NIOZ monitoring data of Westerschelde estuary.
 }
@@ -11,20 +12,23 @@
 
   A total of 17 stations were monitored on a monthly basis. 
 
-  The dataset is in long format and contains the following variables: 
+  The dataset \code{WSnioz} is in long format and contains the following variables: 
   oxygen, temperature, salinity, nitrate, ammonium, nitrite, phosphate, 
   silicate and chlorophyll.
-  
+
+  The dataset \code{WSnioz.table} is in tabular format.
+    
   The full dataset can be downloaded from:
   \url{http://www.nioz.nl/monitoring-data-downloads}  
 }
 
 \usage{
 data(WSnioz)
+data(WSnioz.table)
 }
 
 \format{
-  A \code{data.frame} with the following columns:
+  \code{WSnioz} is a \code{data.frame} with the following columns:
   \itemize{
     \item \code{SamplingDateTime}, a string with the date and time of sampling.
     \item \code{SamplingDateTimeREAL}, a numeric value with day as per 1900.
@@ -93,6 +97,21 @@ data(WSnioz)
  names(dat2)
   
  Mplot(dat2, lty = 1)
+
+## =============================================================================
+## tabular format of the same data
+## =============================================================================
+ head(WSnioz.table)
+
+# plot all data from station 1:
+ Mplot(WSnioz.table, select = 3:11, subset = Station == 1, legend = FALSE)
+
+ Mplot(Msplit(WSnioz.table, "Station", subset = Station \%in\% c(1, 13)) , 
+   select = c("WNO3", "WNO2", "WNH4", "WO2"), lty = 1, lwd = 2,
+   xlab = "Daynr", log = c("y", "y", "y", ""), 
+   legend = list(x = "left", title = "Station")) 
+
+
 
 # reset plotting parameters
  par(mar = mar)

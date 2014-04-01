@@ -182,14 +182,13 @@ transectsigma(var = NULL, sigma, x, y, to, depth = NULL,
   the resolution of a matrix or array \code{var}, or to zoom in on a certain area. 
   It returns an object of the same class as \code{var} (i.e. a matrix or array).
 
-  S3-function \code{transect} takes a line transect or slice from a matrix and array respectively
-  It returns an object with one dimension less than \code{var}
+  S3-function \code{transect} takes a slice from an array; it returns a matrix.
     
   S3-function \code{extract} returns a vector with one value
   corresponding to each row in \code{xyto} or \code{xyzto}.
     
   \code{mapsigma} should be used to make images from data that are in sigma 
-  coordinates
+  coordinates.
 }
 
 \value{
@@ -277,8 +276,6 @@ transectsigma(var = NULL, sigma, x, y, to, depth = NULL,
 # x and or y are a matrix.
  changeres(var = M, x = M, y = 1:2, resfac = c(2, 1))
  changeres(M, x = M, y = 1:2, resfac = 2)
-
-# not so simple for remap:
 
   
 ## =======================================================================

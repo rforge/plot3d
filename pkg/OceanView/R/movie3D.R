@@ -13,7 +13,7 @@ FindInterval <- function(x, vec, ...) {
   res
 }
 
-movieslice <- function(x, y, z, colvar = NULL, xs = NULL,
+movieslice3D <- function(x, y, z, colvar = NULL, xs = NULL,
   ys = NULL, zs = NULL, along = NULL, col = jet.col(100), NAcol = "white",
   clim = NULL, wait  = NULL, ask = FALSE, add = FALSE, basename = NULL,
   ...) {
@@ -142,9 +142,10 @@ movieslice <- function(x, y, z, colvar = NULL, xs = NULL,
 }
 
 
-moviepoints <- function(x, y, z, colvar,  t,
+moviepoints3D <- function(x, y, z, colvar, t, by = 1, 
   col = jet.col(100), NAcol = "white",
-  clim = NULL, wait  = NULL, ask = FALSE, add = FALSE, basename = NULL, ...) {
+  clim = NULL, wait  = NULL, ask = FALSE, 
+  add = FALSE, basename = NULL, ...) {
 
     x <- as.vector(x)
     y <- as.vector(y)
@@ -174,15 +175,22 @@ moviepoints <- function(x, y, z, colvar,  t,
     ask  <- FALSE
   tt <- unique(t)
   popit <- FALSE
-  for (i in 1:length(tt)) {
+
+  main <- paste("time ", tt)
+  if (!is.null(dots$main))
+    main <- rep(dots$main, length.out = length(tt))
+  dots$main <- NULL
+  
+  for (i in seq(1, length(tt), by = by)) {
     T <- tt[i]
     if (ask) 
       readline("Hit enter to add new points")
     else if (! is.null(wait))
       Sys.sleep(wait)
     ii <- which(t == T)
-    addpoints(x[ii], y[ii], z[ii], Col = Col[ii], popit, 
-      main = paste("time ", T), ...)
+    
+    do.call ("addpoints", c(alist(x[ii], y[ii], z[ii], Col = Col[ii], popit, 
+      main = main[i]), dots))
     if (! is.null(basename)) {
       filename <- paste(basename, formatC(as.integer(i), width = 4, format = "d", flag = "0"),".png", sep="")      
       rgl.snapshot(filename) 

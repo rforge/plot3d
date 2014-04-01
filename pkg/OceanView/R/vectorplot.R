@@ -6,11 +6,6 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
                        clim = NULL, clab = NULL, add = FALSE) {
   
   dots <- splitpardots(list(...))
- 
-  if (add) 
-      plist <- getplist()
-  else plist <- NULL
-  setplist(plist)
 
   if (!is.null(colvar)) {
     varlim <- clim
@@ -24,16 +19,9 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
       if (!is.null(clim)) 
         clim <- log(clim)
     }
-    iscolkey <- is.colkey(colkey, col)
-    if (iscolkey) {
-      colkey <- check.colkey(colkey)
-      if (! add) 
-        plist$plt$main <- colkey$parplt
-    }  
 
     if (length(colvar) != length(u)) 
       stop("length of 'colvar' should be equal to length of 'u' and 'v'")
-    par (plt = plist$plt$main)
     if (is.null(clim)) 
       clim <- range(colvar, na.rm = TRUE)
     Col <- variablecol(colvar, col, NAcol, clim)
@@ -58,10 +46,6 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
   y0 <- y0[ii]
   ll <- length(ii)
 
-# the plot
-#  if (length(y) > 1) 
-#    stop ("y should be one number")
-
   if (length(x) == 1) {
     if (is.null(dm$ylim)) 
       dm$ylim <- range(v[ii] + y0)
@@ -70,9 +54,12 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
     x0 <- rep(x, ll)
     xe <- u[ii]+x
     ye <- v[ii]
-    LL <- c(alist(0, 0, type = "n"), dm)
+#    pltori <- plist$plt$ori
+    LL <- c(alist(xe, ye, colvar = colvar, type = "n", colkey = colkey, 
+       col = col, NAcol = NAcol, clim = clim, clab = clab ), dm)
     if (! add) 
-      do.call("points2D",LL)
+      do.call("points2D", LL)
+
   } else {
     ii <- seq(1, length(x), by = by)
     ye <- y0 + v[ii]
@@ -84,14 +71,18 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
       dm$ylim <- range(c(y0, ye))
     if (is.null(dm$xlim)) 
       dm$xlim <- range(c(x0, xe))
-    LL <- c(alist(0, 0, type = "n"), dm)
-    if (! add) 
-      do.call("points2D",LL)
+
+#    pltori <- plist$plt$ori
     pusr <- par("usr")
     if (is.null(xfac))
       xfac <- diff(pusr[1:2])/diff(pusr[3:4])
     xe <- x[ii] + u[ii]*xfac
+    LL <- c(alist(xe, ye, colvar = colvar, type = "n", colkey = colkey, 
+       col = col, NAcol = NAcol, clim = clim, clab = clab ), dm)
+    if (! add) 
+      do.call("points2D", LL)
   }
+
 
 # the segments/arrows
   Ls <- c(alist(x0, y0, xe, ye, col = Col), dp) 
@@ -104,12 +95,12 @@ vectorplot <- function(u, v, x = 0, y = 0, colvar = NULL, ...,
   } else 
     do.call("segments", Ls)
     
-    if (iscolkey) {
-      colkey$parleg <- colkey$parplt <- NULL
-      do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
-        clog = dots$clog, add = TRUE), colkey))
-      par(plt = plist$plt$ori)  
-    }    
+#    if (iscolkey) {
+#      colkey$parleg <- colkey$parplt <- NULL
+#      do.call("colkey", c(alist(col = col, clim = varlim, clab = clab, 
+#        clog = dots$clog, add = TRUE), colkey))
+#      par(plt = pltori)  
+#    }    
     par(mar = par("mar")) 
 }
 

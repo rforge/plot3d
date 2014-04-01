@@ -256,14 +256,14 @@ data(Sylt3D)
  persp3Drgl(x = x, y = y, z = -Sylt3D$depth, smooth = TRUE, 
    col = "grey", lighting = TRUE)
 
- movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, 
+ movieslice3D(xto, yto, -visc_sig$depth, colvar = visc_sig$var, 
    add = TRUE, ys = yto)
 
 # in order to wait inbetween slice drawings until a key is hit:
 \dontrun{
  persp3Drgl(x = x, y = y, z = -Sylt3D$depth, smooth = TRUE, 
    col = "grey", lighting = TRUE)
- movieslice(xto, yto, -visc_sig$depth, colvar = visc_sig$var, add = TRUE, 
+ movieslice3D(xto, yto, -visc_sig$depth, colvar = visc_sig$var, add = TRUE, 
    ask = TRUE, ys = yto)
 }
 

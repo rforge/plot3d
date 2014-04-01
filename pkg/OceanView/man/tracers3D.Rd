@@ -1,7 +1,7 @@
 \name{Tracers in 3D}
 \alias{tracers3D}
 \alias{tracers3Drgl}
-\alias{moviepoints}
+\alias{moviepoints3D}
 \title{
  Plotting tracer distributions in 3D
 }
@@ -14,7 +14,7 @@
   A suitable topography has to be created before calling this function.
   It does not create a movie.  
 
-  \code{moviepoints} creates a movie of tracer distributions
+  \code{moviepoints3D} creates a movie of tracer distributions
     in open-GL graphics. 
   
   It is based on the \code{plot3Drgl} function \link{points3Drgl}.
@@ -27,7 +27,7 @@
   tracers3Drgl (x, y, z, colvar = NULL, ..., 
       col = NULL, NAcol = "white", clim = NULL) 
 
-  moviepoints (x, y, z, colvar, t,
+  moviepoints3D (x, y, z, colvar, t, by = 1, 
     col = jet.col(100), NAcol = "white", clim = NULL, 
     wait  = NULL, ask = FALSE, add = FALSE, 
     basename = NULL, ...) 
@@ -45,6 +45,8 @@
     }
   \item{t }{Vectors with time points of tracers. 
     Should be of length equal to length of \code{x, y ,z, colvar}.
+    }
+  \item{by }{Number increment of the time sequence.
     }
   \item{col }{Colors to be used for coloring each individual point (if colvar not
     specified) or that define the colors as specified by the 
@@ -110,7 +112,13 @@
 }
 
 \author{Karline Soetaert <karline.soetaert@nioz.nl>}
+\seealso{
+  \link{tracers2D} for plotting time series of tracer distributions in 2D
 
+  \link{movieslice3D} for plotting slices in 3D
+  
+  \link{Ltrans} for 3-D output of a particle tracking model
+}
 \examples{
 # save plotting parameters
  pm <- par("mfrow")
@@ -142,7 +150,7 @@
 
  par(mfrow = c(2, 2))
 
-# Topography is defined by arguemnt surf
+# Topography is defined by argument surf
  for (i in 1:4) {
   # update tracer distribution
    xp <- xp + 0.25 * rnorm(200)
@@ -202,6 +210,30 @@
 # or:  readline("hit enter for next")
  }
 
+# using function moviepoints3D
+
+\dontrun{
+# first create the data in matrices
+ xp <- matrix(nrow = 200, ncol = nstep, data = xi) 
+ yp <- matrix(nrow = 200, ncol = nstep,  data = yi) 
+ zp <- matrix(nrow = 200, ncol = nstep, data = zi)
+ tp <- matrix(nrow = 200, ncol = nstep, data = 0)
+ cv <- matrix(nrow = 200, ncol = nstep, data = species)
+ nstep <- 10
+ for (i in 2:nstep) {
+   xp[,i] <- xp[,i-1] + 0.05 * rnorm(200) + 0.05
+   yp[,i] <- yp[,i-1] + 0.0025 * (rnorm(200) + 0.0025)
+   zp[,i] <- zp[,i-1] + 0.05 *rnorm(200)
+   tp[,i] <- i
+ }
+# create the topography
+ persp3Drgl(x, y, z = z, theta = 0, lighting = TRUE, smooth = TRUE)
+
+# add moviepoints:
+  moviepoints3D (xp, yp, zp, colvar = cv, t = tp, 
+    wait = 0.05, cex = 10, col = c("red", "orange")) 
+ 
+}
 
 # reset plotting parameters
  par(mfrow = pm)
