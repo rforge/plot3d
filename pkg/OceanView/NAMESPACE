@@ -13,7 +13,7 @@ S3method("changeres", "matrix")
 S3method("changeres", "array")
 S3method("mapsigma", "matrix")
 S3method("mapsigma", "array")
-S3method("extract", "matrix")
+S3method("extract",  "matrix")
 S3method("extract", "array")
 
 export(db2cross)
