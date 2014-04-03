@@ -122,7 +122,9 @@ Mplot <- function (M, ...,
     if (is.null (cn <- colnames(x))) return (1:ncol(x)) else return(cn)
   }
 
-  plotlegend <- function () {   
+  plotlegend <- function () {
+    if (nolegend) return()
+       
     # Add legend, if legend not equal to NULL or not equal to FALSE
     if (! is.list(legend)) {
       if (legend[1] == FALSE) 
@@ -180,6 +182,8 @@ Mplot <- function (M, ...,
   nother  <- Dots$nother
   nx      <- nother + 1 # total number of objects to be plotted
   varnames <- getnames(x2[[1]])
+  
+  nolegend <- (nother == 0 & is.null(pos.legend))
 
  # x-variable  
   xPos <- vector()

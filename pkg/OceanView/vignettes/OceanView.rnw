@@ -141,7 +141,25 @@ Function \code{Mplot} is a quick way to visualise the contents of tabular data, 
 \footnote{Of course, there are many other functions in other packages 
  that do similar things}
 
-As an example, we plot the contents of the tabular NIOZ monitoring data for the 
+As a first example, plot the contents of the tabular NIOZ monitoring data for  
+station 1 and for two variables. 
+<<label=WSnioza,include=FALSE, pdf = FALSE, eps = FALSE, png = TRUE>>=
+ Mplot(WSnioz.table, subset = Station == 1, 
+   select = c("WNO3", "WNO2"), xlab = "Daynr") 
+@
+\setkeys{Gin}{width=0.8\textwidth}
+\begin{figure} 
+\begin{center}
+<<label=WSnioza,fig=TRUE,echo=FALSE,pdf=FALSE, png = TRUE, width = 8, height = 4>>=
+<<WSnioza>>
+@
+\end{center}
+\caption{A quick plot of a (selection) of a tabular data set}
+\label{fig:WSnioz}
+\end{figure}
+
+
+We now plot the contents of the tabular NIOZ monitoring data for the 
 stations 1 and 13.  We first split the data set according to the station number, 
 selecting these two stations (\code{Msplit}), then plot the timeseries for 
 four variables. 
@@ -159,7 +177,7 @@ four variables.
 <<WSnioz>>
 @
 \end{center}
-\caption{A quick plot of a (selection) of a tabular data set}
+\caption{A quick plot of a (selection) of two data sets}
 \label{fig:WSnioz}
 \end{figure}
 

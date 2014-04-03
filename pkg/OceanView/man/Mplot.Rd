@@ -131,9 +131,13 @@
  Msummary(M1)
  Msummary(M1, M2, M3)
 
-# plot results -  will change mfrow 
+# plot all columns of M3 -  will change mfrow 
+ Mplot(M3, type = "b", pch = 18, col = "red")
+
+# plot results of all three data sets
  Mplot(M1, M2, M3, lwd = 2, mtext = "All variables versus 1st column",
        legend = list(x = "top", legend = c("M1", "M2", "M3")))
+
 
 ## =======================================================================
 ## Plot a selection or only common elements
@@ -159,8 +163,9 @@
  Mdescribe(Irislist, which = "Sepal.Length")
  Mdescribe(iris, which = "Sepal.Length", subset = Species == "setosa")
 
- Mplot(Irislist, type = "p", 
-       legend = list(x = "bottomright", title = "species"))
+# legend in a separate plot
+ Mplot(Irislist, type = "p", pos.legend = 0,
+       legend = list(x = "center", title = "species"))
 
  Mplot(Msplit(Orange,1), lwd = 2,
        legend = list(x = "topleft", title = "tree nr"))
