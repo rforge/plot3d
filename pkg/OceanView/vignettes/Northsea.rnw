@@ -387,7 +387,7 @@ Bathymetric data can also be plotted as perspective plots.
 \setkeys{Gin}{width=1.0\textwidth}
 \begin{figure}[h]
 \begin{center}
-\includegraphics{Northsea-bathy2}
+\includegraphics{northsea-bathy2}
 \end{center}
 \caption{Bathymetry in perspective}
 \label{fig:fo}
@@ -564,7 +564,7 @@ selected depth levels and remove the N and E points, as they are unstable:
  mtext (outer = TRUE, side = 3, "Vertical velocity")
 \end{Sinput}
 \end{Schunk}
-\includegraphics{Northsea-025}
+\includegraphics{northsea-025}
 \clearpage
 \section{time-averaged horizontal velocity vectors at several depths}
 \code{uu} and \code{vv} contain 3D output of horizontal velocities 
@@ -636,7 +636,7 @@ so to produce the quiver plots, they are multiplied with 1000:
  mtext (outer = TRUE, side = 3, "Flow transects")
 \end{Sinput}
 \end{Schunk}
-\includegraphics{Northsea-028}
+\includegraphics{northsea-028}
 
 \section{plotting irregular transects, along a ship track}
 Fot this figure, we will extract data along a (hypothetical) ship track:
@@ -671,7 +671,7 @@ Fot this figure, we will extract data along a (hypothetical) ship track:
    main = "vertical velocity on track")
 \end{Sinput}
 \end{Schunk}
-\includegraphics{Northsea-029}
+\includegraphics{northsea-029}
 
 \section{Finally}
 
