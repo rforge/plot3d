@@ -28,7 +28,7 @@ data(WSnioz.table)
 }
 
 \format{
-  \code{WSnioz} is a \code{data.frame} with the following columns:
+  \code{WSnioz} is a \code{data.frame} with the following columns: 
   \itemize{
     \item \code{SamplingDateTime}, a string with the date and time of sampling.
     \item \code{SamplingDateTimeREAL}, a numeric value with day as per 1900.
