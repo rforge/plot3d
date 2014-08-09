@@ -57,6 +57,9 @@ The Netherlands
   
   In another vignette in \pkg{OceanView}, (\code{vignette("Northsea")}) \ov is used 
   for plotting the output of a 3-D hydrodynamic model.  
+  
+  A graphical gallery using one of  \pkg{plot3D}, \pkg{plot3Drgl} or \pkg{OceanView}
+  is in \url{http://www.rforscience.com/rpackages/visualisation/oceanview/}.
 }
 
 %% The address of (at least) one author should be given
@@ -73,7 +76,7 @@ The Netherlands
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% R/Sweave specific LaTeX commands.
 %% need no \usepackage{Sweave}
 %\VignetteIndexEntry{OceanView: Visualising oceanographic data and model output}
-%\VignetteKeywords{marine science, 3-D data, 4-D data, quiver, image2D}
+%\VignetteKeyword{marine science, 3-D data, 4-D data, quiver, image2D}
 %\VignettePackage{OceanView}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin of the document
