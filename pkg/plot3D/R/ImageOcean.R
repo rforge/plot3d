@@ -14,7 +14,7 @@ ImageOcean <- function(...) {
     dots$NAcol  <- "black"
   zz       <- Hypsometry$z
   zz[zz>0] <- NA
-  
-  do.call("image2D", c(alist(zz, x = plot3D::Hypsometry$x, y = plot3D::Hypsometry$y), dots))
+  Hypsometry <- plot3D::Hypsometry # import package data set from /data
+  do.call("image2D", c(alist(zz, x = Hypsometry$x, y = Hypsometry$y), dots))
 }
 
