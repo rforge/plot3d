@@ -15,6 +15,6 @@ ImageOcean <- function(...) {
   zz       <- Hypsometry$z
   zz[zz>0] <- NA
   
-  do.call("image2D", c(alist(zz, x = Hypsometry$x, y = Hypsometry$y), dots))
+  do.call("image2D", c(alist(zz, x = plot3D::Hypsometry$x, y = plot3D::Hypsometry$y), dots))
 }
 
