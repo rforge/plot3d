@@ -12,9 +12,9 @@ ImageOcean <- function(...) {
     dots$clab  <- "depth, m"
   if (is.null(dots$NAcol)) 
     dots$NAcol  <- "black"
+#  HH <- plot3D::Hypsometry # import package data set from /data  
   zz       <- Hypsometry$z
-  zz[zz>0] <- NA
-  Hypsometry <- plot3D::Hypsometry # import package data set from /data
+  zz[zz>0] <- NA   
   do.call("image2D", c(alist(zz, x = Hypsometry$x, y = Hypsometry$y), dots))
 }
 
