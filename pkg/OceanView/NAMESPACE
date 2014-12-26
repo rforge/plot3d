@@ -12,7 +12,6 @@ importFrom(rgl, rgl.snapshot)
 importFrom(rgl, persp3d)
 importFrom(rgl, par3d)
 importFrom(rgl, rgl.ids)
-importFrom(rgl, plot3d)
 
 S3method("quiver2D", "default")
 S3method("quiver2D", "matrix")
