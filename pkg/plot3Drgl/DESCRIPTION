@@ -1,6 +1,6 @@
 Package: plot3Drgl
 Version: 1.0
-Title: Plotting multi-dimensional data - using rgl.
+Title: Plotting Multi-dimensional Data - Using rgl
 Author: Karline Soetaert <karline.soetaert@nioz.nl>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: rgl, plot3D, R (>= 2.10)
