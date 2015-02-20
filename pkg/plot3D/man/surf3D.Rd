@@ -103,7 +103,7 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
     for the color key.  Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
   \item{bty }{The type of the box, the default is to draw no box.
-    Set \code{bty = "f"} or \code{bty = "b") if you want a full box or the backpanel.
+    Set \code{bty = "f"} or \code{bty = "b"} if you want a full box or the backpanel.
     See \link{perspbox}.
     }
   \item{lighting }{If not \code{FALSE} the facets will be illuminated, and colors may
