@@ -26,28 +26,29 @@
 image2Drgl (z, x = seq(0, 1, length.out = nrow(z)), 
           y = seq(0, 1, length.out = ncol(z)), ...,
           col = jet.col(100), NAcol = "white", border = NA,
-          contour = FALSE, smooth = FALSE,
+          colkey = NULL, contour = FALSE, smooth = FALSE,
           clim = NULL, inttype = 1, dz = 0, add = FALSE) 
 
 contour2Drgl (z, x = seq(0, 1, length.out = nrow(z)),
             y = seq(0, 1, length.out = ncol(z)), ...,
-            col = NULL, clim = NULL, dz = 0.1, add = FALSE) 
+            col = NULL, colkey = NULL, clim = NULL, dz = 0.1,
+            add = FALSE)
 
 scatter2Drgl (x, y, colvar = NULL, ...,
-          col = NULL, NAcol = "white",
+          col = NULL, NAcol = "white", colkey = NULL,
           clim = NULL, CI = NULL, dz = 0.1, add = FALSE) 
 
 text2Drgl (x, y, labels, colvar = NULL, ...,
-          col = NULL, NAcol = "white",
+          col = NULL, NAcol = "white", colkey = NULL,
           clim = NULL, CI = NULL, dz = 0.1, add = FALSE) 
 
 arrows2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
-           col = NULL, NAcol = "white", clim = NULL, 
-           type = "simple", dz = 0.1, add = FALSE)  
+           col = NULL, NAcol = "white", colkey = NULL,
+           clim = NULL, type = "simple", dz = 0.1, add = FALSE)
 
 segments2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
-           col = NULL, NAcol = "white", clim = NULL, 
-           type = "simple", dz = 0.1, add = FALSE)  
+           col = NULL, NAcol = "white", colkey = NULL,
+           clim = NULL, type = "simple", dz = 0.1, add = FALSE)
 
 }
 
@@ -85,6 +86,11 @@ segments2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
     or flat shading should be used. (if \code{TRUE} then function 
     \link{cutrgl} will not work).
     }  
+  \item{colkey }{A logical, NULL (default), or a list with parameters for the
+    color key (legend). Not all arguments from the original \link{colkey} function
+    from \code{plot3D} are supported. For instance, color keys will always be
+    put on the 4th margin.
+    }
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable used. 
     Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 

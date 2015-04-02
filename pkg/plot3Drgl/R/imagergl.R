@@ -6,7 +6,7 @@
 image2Drgl <- function(z, x = seq(0, 1, length.out = nrow(z)),
                     y = seq(0, 1, length.out = ncol(z)), ...,
                     col = jet.col(100), NAcol = "white", border = NA,
-                    contour = FALSE, smooth = FALSE, 
+                    colkey = NULL, contour = FALSE, smooth = FALSE, 
                     clim = NULL, inttype = 1, dz = 0, add = FALSE)  {
 # ------------------------------------------------------------------------------
 # check input
@@ -15,7 +15,7 @@ image2Drgl <- function(z, x = seq(0, 1, length.out = nrow(z)),
   dots <- plot2Drgl("image3D", x, y, colvar = z,
                     col, NAcol, clim, 
                     add, namesextra = namesextra,  z = 1 + dz, 
-                    border = border,
+                    border = border, colkey = colkey, 
                     inttype = inttype, smooth = smooth, ...)
                     
   iscontour <- contour
@@ -38,7 +38,7 @@ image2Drgl <- function(z, x = seq(0, 1, length.out = nrow(z)),
 
 contour2Drgl <- function(z, x = seq(0, 1, length.out = nrow(z)),
                     y = seq(0, 1,  length.out = ncol(z)), ...,
-                    col = NULL,   clim = NULL, dz = 0.1, add = FALSE)  {
+                    col = NULL, colkey = NULL,  clim = NULL, dz = 0.1, add = FALSE)  {
 # ------------------------------------------------------------------------------
 # check input
 # ------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ contour2Drgl <- function(z, x = seq(0, 1, length.out = nrow(z)),
   dotpersp <- dots[names(dots) %in% namesscat]
 
   do.call("contour3D", c(alist(x = x, y = y, z = 1 + dz, colkey = FALSE,
-    colvar = z, col = col, clim = clim, bty = "b",  
+    colvar = z, col = col, colkey = colkey, clim = clim, bty = "b",  
     plot = FALSE, add = add, zlab = "", ticktype = "simple"), dotpersp))
 
   finishplotrgl(dots, namesextra = namesextra, add = add)  

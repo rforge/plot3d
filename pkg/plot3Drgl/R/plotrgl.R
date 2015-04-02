@@ -100,12 +100,19 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   if (new) 
     do.call("open3d", dots[names(dots) %in% par3dpars]) #[!names(dots) %in% materialnames])
   else {
-    if (! add)
+    if (! add & is.null(plist$clearit))
       rgl.clear()
+    else if (! is.null(plist$clearit))
+      if (plist$clearit) rgl.clear()
+    
     dotmat <- dots[names(dots) %in% par3dpars]  
     if (length(dotmat) > 0)
       do.call("material3d", dotmat) #dots[!names(dots) %in% materialnames])
   }
+  if (! add & ! is.null(plist$colkey))
+    colkey3D(plist$colkey[[1]]$par, plist$colkey[[1]]$col, plist$colkey[[1]]$clim,
+     plist$colkey[[1]]$clab, plist$colkey[[1]]$clog, plist$colkey[[1]]$New)
+
   if (length(material) > 0)
     do.call("material3d", material)
 
@@ -284,10 +291,21 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   if (length(labs) > 0) {
       alpha <- labs$alpha 
       alpha[is.na(alpha)] <- material3d()$alpha
-   
-    text3d(x = labs$x, y = labs$y, z = labs$z,
-               color = labs$col, texts = labs$labels, font = labs$font,
-               cex = labs$cex, adj = labs$adj[1], alpha = alpha) 
+    i1 <- which (labs$adj == 0) 
+    if (length(i1))
+    text3d(x = labs$x[i1], y = labs$y[i1], z = labs$z[i1],
+        color = labs$col[i1], texts = labs$labels[i1], font = labs$font[i1],
+        cex = labs$cex[i1], adj = 0, alpha = alpha[i1]) 
+    i1 <- which (labs$adj == 0.5) 
+    if (length(i1))
+    text3d(x = labs$x[i1], y = labs$y[i1], z = labs$z[i1],
+        color = labs$col[i1], texts = labs$labels[i1], font = labs$font[i1],
+        cex = labs$cex[i1], adj = 0.5, alpha = alpha[i1]) 
+    i1 <- which (labs$adj == 1) 
+    if (length(i1))
+    text3d(x = labs$x[i1], y = labs$y[i1], z = labs$z[i1],
+        color = labs$col[i1], texts = labs$labels[i1], font = labs$font[i1],
+        cex = labs$cex[i1], adj = 1, alpha = alpha[i1]) 
   }
   D <- NULL
   if (plist$persp$drawbox & !add) {
@@ -554,7 +572,8 @@ plotrgl2D <- function(plist, new, add, smooth, plot = FALSE, ...) {
       if (! is.null(dots$ylim)) 
         pdots$ylim <- dots$ylim
     }
-    pdots$colkey <- pdots$clab <- pdots$facets <- pdots$resfac <- pdots$theta <- pdots$add <- NULL 
+    pdots$colkey <- pdots$clab <- NULL
+    pdots$facets <- pdots$resfac <- pdots$theta <- pdots$add <- NULL 
     pdots$rasterImage <- NULL 
     pdots$new <- new
     pdots

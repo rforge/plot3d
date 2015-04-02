@@ -22,7 +22,8 @@ plot2Drgl <- function(func.name, x, y, colvar, col, NAcol, clim, add,
   if (is.null(z)) 
     z <- rep(1, length.out = length(x))
   plot3D:::refresh(FALSE)
-  do.call(func.name, c(alist(x = x, y = y, z = z, colkey = FALSE,
+  colkey <- getplist()$colkeyargs
+  do.call(func.name, c(alist(x = x, y = y, z = z, colkey = colkey,
     colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",
     plot = FALSE, add = add, zlab = "", ticktype = "simple"), dotpersp))
   plot3D:::refresh(TRUE)

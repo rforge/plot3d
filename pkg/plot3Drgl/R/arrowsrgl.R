@@ -3,7 +3,7 @@
 # ==============================================================================
 
 arrows2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
-                    col = NULL, NAcol = "white",
+                    col = NULL, NAcol = "white", colkey = NULL, 
                     clim = NULL, type = "simple", dz = 0.1, 
                     add = FALSE)  {
 
@@ -19,7 +19,7 @@ arrows2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
 
   z <- rep(1 + dz, length.out = length(x0))
   do.call("arrows3D", c(alist(x0 = x0, y0 = y0, z0 = z, 
-    x1 = x1, y1 = y1, z1 = z, colkey = FALSE, type = type,
+    x1 = x1, y1 = y1, z1 = z, colkey = colkey, type = type,
     colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",
     plot = FALSE, add = add, zlab = "", ticktype = "simple"), dotpersp))
 
@@ -32,7 +32,7 @@ arrows2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
 # ==============================================================================
 
 segments2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
-                    col = NULL, NAcol = "white",
+                    col = NULL, NAcol = "white", colkey = NULL, 
                     clim = NULL, type = "simple", dz = 0.1,
                     add = FALSE)  {
 
@@ -48,7 +48,7 @@ segments2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
 
   z <- rep(1+dz, length.out = length(x0))
   do.call("segments3D", c(alist(x0 = x0, y0 = y0, z0 = z, 
-    x1 = x1, y1 = y1, z1 = z, colkey = FALSE, type = type,
+    x1 = x1, y1 = y1, z1 = z, colkey = colkey, type = type,
     colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",
     plot = FALSE, add = add, zlab = "", ticktype = "simple"), dotpersp))
 
