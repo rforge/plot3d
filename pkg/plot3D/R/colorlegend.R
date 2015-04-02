@@ -180,6 +180,15 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
   ix <- 1
   minz <- min(clim)
   maxz <- max(clim)
+# the parameters for the axis
+  axispar <- colkeypar
+  if (! is.null(axispar$breaks)) {
+    nbreaks <- length(axispar$breaks)
+    axispar$labels <- 0.5*(axispar$breaks[-1] +axispar$breaks[-nbreaks])
+    minz <- 0.5
+    maxz <- nbreaks+0.5
+    clim <- c(minz, maxz)
+  }
   nbins <- length(col) 
   binwidth <- (maxz - minz)/nbins
   iy <- IY <- seq(minz + binwidth/2, maxz - binwidth/2, by = binwidth)
@@ -198,13 +207,13 @@ drawcolkey <- function (colkeypar, col, clim, clab = NULL,
   if (! is.numeric(cex.clab)) 
     cex.clab <- 1.
 
-# the parameters for the axis
-  axispar <- colkeypar
+  if (! is.null(axispar$breaks))
+    axispar$at <- iy
 
 # remove arguments not in axis function
   axispar$side <- axispar$length <- axispar$width <- axispar$plot <- NULL
   axispar$parleg <- axispar$parplt <- axispar$dist <- NULL
-  axispar$shift <-axispar$col.box <- NULL  
+  axispar$shift <-axispar$col.box <- axispar$breaks <- NULL
   axispar$col.clab <- axispar$cex.clab <- axispar$side.clab <- NULL
   axispar$line.clab <- axispar$adj.clab <- axispar$font.clab <- NULL
   axispar$addlines <- NULL

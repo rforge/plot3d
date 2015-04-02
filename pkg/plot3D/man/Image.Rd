@@ -256,8 +256,9 @@ contour2D (z, x = seq(0, 1, length.out = nrow(z)),
  image2D(volcano, x = 1:nr, y = 1:nc, contour = TRUE, shade = 0.5, lphi = 0,
        col = "lightblue", main = "volcano")
 
- image2D(volcano, x = 1:nr, y = 1:nc, col = jet.col(12),
-       main = "volcano", clab = "height, m")
+ breaks <- seq(90, 200, by = 10)
+ image2D(volcano, x = 1:nr, y = 1:nc, col = jet.col(length(breaks)-1),
+       main = "volcano", clab = "height, m", breaks = breaks)
 
 ## =======================================================================
 ## Contour plots

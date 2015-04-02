@@ -5,7 +5,7 @@ Author: Karline Soetaert <karline.soetaert@nioz.nl>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
 Depends: R (>= 2.15)
 Imports: misc3d
-Description: Functions for viewing 2-D and 3-D data, including perspective plots, slice plots, surface plots, scatter plots, ... Includes data sets from oceanography
+Description: Functions for viewing 2-D and 3-D data, including perspective plots, slice plots, surface plots, scatter plots, etc. Includes data sets from oceanography.
 License: GPL (>=3.0)
 LazyData: yes
 

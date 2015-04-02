@@ -919,7 +919,7 @@ splitpardots <- function(dots) {
   # plotting parameters : split in plot parameters and point parameters
   plotnames <- c("xlab", "ylab", "zlab", "xlim", "ylim", "zlim", 
                  "main", "sub", "log", "asp", "bty", 
-                 "xaxs", "yaxs", "xaxt", "yaxt", 
+                 "xaxs", "yaxs", "xaxt", "yaxt", "breaks",
                  "ann", "axes", "frame.plot", "panel.first", "panel.last",
                  "cex.lab", "col.lab", "font.lab", "las", "tck", "tcl", "mgp", 
                  "cex.axis", "col.axis", "font.axis", 

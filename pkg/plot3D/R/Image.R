@@ -54,7 +54,13 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     colkey <- check.colkey(colkey)
     if (! add)       
       plist$plt$main <- colkey$parplt
-    setplist(plist)    
+    setplist(plist)
+    if (! is.null(dotimage$breaks)) {
+      nbreaks <- length(dotimage$breaks)
+      if (length(col) != nbreaks-1)
+        stop("must have one more break than col - suggest to use jet.col(", nbreaks, ")")
+      colkey$breaks <- dotimage$breaks
+    }
   }  
   par (plt = plist$plt$main)
   

@@ -188,6 +188,7 @@ add2Dplist <- function(plist, method, ...) {
   }
 
   plist$twoD <- p
+  plist$colkeyargs <- dots$colkey
   class(plist) <- c("plist","list")
   plist
 }

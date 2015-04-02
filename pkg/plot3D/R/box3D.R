@@ -392,7 +392,7 @@ box3D  <- function(x0, y0, z0, x1, y1, z1,
       lwd    = c(poly$lwd,    rep(lwd[i], length.out = 6)),
       lty    = c(poly$lty,    rep(lty[i], length.out = 6)),
       isimg  = c(poly$isimg,  rep(0, length.out = 6)),
-      alpha  = c(poly$alpha, alpha)
+      alpha  = c(poly$alpha, rep(alpha, length.out = 6))
       
     )
   }
