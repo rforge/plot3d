@@ -1,6 +1,5 @@
 \name{Moving slices in 3D}
 \alias{movieslice3D}
-\alias{movieslice3D}
 \title{
  Plotting volumetric data as moving slices in 3D using rgl
 }
@@ -13,9 +12,9 @@
 \usage{
 movieslice3D (x, y, z, colvar = NULL, xs = NULL,
   ys = NULL, zs = NULL, along = NULL,
-  col = jet.col(100), NAcol = "white", clim = NULL, 
-  wait  = NULL, ask = FALSE, add = FALSE, 
-  basename = NULL, ...) 
+  col = jet.col(100), NAcol = "white", breaks = NULL,
+  colkey = FALSE, clim = NULL, clab = NULL,
+  wait  = NULL, ask = FALSE, add = FALSE, basename = NULL, ...)
 }
 
 \arguments{
@@ -34,11 +33,28 @@ movieslice3D (x, y, z, colvar = NULL, xs = NULL,
     }
   \item{NAcol }{Colors to be used for \code{colvar} values that are \code{NA}.
     }
-  \item{clim }{Only if \code{colvar} is specified, the range of the color variable values. 
+  \item{breaks }{a set of finite numeric breakpoints for the colors;
+    must have one more breakpoint than color and be in increasing order.
+    Unsorted vectors will be sorted, with a warning.
+    }
+ \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters
+    for the color key (legend).
+    If \code{colkey} = \code{NULL} then a color key will be added only if \code{col} is a vector.
+    Setting \code{colkey = list(plot = FALSE)} will create room for the color key
+    without drawing it.
+    if \code{colkey = FALSE}, no color key legend will be added.
+    }
+  \item{clim }{Only if \code{colvar} is specified, the range of the color variable values.
     Values of \code{colvar} that extend the range will be put to \code{NA} and colored
     as specified with \code{NAcol}.
     } 
-  \item{xs, ys, zs }{Vectors specify the positions in x, y or z where the slices (planes) are to be drawn consecutively. 
+  \item{clab }{Only if \code{colkey} is not \code{NULL} or \code{FALSE},
+     the label to be written on top of the color key.
+     The label will be written at the same level as the main title.
+     To lower it, \code{clab} can be made a vector, with the first values empty
+     strings.
+    }
+  \item{xs, ys, zs }{Vectors specify the positions in x, y or z where the slices (planes) are to be drawn consecutively.
     The movie will loop over the slices, each time projecting the values of \code{colvar} on them.
     If all \code{xs, ys, zs} are \code{NULL}, then \code{xs} will be taken equal to \code{x}.
     } 
