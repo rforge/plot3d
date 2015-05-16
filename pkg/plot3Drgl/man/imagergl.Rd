@@ -2,9 +2,12 @@
 \alias{image2Drgl}
 \alias{contour2Drgl}
 \alias{scatter2Drgl}
+\alias{lines2Drgl}
+\alias{points2Drgl}
 \alias{text2Drgl}
 \alias{arrows2Drgl}
 \alias{segments2Drgl}
+\alias{rect2Drgl}
 \title{
  2-D image, contour, scatterplots, segments and arrows in rgl.
 }
@@ -14,41 +17,55 @@
   \code{contour2Drgl} creates a contourplot in rgl. 
 
   \code{scatter2Drgl} creates a scatterplot (lineplot, points, ...) in rgl. 
-  
+
+  \code{points2Drgl} is shorthand for \code{scatter2Drgl(..., type = "p")}
+
+  \code{lines2Drgl} is shorthand for \code{scatter2Drgl(..., type = "l")}
+
+
   \code{arrows2Drgl} and \code{segments3D} plot arrows and segments in rgl. 
   
-  \code{text2Drgl} plot labels in rgl. 
+  \code{text2Drgl} plots labels in rgl.
   
-  These functions were implemented for their sideeffect that rgl plots can be 
+  These functions were implemented for their side effect that rgl plots can be
   zoomed, translocated, rectangular selections taken.
 }
 \usage{
 image2Drgl (z, x = seq(0, 1, length.out = nrow(z)), 
           y = seq(0, 1, length.out = ncol(z)), ...,
-          col = jet.col(100), NAcol = "white", border = NA,
-          colkey = NULL, contour = FALSE, smooth = FALSE,
-          clim = NULL, inttype = 1, dz = 0, add = FALSE) 
+          col = NULL, NAcol = "white", breaks = NULL, border = NA,
+          facets = TRUE, colkey = NULL, contour = FALSE,
+          smooth = FALSE, clim = NULL, clab = NULL, shade = NA,
+          inttype = 1, dz = 0, add = FALSE)
 
 contour2Drgl (z, x = seq(0, 1, length.out = nrow(z)),
             y = seq(0, 1, length.out = ncol(z)), ...,
-            col = NULL, colkey = NULL, clim = NULL, dz = 0.1,
+            col = NULL, colkey = NULL, clim = NULL, clab = NULL, dz = 0.1,
             add = FALSE)
 
 scatter2Drgl (x, y, colvar = NULL, ...,
-          col = NULL, NAcol = "white", colkey = NULL,
-          clim = NULL, CI = NULL, dz = 0.1, add = FALSE) 
+          col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+          clim = NULL, clab = NULL, CI = NULL, dz = 0.1, add = FALSE)
 
 text2Drgl (x, y, labels, colvar = NULL, ...,
-          col = NULL, NAcol = "white", colkey = NULL,
-          clim = NULL, CI = NULL, dz = 0.1, add = FALSE) 
+          col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+          clim = NULL, clab = NULL, dz = 0.1, add = FALSE)
 
 arrows2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
-           col = NULL, NAcol = "white", colkey = NULL,
-           clim = NULL, type = "simple", dz = 0.1, add = FALSE)
+           col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+           clim = NULL, clab = NULL, type = "simple", dz = 0.1, add = FALSE)
 
 segments2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
-           col = NULL, NAcol = "white", colkey = NULL,
-           clim = NULL, type = "simple", dz = 0.1, add = FALSE)
+           col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+           clim = NULL, clab = NULL, dz = 0.1, add = FALSE)
+
+rect2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
+           col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+           clim = NULL, clab = NULL, dz = 0.1, add = FALSE)
+
+lines2Drgl(x, y, ...)
+
+points2Drgl(x, y, ...)
 
 }
 
@@ -74,10 +91,25 @@ segments2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
     }
   \item{NAcol }{Color to be used for \code{NA} values; default is ``white''. 
     }
+  \item{breaks }{a set of finite numeric breakpoints for the colors;
+    must have one more breakpoint than color and be in increasing order.
+    Unsorted vectors will be sorted, with a warning.
+    }
   \item{border }{The color of the lines drawn around the surface facets.
     The default, \code{NA}, will disable the drawing of borders.
     }
-  \item{contour }{If \code{TRUE}, then a \link{contour} plot will be 
+  \item{facets }{If \code{TRUE}, then \code{col} denotes the color of the surface facets.
+    If \code{FALSE}, then the surface facets are colored ``white'' and the \code{border}
+    will be colored as specified by \code{col}. If \code{NA} then the facets will be
+    transparent.
+    }
+  \item{shade }{the degree of shading of the surface facets.
+    Values of shade close to one yield shading similar to a point light
+    source model and values close to zero produce no shading.
+    Creates the illusion of perspective.
+    See \link{persp}.
+    }
+  \item{contour }{If \code{TRUE}, then a \link{contour} plot will be
     added to the image plot. 
     Also allowed is to pass a \code{list} with arguments for the 
     \link{contour2D} function. 
@@ -94,7 +126,12 @@ segments2Drgl (x0, y0, x1, y1, colvar = NULL, ...,
   \item{clim }{Only if \code{colvar} is specified, the range of the color variable used. 
     Values of \code{colvar} that extend the range will be put to \code{NA}.
     } 
-  \item{inttype }{The interpolation type to create the polygons, either 
+  \item{clab }{Only if \code{colkey = TRUE}, the label to be written on top of the
+    color key. The label will be written at the same level as the main title.
+    to lower it, \code{clab} can be made a vector, with the first values empty
+    strings.
+    }
+  \item{inttype }{The interpolation type to create the polygons, either
     interpolating the \code{z} (\code{inttype = 1} or the \code{x, y}
     values (\code{inttype = 2}) - see \link{persp3D}. 
     } 

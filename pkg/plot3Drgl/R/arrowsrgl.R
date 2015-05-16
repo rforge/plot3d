@@ -3,58 +3,49 @@
 # ==============================================================================
 
 arrows2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
-                    col = NULL, NAcol = "white", colkey = NULL, 
-                    clim = NULL, type = "simple", dz = 0.1, 
-                    add = FALSE)  {
-
+              col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+              clim = NULL, clab = NULL, type = "simple", dz = 0.1, add = FALSE)  {
 # ------------------------------------------------------------------------------
-# check input
-# ------------------------------------------------------------------------------
-  dots <- list(...)
 
-  dots$expand <- dots$ticktype <- dots$zlab <- NULL
-  dots$box <- TRUE
-  namesextra <- c("code", "length", "angle", "lwd", "lty", "type")  
-  dotpersp <- dots[names(dots) %in% c(namesextra,namespersp)]
-
-  z <- rep(1 + dz, length.out = length(x0))
-  do.call("arrows3D", c(alist(x0 = x0, y0 = y0, z0 = z, 
-    x1 = x1, y1 = y1, z1 = z, colkey = colkey, type = type,
-    colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",
-    plot = FALSE, add = add, zlab = "", ticktype = "simple"), dotpersp))
-
-  finishplotrgl(dots, namesextra, add = add)
+  namesextra <- c("code", "length", "angle", "lwd", "lty", "type")
+  dots <- plot2Drglbis("arrows3D", x0 = x0, y0 = y0, x1 = x1, y1 = y1,
+     dz = dz, colkey = colkey, type = type, colvar = colvar, col = col,
+     NAcol = NAcol, breaks = breaks, clim = clim, clab = clab,
+     add = add, namesextra = namesextra, ...)
+  finishplotrgl(dots, namesextra)
 }
 
+# ==============================================================================
+
+rect2Drgl <- function (x0, y0, x1, y1, colvar = NULL, ...,
+         col = NULL, NAcol = "white", breaks = NULL,
+         colkey = NULL, clim = NULL, clab = NULL,
+         dz = 0.1, add = FALSE)   {
+
+
+  namesextra <- c("lwd", "lty")
+  z <- rep(1+dz, length.out = length(x0))
+  dots <- plot2Drglbis("box3D", x0 = x0, y0 = y0, x1 = x1, y1 = y1,
+    dz = dz, colkey = colkey, colvar = colvar, col = col,
+    NAcol = NAcol, breaks = breaks, clim = clim, clab = clab, add = add,
+    namesextra = namesextra, ...)
+  finishplotrgl(dots, namesextra)
+}
 
 # ==============================================================================
-# the 2D arrows function, using rgl
+# the 2D segments function, using rgl
 # ==============================================================================
 
 segments2Drgl <- function(x0, y0, x1, y1, colvar = NULL, ...,
-                    col = NULL, NAcol = "white", colkey = NULL, 
-                    clim = NULL, type = "simple", dz = 0.1,
-                    add = FALSE)  {
-
+               col = NULL, NAcol = "white", breaks = NULL, colkey = NULL,
+               clim = NULL, clab = NULL, dz = 0.1, add = FALSE)  {
 # ------------------------------------------------------------------------------
-# check input
-# ------------------------------------------------------------------------------
-  dots <- list(...)
 
-  dots$expand <- dots$ticktype <- dots$zlab <- NULL
-  dots$box <- TRUE
-  namesextra <- c("lwd", "lty")  
-  dotpersp <- dots[names(dots) %in% c(namesextra,namespersp)]
-
+  namesextra <- c("lwd", "lty")
   z <- rep(1+dz, length.out = length(x0))
-  do.call("segments3D", c(alist(x0 = x0, y0 = y0, z0 = z, 
-    x1 = x1, y1 = y1, z1 = z, colkey = colkey, type = type,
-    colvar = colvar, col = col, NAcol = NAcol, clim = clim, bty = "b",
-    plot = FALSE, add = add, zlab = "", ticktype = "simple"), dotpersp))
-
-  finishplotrgl(dots, namesextra, add = add)
+  dots <- plot2Drglbis("segments3D", x0 = x0, y0 = y0, x1 = x1, y1 = y1,
+    dz = dz, colkey = colkey, colvar = colvar, col = col,
+    NAcol = NAcol, breaks = breaks, clim = clim, clab = clab, add = add,
+    namesextra = namesextra, ...)
+  finishplotrgl(dots, namesextra)
 }
-
-
-
-

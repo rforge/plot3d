@@ -9,6 +9,7 @@
 \alias{slicecont3Drgl}
 \alias{isosurf3Drgl}
 \alias{voxel3Drgl}
+\alias{triangle3Drgl}
 \alias{surf3Drgl}
 \alias{spheresurf3Drgl}
 \alias{segments3Drgl}
@@ -39,8 +40,6 @@
   Functions \code{box3Drgl}, \code{border3Drgl}, \code{rect3Drgl}, \code{text3Drgl} produce boxes, rectangles, texts to 3D plots
   using rgl; they are similar to functions \link{box3D}, \link{border3D}, \link{rect3D}, \link{text3Drgl} from package \code{plot3D}.
   
-  These functions were implemented for their sideeffect that rgl plots can be 
-  zoomed, translocated, rectangular selections taken.
 }
 \usage{
 persp3Drgl(...) 
@@ -52,7 +51,8 @@ lines3Drgl(...)
 slice3Drgl(...)
 slicecont3Drgl(...)
 isosurf3Drgl(...)
-voxel3Drgl(...) 
+voxel3Drgl(...)
+triangle3Drgl(...)
 surf3Drgl(...)
 spheresurf3Drgl(...)
 segments3Drgl(...)

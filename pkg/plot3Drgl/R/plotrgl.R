@@ -65,7 +65,6 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   if (add)
     new <- FALSE
   dots <- list(...)
-
   clipit <- FALSE
   if (! is.null(dots$xlim))  {
     xlim <- dots$xlim        
@@ -98,7 +97,7 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   material <- dots[names(dots) %in% materialnames] 
   material$lit <- lighting
   if (new) 
-    do.call("open3d", dots[names(dots) %in% par3dpars]) #[!names(dots) %in% materialnames])
+      do.call("open3d", dots[names(dots) %in% par3dpars]) #[!names(dots) %in% materialnames])
   else {
     if (! add & is.null(plist$clearit))
       rgl.clear()
@@ -111,7 +110,8 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
   }
   if (! add & ! is.null(plist$colkey))
     colkey3D(plist$colkey[[1]]$par, plist$colkey[[1]]$col, plist$colkey[[1]]$clim,
-     plist$colkey[[1]]$clab, plist$colkey[[1]]$clog, plist$colkey[[1]]$New)
+     plist$colkey[[1]]$clab, plist$colkey[[1]]$clog,
+     plist$colkey[[1]]$New, dots$alpha)
 
   if (length(material) > 0)
     do.call("material3d", material)
@@ -149,10 +149,10 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
       img <- plist$img[[i]]
       fb <- Createcolors(img$facets, img$border, img$col.full, img$alpha)
       if (!all(is.na(fb$facets))) 
-          persp3d(img$x, img$y, img$z, col = fb$facets, add = TRUE, aspect = FALSE, 
+          persp3d(img$x, img$y, img$z, col = fb$facets, add = TRUE, aspect = FALSE,
             front = "filled", back = "filled", smooth = smooth, alpha = fb$alpha)
       if (!all(is.na(fb$border))) 
-        persp3d(img$x, img$y, img$z, col = fb$border, add = TRUE, aspect = FALSE, 
+        persp3d(img$x, img$y, img$z, col = fb$border, add = TRUE, aspect = FALSE,
           front = "lines", back = "lines", smooth = smooth)
     }
     
@@ -170,7 +170,7 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
  # two types of polygons
   if (length(poly$x) > 0) {
     if (is.null(poly$alpha))
-      poly$alpha <- material3d()$alpha 
+      poly$alpha <- rep(material3d()$alpha, length(poly$col))
     else  
       poly$alpha[is.na(poly$alpha)] <- material3d()$alpha  
     if (nrow(poly$x) > 5)
@@ -192,12 +192,13 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
       ii <- which(segm$lwd == ilwd[i])
       alpha <- segm$alpha[ii]
       alpha[is.na(alpha)] <- material3d()$alpha
-      segments3d(x = rbind(as.vector(segm$x.from)[ii], as.vector(segm$x.to)[ii]), 
+        segments3d(x = rbind(as.vector(segm$x.from)[ii], as.vector(segm$x.to)[ii]),
                  y = rbind(as.vector(segm$y.from)[ii], as.vector(segm$y.to)[ii]),
                  z = rbind(as.vector(segm$z.from)[ii], as.vector(segm$z.to)[ii]),
                  color = matrix (nrow = 2, byrow = TRUE, data = rep(segm$col[ii], 2)),
                  lwd = ilwd[i], lty = segm$lty[ii[1]], 
-                 alpha =  matrix (nrow = 2, byrow = TRUE, data = rep(alpha, 2)))   
+                 alpha =  matrix (nrow = 2, byrow = TRUE, data = rep(alpha, 2))
+        )
     }           
   }
  # arrows 
@@ -226,7 +227,6 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
         ij <- ii[which(pts$cex[ii] == j)]
       alpha <- pts$alpha[ij]
       alpha[is.na(alpha)] <- material3d()$alpha
-        
         plot3d(x = pts$x.mid[ij], y = pts$y.mid[ij], z = pts$z.mid[ij],
                size = 1 *j, col = pts$col[ij], alpha = alpha, add = TRUE)
       }
@@ -267,7 +267,7 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
         ij <- ii[which(pts$cex[ii] == j)]
         alpha <- pts$alpha[ij]
         alpha[is.na(alpha)] <- material3d()$alpha
-        
+
         plot3d(x = pts$x.mid[ij], y = pts$y.mid[ij], z = pts$z.mid[ij],
              size = 6 *j, col = pts$col[ij], alpha = alpha, add = TRUE)
       }
@@ -279,11 +279,11 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
       alpha <- pts$alpha[ii]
       alpha[is.na(alpha)] <- material3d()$alpha
       
-      segments3d(x = rbind(pts$x.from[ii,i], pts$x.to[ii,i]), 
+       segments3d(x = rbind(pts$x.from[ii,i], pts$x.to[ii,i]),
                  y = rbind(pts$y.from[ii,i], pts$y.to[ii,i]),
                  z = rbind(pts$z.from[ii,i], pts$z.to[ii,i]),
                  color = matrix (nrow = 2, byrow = TRUE, data = rep(pts$CIpar$col[ii], 2)),
-                 lwd = pts$CIpar$lwd[1], lty = pts$CIpar$lty[1], alpha = alpha)   
+                 lwd = pts$CIpar$lwd[1], lty = pts$CIpar$lty[1], alpha = alpha)
     }           
   }
   
@@ -295,29 +295,35 @@ plotrglplist <- function(plist, lighting = FALSE, new = TRUE, smooth = FALSE,
     if (length(i1))
     text3d(x = labs$x[i1], y = labs$y[i1], z = labs$z[i1],
         color = labs$col[i1], texts = labs$labels[i1], font = labs$font[i1],
-        cex = labs$cex[i1], adj = 0, alpha = alpha[i1]) 
+        cex = labs$cex[i1], adj = 0, alpha = alpha[i1])
     i1 <- which (labs$adj == 0.5) 
     if (length(i1))
     text3d(x = labs$x[i1], y = labs$y[i1], z = labs$z[i1],
         color = labs$col[i1], texts = labs$labels[i1], font = labs$font[i1],
-        cex = labs$cex[i1], adj = 0.5, alpha = alpha[i1]) 
+        cex = labs$cex[i1], adj = 0.5, alpha = alpha[i1])
     i1 <- which (labs$adj == 1) 
     if (length(i1))
     text3d(x = labs$x[i1], y = labs$y[i1], z = labs$z[i1],
         color = labs$col[i1], texts = labs$labels[i1], font = labs$font[i1],
-        cex = labs$cex[i1], adj = 1, alpha = alpha[i1]) 
+        cex = labs$cex[i1], adj = 1, alpha = alpha[i1])
   }
   D <- NULL
   if (plist$persp$drawbox & !add) {
     axes <- FALSE
-    
+    box <- TRUE
+
     if (! is.null(plist$dot$ticktype))
       if (plist$dot$ticktype == "detailed")
         axes <- TRUE
-
+    if (! is.null(plist$dot$bty)){
+     if (axes & plist$dot$bty %in% c("b", "b2"))
+       box <- FALSE
+     if (plist$dot$bty == "n")
+       box <- FALSE
+    }
     D <- decorate3d(xlim = xlim, ylim = ylim, zlim = zlim, 
 	     xlab = plist$dot$xlab, ylab = plist$dot$ylab, zlab =  plist$dot$zlab, 
-	     main = plist$dot$main, sub = plist$dot$sub, axes = axes)
+	     main = plist$dot$main, sub = plist$dot$sub, axes = axes, box = box)
 	  if (!axes)
       box3d()   
   } else if (!add)
@@ -386,7 +392,7 @@ Createcolors <- function(facets, border, Cols, Alpha) {
 ## Plot polygons of a plist
 ## =============================================================================
   
-rglpoly <- function(poly, il, front) { 
+rglpoly <- function(poly, il, front) {
    
   if (is.null(il)) {    # choose all
     i.Tri  <- which(is.na (poly$x[4, ]))
@@ -401,19 +407,19 @@ rglpoly <- function(poly, il, front) {
   plotpoly <- function(ipol, func, ir) {
     if (front == "filled")  {
       it <- ipol[poly$col[ipol] != "transparent" ]
-      func(x = poly$x[1:ir, it], y = poly$y[1:ir, it], z = poly$z[1:ir, it], 
+      F <- func(x = poly$x[1:ir, it], y = poly$y[1:ir, it], z = poly$z[1:ir, it],
         col = matrix (nrow = ir, byrow = TRUE, data = rep(poly$col[it], ir)), 
         front = front, lwd = poly$lwd[it[1]], alpha = poly$alpha[it]) 
       ii <- which(poly$border[ipol] != poly$col[ipol])
       if (length(ii) > 0) {
         is <- ipol[ii]
         irr <- c(1:ir, 1, ir+1)
-        lines3d(x = poly$x[irr, is], y = poly$y[irr, is], z = poly$z[irr, is], 
+          lines3d(x = poly$x[irr, is], y = poly$y[irr, is], z = poly$z[irr, is],
           col = matrix (nrow = ir+2, byrow = TRUE, data = rep(poly$border[is], ir+2)), 
-          lty = poly$lty[is[1]], lwd = poly$lwd[is[1]], alpha = poly$alpha[it]) 
+          lty = poly$lty[is[1]], lwd = poly$lwd[is[1]], alpha = poly$alpha[it])
       }
     } else  
-       func(x = poly$x[1:ir, ipol], y = poly$y[1:ir, ipol], z = poly$z[1:ir, ipol], 
+       F <- func(x = poly$x[1:ir, ipol], y = poly$y[1:ir, ipol], z = poly$z[1:ir, ipol],
           col = matrix (nrow = ir, byrow = TRUE, data = rep(poly$border[ipol], ir)), 
           front = front, back = front, lwd = poly$lwd[ipol[1]], alpha = poly$alpha[ipol]) 
   }
@@ -421,10 +427,10 @@ rglpoly <- function(poly, il, front) {
     plotpoly(i.Tri, triangles3d, 3)
   if (length(i.Quad) > 0) 
     plotpoly(i.Quad, quads3d, 4)
-}   
+}
 
 ## =============================================================================
-## An arrow function, 
+## An arrow function, not perfect at all
 ## =============================================================================
   
 hypoth <- function(a, b) sqrt(a^2 + b^2)
@@ -558,9 +564,7 @@ arrfun <- function (x.from, y.from, z.from, x.to, y.to, z.to, code,
   arrhead(2)
 }
 
-
-
-
+## =============================================================================
 
 
 plotrgl2D <- function(plist, new, add, smooth, plot = FALSE, ...) {
@@ -573,7 +577,7 @@ plotrgl2D <- function(plist, new, add, smooth, plot = FALSE, ...) {
         pdots$ylim <- dots$ylim
     }
     pdots$colkey <- pdots$clab <- NULL
-    pdots$facets <- pdots$resfac <- pdots$theta <- pdots$add <- NULL 
+    pdots$resfac <- pdots$theta <- pdots$add <- NULL
     pdots$rasterImage <- NULL 
     pdots$new <- new
     pdots
