@@ -16,8 +16,8 @@
 persp3D (x = seq(0, 1, length.out = nrow(z)), 
        y = seq(0, 1, length.out = ncol(z)), z, ..., 
        colvar = z, phi = 40, theta = 40,
-       col = NULL,  NAcol = "white", border = NA, facets = TRUE,
-       colkey = NULL, resfac = 1,
+       col = NULL,  NAcol = "white", breaks = NULL,
+       border = NA, facets = TRUE, colkey = NULL, resfac = 1,
        image = FALSE, contour = FALSE, panel.first = NULL,
        clim = NULL, clab = NULL, bty = "b", 
        lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
@@ -26,8 +26,8 @@ persp3D (x = seq(0, 1, length.out = nrow(z)),
 ribbon3D (x = seq(0, 1, length.out = nrow(z)), 
       y = seq(0, 1, length.out = ncol(z)), z, ..., 
       colvar = z, phi = 40, theta = 40, 
-      col = NULL,  NAcol = "white", border = NA, facets = TRUE,
-      colkey = NULL, resfac = 1, 
+      col = NULL,  NAcol = "white", breaks = NULL,
+      border = NA, facets = TRUE, colkey = NULL, resfac = 1,
       image = FALSE, contour = FALSE, panel.first = NULL,
       clim = NULL, clab = NULL, bty = "b",
       lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
@@ -37,8 +37,9 @@ ribbon3D (x = seq(0, 1, length.out = nrow(z)),
 hist3D (x = seq(0, 1, length.out = nrow(z)),
       y = seq(0, 1, length.out = ncol(z)), z, ..., 
       colvar = z, phi = 40, theta = 40, 
-      col = NULL, NAcol = "white", border = NA, facets = TRUE,
-      colkey = NULL, image = FALSE, contour = FALSE, 
+      col = NULL, NAcol = "white", breaks = NULL,
+      border = NA, facets = TRUE, colkey = NULL,
+      image = FALSE, contour = FALSE,
       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
       lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
       space = 0, add = FALSE, plot = TRUE)  
@@ -70,7 +71,11 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     }
   \item{NAcol }{Color to be used for \code{NA} values of \code{colvar}; default is ``white''. 
     }
- \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters 
+  \item{breaks }{a set of finite numeric breakpoints for the colors;
+    must have one more breakpoint than color and be in increasing order.
+    Unsorted vectors will be sorted, with a warning.
+    }
+ \item{colkey }{A logical, \code{NULL} (default), or a \code{list} with parameters
     for the color key (legend). List parameters should be one of 
     \code{side, plot, length, width, dist, shift, addlines, col.clab, cex.clab,
       side.clab, line.clab, adj.clab, font.clab}

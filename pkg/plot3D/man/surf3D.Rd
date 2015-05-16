@@ -11,16 +11,16 @@
 }
 \usage{
 surf3D (x, y, z, ..., colvar = z, phi = 40, theta = 40,
-        col = jet.col(100), NAcol = "white", border = NA, 
-        facets = TRUE, colkey = NULL, panel.first = NULL,
-        clim = NULL, clab = NULL, bty = "n", 
+        col = NULL, NAcol = "white", breaks = NULL,
+        border = NA, facets = TRUE, colkey = NULL,
+        panel.first = NULL, clim = NULL, clab = NULL, bty = "n",
         lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
         inttype = 1, add = FALSE, plot = TRUE)
 
 spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE), 
         ..., phi = 0, theta = 0,
-        col = jet.col(100), NAcol = "white", border = NA, 
-        facets = TRUE, contour = FALSE, 
+        col = NULL, NAcol = "white", breaks = NULL,
+        border = NA, facets = TRUE, contour = FALSE,
         colkey = NULL, resfac = 1,
         panel.first = NULL, clim = NULL, clab = NULL, bty = "n", 
         lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
@@ -48,6 +48,10 @@ spheresurf3D (colvar = matrix(nrow = 50, ncol = 50, data = 1:50, byrow = TRUE),
     \code{col} will be "grey". 
     }
   \item{NAcol }{Colors to be used for \code{colvar} values that are \code{NA}.
+    }
+  \item{breaks }{a set of finite numeric breakpoints for the colors;
+    must have one more breakpoint than color and be in increasing order.
+    Unsorted vectors will be sorted, with a warning.
     }
   \item{border }{The color of the lines drawn around the surface facets.
     The default, \code{NA}, will disable the drawing of borders.

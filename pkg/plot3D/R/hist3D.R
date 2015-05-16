@@ -6,8 +6,8 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                    y = seq(0, 1, length.out = ncol(z)),
                    z, ..., 
                    colvar = z, phi = 40, theta = 40,
-                   col = NULL, NAcol = "white", border = NA, facets = TRUE,
-                   colkey = NULL, 
+                   col = NULL, NAcol = "white", breaks = NULL,
+                   border = NA, facets = TRUE, colkey = NULL,
                    image = FALSE, contour = FALSE, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b",
                    lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
@@ -37,11 +37,11 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
 
   space <- rep(space, length.out = 2) / 2
 
-  
   plist <- initplist(add)
 
   dot <- splitdotpersp(list(...), bty, lighting, 
-    extendvec(x), extendvec(y), z, plist = plist, shade, lphi, ltheta)
+    extendvec(x), extendvec(y), z, plist = plist, shade, lphi, ltheta,
+    breaks = breaks)
   
  # swap if decreasing
   if (length(x) > 0 & all(diff(x) < 0)) {     
@@ -74,6 +74,12 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   if (contour$add) 
     cv <- colvar
 
+  if (is.null(col) & is.null(breaks))
+   col <- jet.col(100)
+  else if (is.null(col))
+   col <- jet.col(length(breaks)-1)
+  breaks <- check.breaks(breaks,col)
+
   CC <- check.colvar.2(colvar, z, col, clim, dot$alpha)
   colvar <- CC$colvar
   col <- CC$col
@@ -88,15 +94,21 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
     }
   
     iscolkey <- is.colkey(colkey, col) 
-    if (iscolkey) 
+    if (iscolkey)
       colkey <- check.colkey(colkey)
- 
+
  # colors
     crange <- diff(clim)
     N      <- length(col) - 1
     cmin   <- clim[1]
-    
-    Cols <- matrix(nrow = nrow(z), col[1 + trunc((colvar - cmin)/crange*N)])
+
+    if (is.null(breaks))
+     Cols <- matrix(nrow = nrow(z),
+       col[1 + trunc((colvar - cmin)/crange*N)])
+    else
+     Cols <- matrix(nrow = nrow(z),
+       col[.bincode(colvar, breaks, TRUE, TRUE)])
+    Cols [is.na(Cols)] <- NAcol
   } else { 
     iscolkey <- FALSE
     Cols <- rep(col , length.out = length(z))
@@ -262,7 +274,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   class(Poly) <- "poly"
 
   if (image$add) 
-    Poly <- XYimage (Poly, image, x, y, z, plist, col) 
+    Poly <- XYimage (Poly, image, x, y, z, plist, col, breaks = breaks)
 
   if (contour$add) 
     segm <- contourfunc(contour, x, y, z, plist, cv, clim)
@@ -271,7 +283,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
 
   if (iscolkey) 
     plist <- plistcolkey(plist, colkey, col, clim, clab, 
-      dot$clog, type = "hist3D") 
+      dot$clog, type = "hist3D", breaks = breaks)
 
   plist <- plot.struct.3D(plist, poly = Poly, segm = segm, plot = plot)  
 
