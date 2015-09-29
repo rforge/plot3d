@@ -285,8 +285,9 @@ The New S Language. Wadsworth & Brooks/Cole.
 ## =======================================================================
 
  par(mfrow = c(2, 2))
-# simple, no scaling,
- persp3D(z = volcano, main = "volcano", clab = c("height", "m"))
+# simple, no scaling, use breaks to set colors
+ persp3D(z = volcano, main = "volcano", clab = c("height", "m"), 
+   breaks = seq(80,200, by = 10))
   
 # keep ratios between x- and y (scale = FALSE) 
 # change ratio between x- and z (expand)

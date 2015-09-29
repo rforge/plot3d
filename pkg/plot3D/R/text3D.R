@@ -26,7 +26,6 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
     stop("'labels' should have same length as 'x'")
 
   dot <- splitdotpersp(list(...), bty, NULL, x, y, z, plist = plist, breaks = breaks)
-  breaks <- check.breaks(breaks, col)
 
   if (ispresent(colvar)) {
   
@@ -49,6 +48,7 @@ text3D <- function(x, y, z, labels, ..., colvar = NULL,
       else
         col <- jet.col(length(breaks)-1)
 
+    breaks <- check.breaks(breaks, col)
     iscolkey <- is.colkey(colkey, col)
     if (iscolkey) 
       colkey <- check.colkey(colkey)
@@ -151,7 +151,10 @@ text2D <- function(x, y, labels, ..., colvar = NULL,
 
   if (! is.null(colvar)) {
     if (is.null(col))
-      col <- jet.col(100)
+      if (is.null(breaks))
+        col <- jet.col(100)
+      else
+        col <- jet.col(length(breaks)-1)
 
     if (dots$clog) {
       colvar <- log(colvar)

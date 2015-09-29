@@ -39,13 +39,13 @@ scatter2D <- function(x, y, ..., colvar = NULL,
     CI <- check.CI(CI, length(x), 2)
 
 
+  if (is.null(col) & is.null(breaks))
+     col <- jet.col(100)
+   else if (is.null(col))
+     col <- jet.col(length(breaks)-1)
   breaks <- check.breaks(breaks, col)
+  
   if (! is.null(colvar)) {
-
-    if (is.null(col) & is.null(breaks))
-      col <- jet.col(100)
-    else if (is.null(col))
-      col <- jet.col(length(breaks)-1)
 
     if (dots$clog) {
       colvar <- log(colvar)

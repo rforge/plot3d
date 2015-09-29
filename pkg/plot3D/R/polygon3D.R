@@ -210,8 +210,7 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
     yy <- matrix(ncol = 1, data = c(y, NA)) 
   }
   breaks <- check.breaks(breaks, col)
-  colkey$breaks <- colkey$breaks
-  if (ispresent(colvar)) { 
+  if (ispresent(colvar)) {
     if (length(colvar) != len)
       stop("'colvar' should have same length as number of polygons (= 1+ number of NAs in 'x', 'y' and 'z')")
     
@@ -234,6 +233,8 @@ polygon2D  <- function(x, y, ..., colvar = NULL,
       colkey <- check.colkey(colkey, add)
       if (! add)
         par.ori <- par(plt = colkey$parplt)
+      colkey$breaks <- breaks
+
     }
      
     if (! is.null(dots$alpha)) 

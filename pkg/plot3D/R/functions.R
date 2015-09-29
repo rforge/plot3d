@@ -528,7 +528,7 @@ variablecol <- function(colvar, col, NAcol, clim, breaks) {
     colvar[colvar > max(clim)] <- NA
     rn <- clim[2] - clim[1]
     ifelse (rn != 0, Col <- col[1 + trunc((colvar - clim[1])/rn *
-      (ncol - 1))], Col <- rep(col[1], ncol))
+      (ncol - 1)+1e-15)], Col <- rep(col[1], ncol))               # + tiny: since R 3.2.2
   } else {
       zi <- .bincode(colvar, breaks, TRUE, TRUE)
       Col <- col[zi]
