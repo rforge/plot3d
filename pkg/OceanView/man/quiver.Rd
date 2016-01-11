@@ -294,9 +294,9 @@ flowpath(u, v, x = NULL, y = NULL, startx = NULL, starty = NULL, ...,
 
 # merge u, u2 and v, v2 to create an "array"
  U <- array(dim = c(dim(u2), 2), data = c(u, u2), 
-            dimnames = c("x", "y", "times"))
+            dimnames = list("x", "y", "times"))
  V <- array(dim = c(dim(v2), 2), data = c(v, v2), 
-            dimnames = c("x", "y", "times"))
+            dimnames = list("x", "y", "times"))
 
  quiver2D(u = U, v = V, x = x, y = y, main = c("time 1", "time 2"))
 

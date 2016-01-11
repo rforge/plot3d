@@ -2,6 +2,7 @@ useDynLib(OceanView)
 
 import (plot3D)
 import (plot3Drgl)
+import(methods, graphics, grDevices, stats)
 importFrom(shape, Arrows)
 
 importFrom(rgl, rgl.pop)

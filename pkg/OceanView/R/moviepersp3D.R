@@ -117,7 +117,6 @@ moviepersp <- function(z, x = NULL, y = NULL, t = NULL,
      readline("Hit enter to change surface")
     else if (! is.null(wait))
      Sys.sleep(wait)
-    }
     if (! is.null(basename)) {
       filename <- paste(basename, formatC(as.integer(fi), width = 4, format = "d", flag = "0"),".png", sep="")
       rgl.snapshot(filename)
