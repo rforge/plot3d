@@ -42,7 +42,7 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
       image = FALSE, contour = FALSE,
       panel.first = NULL, clim = NULL, clab = NULL, bty = "b", 
       lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
-      space = 0, add = FALSE, plot = TRUE)  
+      space = 0, opaque.top = FALSE, add = FALSE, plot = TRUE)  
 }
 
 \arguments{
@@ -179,6 +179,9 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
   \item{inttype }{The interpolation type to create the polygons, either 
     averaging the \code{colvar} (\code{inttype = 1, 3} or extending 
     the \code{x, y, z} values (\code{inttype = 2}) - see details.
+    } 
+  \item{opaque.top }{Only used when \code{alpha} is set (transparency):
+    if \code{TRUE} then the top of the bars is opaque.
     } 
   \item{add }{Logical. If \code{TRUE}, then the surfaces will be added to the current plot.
     If \code{FALSE} a new plot is started. 
@@ -457,11 +460,11 @@ The New S Language. Wadsworth & Brooks/Cole.
 
  par(mfrow = c(2, 2))
  VV   <- volcano[seq(1, 87, 15), seq(1, 61, 15)]
- hist3D(z = VV, scale = FALSE, expand = 0.01)
+ hist3D(z = VV, scale = FALSE, expand = 0.01, border = "black")
 
 # transparent colors
  hist3D(z = VV, scale = FALSE, expand = 0.01, 
-   col = jet.col(100, alpha = 0.3), border = "black")
+   alpha = 0.5, opaque.top = TRUE, border = "black")
 
  hist3D(z = VV, scale = FALSE, expand = 0.01, facets = FALSE, lwd = 2)
 

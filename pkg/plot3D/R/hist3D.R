@@ -11,7 +11,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                    image = FALSE, contour = FALSE, panel.first = NULL,
                    clim = NULL, clab = NULL, bty = "b",
                    lighting = FALSE, shade = NA, ltheta = -135, lphi = 0,
-                   space = 0, 
+                   space = 0, opaque.top = FALSE,
                    add = FALSE, plot = TRUE) {
 
   if (! is.matrix(z))
@@ -38,8 +38,8 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   space <- rep(space, length.out = 2) / 2
 
   plist <- initplist(add)
-
-  dot <- splitdotpersp(list(...), bty, lighting, 
+  ll <- list(...)
+  dot <- splitdotpersp(ll, bty, lighting, 
     extendvec(x), extendvec(y), z, plist = plist, shade, lphi, ltheta,
     breaks = breaks)
   
@@ -80,7 +80,11 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
    col <- jet.col(length(breaks)-1)
   breaks <- check.breaks(breaks,col)
 
-  CC <- check.colvar.2(colvar, z, col, clim, dot$alpha)
+  CC <- check.colvar.2(colvar, z, col, clim, dot$alpha) 
+  topcol <- (! is.null(dot$alpha) & opaque.top)
+  if (topcol)  
+    col2 <- check.colvar.2(colvar, z, col, clim, NULL)$col
+  
   colvar <- CC$colvar
   col <- CC$col
 
@@ -109,9 +113,20 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
      Cols <- matrix(nrow = nrow(z),
        col[.bincode(colvar, breaks, TRUE, TRUE)])
     Cols [is.na(Cols)] <- NAcol
+    if (topcol) {
+      if (is.null(breaks))
+       Col2 <- matrix(nrow = nrow(z),
+         col2[1 + trunc((colvar - cmin)/crange*N)])
+      else
+       Col2 <- matrix(nrow = nrow(z),
+         col2[.bincode(colvar, breaks, TRUE, TRUE)])
+      Col2 [is.na(Col2)] <- NAcol
+     }  
   } else { 
     iscolkey <- FALSE
     Cols <- rep(col , length.out = length(z))
+    if (topcol) 
+      Col2 <- rep(col2, length.out = length(z))
   }
   
  # mapping from centre to interfaces
@@ -152,6 +167,8 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   
  # The colors
   Col <- createcolors(facets, border, Cols)
+  if (topcol) 
+    Col2 <- createcolors(facets, border, Col2)
 
  # the polygons:
  #     2
@@ -196,7 +213,7 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   dy <- diff(yy)*space[2]
 
  # basal and top points of the column; x and y positions
-  z.k    <- rep(min(z), length(z))
+  z.k    <- rep(min(dot$persp$zlim), length(z))
   z.kp1  <- as.vector(z)
   x.i    <- xx[ix  ]+dx[ix]
   x.ip1  <- xx[ix+1]-dx[ix]
@@ -222,13 +239,29 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
                  rbind(z.kp1, z.kp1, z.kp1, z.kp1))
 
  # facet colors  
-  COL   <- rep(Col$facet , 5)#[i,j] 
-  BORD  <- rep(Col$border, 5)#[i,j] 
+  if (!topcol) 
+    COL   <- rep(Col$facet , 5)#[i,j] 
+  else
+    COL   <- c(rep(Col$facet , 4), Col2$facet)#[i,j] 
+    
+  if (!topcol) 
+    BORD  <- rep(Col$border, 5)#[i,j] 
+  else
+    BORD  <- c(rep(Col$border, 4), Col2$border)#[i,j] 
+  
   if (isshade) {
      if (facets) {
        RGB  <- t(col2rgb(COL)) * Shade / 255
        COL  <- rgb(RGB)
-       if (! is.null(dot$alpha)) COL <- setalpha(COL, dot$alpha)
+       
+     if (! is.null(dot$alpha)) {
+         if (!topcol) 
+           COL <- setalpha(COL, dot$alpha)
+         else {
+           ialph <- 1:(4*length(Col$facet))
+           COL[ialph] <- setalpha(COL[ialph], dot$alpha)
+         }    
+     }           
              
      }
      if (! is.na(border)){

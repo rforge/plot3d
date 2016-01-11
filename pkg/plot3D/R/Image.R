@@ -323,9 +323,12 @@ image2D.matrix <- function (z, x = seq(0, 1, length.out = nrow(z)),
     do.call("abline", c(alist(h = 0.5*(y[-1]+y[-length(y)]), col = border), dotother))
     do.call("abline", c(alist(v = 0.5*(x[-1]+x[-length(x)]), col = border), dotother))
   }
-  if (!add) 
+  if (is.null(dotimage$frame.plot)) {
+    if (!add)
+      box()
+  } else if (dotimage$frame.plot)
     box()
-  
+    
   # contours
   if (iscontour) {
     if (zlog) 
