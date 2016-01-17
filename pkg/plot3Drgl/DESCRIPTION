@@ -1,10 +1,11 @@
 Package: plot3Drgl
 Version: 1.0.1
-Title: Plotting Multi-Dimensional Data - Using rgl
+Title: Plotting Multi-Dimensional Data - Using 'rgl'
 Author: Karline Soetaert <karline.soetaert@nioz.nl>
 Maintainer: Karline Soetaert <karline.soetaert@nioz.nl>
-Depends: rgl, plot3D, R (>= 3.1.1)
-Description: The rgl implementation of plot3D functions.
+Depends: rgl, plot3D, R (>= 3.2.3)
+Imports: grDevices
+Description: The 'rgl' implementation of plot3D functions.
 License: GPL (>=3.0)
 LazyData: yes
 Packaged: 2013-09-26 14:54:27 UTC; KarlineS

@@ -405,6 +405,8 @@ rglpoly <- function(poly, il, front) {
 
     
   plotpoly <- function(ipol, func, ir) {
+    if (length(poly$alpha) !=  length(poly$lwd))
+      poly$alpha <- rep(poly$alpha, length.out = length(poly$lwd)) # to overcome an error in older versions plot3D
     if (front == "filled")  {
       it <- ipol[poly$col[ipol] != "transparent" ]
       F <- func(x = poly$x[1:ir, it], y = poly$y[1:ir, it], z = poly$z[1:ir, it],
