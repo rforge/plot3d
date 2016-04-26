@@ -213,9 +213,9 @@ hist3D <- function(x = seq(0, 1, length.out = nrow(z)),
   dy <- diff(yy)*space[2]
 
  # basal and top points of the column; x and y positions
-  if (is.null(zlim))
-    zlim <- min(dot$persp$zlim) 
-  z.k    <- rep(zlim, length(z))
+  if (is.null(zmin))
+    zmin <- min(dot$persp$zlim) 
+  z.k    <- rep(zmin, length(z))
   z.kp1  <- as.vector(z)
   x.i    <- xx[ix  ]+dx[ix]
   x.ip1  <- xx[ix+1]-dx[ix]
