@@ -185,7 +185,8 @@ hist3D (x = seq(0, 1, length.out = nrow(z)),
     if \code{TRUE} then the top of the bars is opaque.
     } 
   \item{zmin }{The base of the histogram ; if \code{NULL} then it extends to 
-    the minimum of the z-axis.
+    the minimum of the z-axis. Note: this was added from version 1.1.1 on;
+    before that it was assumed that the base of the histogram was at z=0. 
     } 
   \item{add }{Logical. If \code{TRUE}, then the surfaces will be added to the current plot.
     If \code{FALSE} a new plot is started. 
