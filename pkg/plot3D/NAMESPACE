@@ -6,6 +6,7 @@ S3method("plot", "plist")
 
 importFrom(misc3d, computeContour3d)
 import("grDevices", "graphics", "stats")
+importFrom("methods", "formalArgs")
 
 export(jet.col, jet2.col, gg.col, gg2.col, ramp.col, alpha.col)
 export(colkey, mesh, trans3D)
@@ -19,3 +20,6 @@ export(text3D, voxel3D, isosurf3D, createvoxel, createisosurf)
 export(arrows2D, segments2D, rect2D, polygon2D)
 
 export(getplist, setplist, plotdev, selectplist)
+export(createKey, legend.plt, legend.oma, colorkey.plt, colorkey.oma, 
+       legendplot, legendmatplot, legendhist, legendpairs,
+       colorkeyplot, colorkeymatplot, colorkeyhist, colorkeypairs)
