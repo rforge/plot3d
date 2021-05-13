@@ -235,7 +235,7 @@ points2Drgl(x, y, ...)
  cv <- sqrt(x^2 + y^2)
 
  CI <- list(lwd = 2)
- CI$x <- matrix (nrow = length(x), data = c(rep(0.125, 2*length(x))))
+ CI$x <- matrix (nrow = length(x), ncol = 2, data = rep(0.125, 2*length(x)))
  scatter2D(x, y, colvar = cv, pch = 16, cex = 2, CI = CI)
 
  scatter2Drgl(x, y, colvar = cv, cex = 2, CI = CI)
