@@ -411,8 +411,8 @@ createvoxel (x, y, z, colvar, level = mean(colvar, na.rm = TRUE), eps = 0.01,
    M <- mesh(Oxsat$lon, Oxsat$lat) 
    xy <- trans3D(pmat = pmat, x = as.vector(M$x), y = as.vector(M$y), 
         z = rep(-1000, length.out = Nx*Ny)) 
-   x <- matrix(nrow = Nx, ncol = Ny, data = xy$x)
-   y <- matrix(nrow = Nx, ncol = Ny, data = xy$y)
+   x <- matrix(nrow = Nx, ncol = Ny, data = rep(xy$x, times=Ny))
+   y <- matrix(nrow = Nx, ncol = Ny, data = rep(xy$y, times=Nx))
    Bat <- Oxsat$val[,,1]; Bat[!is.na(Bat)] <- 1
    image2D(x = x, y = y, z = Bat, NAcol = "black", col = "grey",
          add = TRUE, colkey = FALSE)
