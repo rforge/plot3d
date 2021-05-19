@@ -17,7 +17,7 @@
 }
 \description{
   \code{legendplot}, \code{legendmatplot}, \code{legendhist} and \code{legendpairs} create 
-    plots with a legend adjacent to it, using R's default plotting functions plot, matplot, his and pairs. 
+    plots with a legend adjacent to it, using R's default plotting functions plot, matplot, hist and pairs. 
   
   \code{colorkeyplot}, \code{colorkeymatplot}, \code{colorkeyhist} and \code{colorkeypairs} 
   create a plot with a colorkey adjacent to it. 
@@ -95,6 +95,8 @@ createKey (x, clim = NULL, col = NULL, NAcol = "black")
  The legend plotting functions return as \code{invisible}, a \code{list} that contains the plotting parameters for the regions of the legend and of the main plotting region, elements called \code{plt.legend} and \code{plt.main}. For the \code{pairs} method, the list returned contains the size of the outer margin  instead, i.e. the \code{oma} parameter. 
 }
 
+\note{The method that changes the oma parameter (based on legend.oma) is not optimal, as plot.new is called several times. This means you will need to "hit return to see next plot" several times before you see the actual figure.  
+}
 \examples{
 
 # save plotting parameters
