@@ -108,7 +108,7 @@ plotrgl (lighting = FALSE, new = TRUE, add = FALSE, smooth = FALSE, ...)
 
    mpg.pred <- matrix (nrow = 30, ncol = 30, 
       data = predict(fit, newdata = data.frame(xy), 
-      interval = "prediction"))
+      interval = "prediction")[,1])
 
 # fitted points for droplines to surface
    fitpoints <- predict(fit) 

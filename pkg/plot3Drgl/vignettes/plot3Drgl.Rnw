@@ -2,9 +2,6 @@
 \DeclareGraphicsExtensions{.pdf,.eps,.png}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Add-on packages and fonts
-\usepackage{graphicx}
-\usepackage{amsmath}
-
 
 \newcommand{\noun}[1]{\textsc{#1}}
 %% Bold symbol macro for standard LaTeX users
@@ -166,7 +163,7 @@ xy <- expand.grid(wt = wt.pred,
 
 mpg.pred <- matrix (nrow = 30, ncol = 30,
     data = predict(fit, newdata = data.frame(xy),
-    interval = "prediction"))
+    interval = "prediction")[,1])
 
 # fitted points for droplines to surface
 fitpoints <- predict(fit)
